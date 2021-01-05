@@ -61,7 +61,7 @@ public class EnlightenmentCenter {
             }
             int influence = 10;
             int dirIndex = guardCount % 4;
-            if (rc.csnBuildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence)) {
+            if (rc.canBuildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence)) {
                 rc.buildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence);
                 guardCount++;
             }
