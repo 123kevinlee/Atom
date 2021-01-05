@@ -27,6 +27,7 @@ public class EnlightenmentCenter {
                     }
                 }
             }
+            int removeId = 0;
             for (Integer id : scoutIds) {
                 if (rc.canGetFlag(id)) {
                     int flag = rc.getFlag(id);
@@ -34,9 +35,12 @@ public class EnlightenmentCenter {
                         System.out.println("id: " + id + "msg:" + flag);
                     }
                 } else {
-                    scoutIds.remove(id);
+                    removeId = id;
                     System.out.println("DEAD");
                 }
+            }
+            if (removeId != 0) {
+                scoutIds.remove(removeId);
             }
         }
         System.out.println(scoutIds.size());

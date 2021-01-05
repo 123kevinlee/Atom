@@ -3,7 +3,9 @@ package atomAlpha;
 import battlecode.common.*;
 
 public class Slanderer {
-    static Direction scoutDirection;
+    public static Direction scoutDirection;
+
+    public static MapLocation originPoint;
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
         // scout code
@@ -26,6 +28,8 @@ public class Slanderer {
                         default:
                             break;
                     }
+                    originPoint = Helper.determineOrigin(rc.getLocation(), scoutDirection);
+                    System.out.println(originPoint.x + " " + originPoint.y);
                 }
             }
         }

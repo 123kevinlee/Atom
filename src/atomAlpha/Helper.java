@@ -54,4 +54,8 @@ public class Helper {
             rc.setFlag(i);
         }
     }
+
+    public static MapLocation determineOrigin(MapLocation startingPoint, Direction intendedDirection) {
+        return startingPoint.subtract(intendedDirection);
+    }
 }
