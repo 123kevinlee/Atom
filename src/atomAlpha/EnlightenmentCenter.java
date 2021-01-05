@@ -10,10 +10,11 @@ public class EnlightenmentCenter {
     public static Set<Integer> scoutIds = new TreeSet<Integer>();
 
     public static int[] coords = new int[4]; // 0=x1 1=y1 2=x2 3=y2
-    public static int limit = 2;
+    public static int scoutLimit = 20;
+    public static ArrayList<Direction> enemyDirections = new ArrayList<Direction>();
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
-        if (scoutingPhase && scoutIds.size() < limit) {
+        if (scoutingPhase && scoutIds.size() < scoutLimit) {
             int dirIndex = scoutCount % 4;
             System.out.println(scoutCount);
             int influence = 1;
@@ -26,15 +27,22 @@ public class EnlightenmentCenter {
                     }
                 }
             }
+            int removeId = 0;
             for (Integer id : scoutIds) {
                 if (rc.canGetFlag(id)) {
                     int flag = rc.getFlag(id);
-                    System.out.println("id: " + id + "msg:" + flag);
+                    if (flag != 0) {
+                        System.out.println("id: " + id + "msg:" + flag);
+                    }
                 } else {
-                    scoutIds.remove(id);
+                    removeId = id;
+                    System.out.println("DEAD");
                 }
             }
+            if (removeId != 0) {
+                scoutIds.remove(removeId);
+            }
         }
-        System.out.println(scoutIds);
+        System.out.println(scoutIds.size());
     }
 }
