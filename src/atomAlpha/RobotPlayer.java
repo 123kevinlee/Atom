@@ -12,6 +12,8 @@ public strictfp class RobotPlayer {
 
     static int turnCount;
 
+    static Direction scoutDirection;
+
     /**
      * run() is the method that is called when a robot is instantiated in the
      * Battlecode world. If this method returns, the robot dies!
@@ -106,24 +108,28 @@ public strictfp class RobotPlayer {
                 if (!rc.canMove(dir) && rc.getCooldownTurns() == 0) {
                     switch (dir) {
                         case NORTH:
-                            if (rc.canSetFlag(1)) {
-                                rc.setFlag(1);
-                            }
+                            // if (rc.canSetFlag(1)) {
+                            // rc.setFlag(1);
+                            // }
+                            scoutDirection = Direction.SOUTH;
                             break;
                         case EAST:
-                            if (rc.canSetFlag(2)) {
-                                rc.setFlag(2);
-                            }
+                            // if (rc.canSetFlag(2)) {
+                            // rc.setFlag(2);
+                            // }
+                            scoutDirection = Direction.WEST;
                             break;
                         case SOUTH:
-                            if (rc.canSetFlag(3)) {
-                                rc.setFlag(3);
-                            }
+                            // if (rc.canSetFlag(3)) {
+                            // rc.setFlag(3);
+                            // }
+                            scoutDirection = Direction.NORTH;
                             break;
                         case WEST:
-                            if (rc.canSetFlag(4)) {
-                                rc.setFlag(4);
-                            }
+                            // if (rc.canSetFlag(4)) {
+                            // rc.setFlag(4);
+                            // }
+                            scoutDirection = Direction.EAST;
                             break;
                         default:
                             break;
@@ -131,29 +137,21 @@ public strictfp class RobotPlayer {
                 }
             }
         }
-        int flag = rc.getFlag(rc.getID());
-        // System.out.println(flag);
-        if (flag == 1) {
-            if (rc.canMove(Direction.SOUTH)) {
-                rc.move(Direction.SOUTH);
-                System.out.println("I moved!");
-            }
-        } else if (flag == 2) {
-            if (rc.canMove(Direction.WEST)) {
-                rc.move(Direction.WEST);
-                System.out.println("I moved!");
-            }
-        } else if (flag == 3) {
-            if (rc.canMove(Direction.NORTH)) {
-                rc.move(Direction.NORTH);
-                System.out.println("I moved!");
-            }
-        } else if (flag == 4) {
-            if (rc.canMove(Direction.EAST)) {
-                rc.move(Direction.EAST);
-                System.out.println("I moved!");
-            }
+        if (rc.canMove(scoutDirection)) {
+            rc.move(scoutDirection);
+            System.out.println("I moved!");
         }
+        /*
+         * int flag = rc.getFlag(rc.getID()); // System.out.println(flag); if (flag ==
+         * 1) { if (rc.canMove(Direction.SOUTH)) { rc.move(Direction.SOUTH);
+         * System.out.println("I moved!"); } } else if (flag == 2) { if
+         * (rc.canMove(Direction.WEST)) { rc.move(Direction.WEST);
+         * System.out.println("I moved!"); } } else if (flag == 3) { if
+         * (rc.canMove(Direction.NORTH)) { rc.move(Direction.NORTH);
+         * System.out.println("I moved!"); } } else if (flag == 4) { if
+         * (rc.canMove(Direction.EAST)) { rc.move(Direction.EAST);
+         * System.out.println("I moved!"); } }
+         */
         // if (tryMove(randomDirection()))
         // System.out.println("I moved!");
     }
