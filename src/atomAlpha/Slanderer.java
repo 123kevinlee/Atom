@@ -30,7 +30,7 @@ public class Slanderer {
             }
         }
         if (rc.canMove(scoutDirection)) {
-            rc.move(Pathfinding.chooseScoutNextStep(rc, scoutDirection));
+            rc.move(Pathfinding.chooseBestNextStep(rc, scoutDirection));
         } else {
             switch (scoutDirection) {
                 case NORTH:
@@ -57,6 +57,15 @@ public class Slanderer {
                         Helper.sendFlag(rc, 21);
                     }
                     break;
+            }
+        }
+        int sensorRadius = rc.getType().sensorRadiusSquared;
+        if (rc.canSenseRadiusSquared(sensorRadius)) {
+            for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, rc.getTeam().opponent())) {
+                if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
+                    System.out.println("BASE!");
+                    Helper.sendFlag(rc, 69);
+                }
             }
         }
     }

@@ -5,7 +5,7 @@ import battlecode.common.*;
 
 public class Pathfinding {
 
-    public static Direction chooseScoutNextStep(RobotController rc, Direction dir) throws GameActionException {
+    public static Direction chooseBestNextStep(RobotController rc, Direction dir) throws GameActionException {
         MapLocation myLoc = rc.getLocation();
         MapLocation testLoc;
         Map<Double, MapLocation> pass = new TreeMap<Double, MapLocation>();
@@ -38,6 +38,7 @@ public class Pathfinding {
                 }
             }
         }
-        return (rc.getLocation().directionTo(pass.get(pass.keySet().toArray()[2])));
+        Object[] keys = pass.keySet().toArray();
+        return (rc.getLocation().directionTo(pass.get(keys[keys.length - 1])));
     }
 }

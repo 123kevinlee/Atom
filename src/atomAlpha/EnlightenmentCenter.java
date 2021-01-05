@@ -10,7 +10,8 @@ public class EnlightenmentCenter {
     public static Set<Integer> scoutIds = new TreeSet<Integer>();
 
     public static int[] coords = new int[4]; // 0=x1 1=y1 2=x2 3=y2
-    public static int scoutLimit = 8;
+    public static int scoutLimit = 20;
+    public static ArrayList<Direction> enemyDirections = new ArrayList<Direction>();
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
         if (scoutingPhase && scoutIds.size() < scoutLimit) {
@@ -29,12 +30,15 @@ public class EnlightenmentCenter {
             for (Integer id : scoutIds) {
                 if (rc.canGetFlag(id)) {
                     int flag = rc.getFlag(id);
-                    System.out.println("id: " + id + "msg:" + flag);
+                    if (flag != 0) {
+                        System.out.println("id: " + id + "msg:" + flag);
+                    }
                 } else {
                     scoutIds.remove(id);
+                    System.out.println("DEAD");
                 }
             }
         }
-        System.out.println(scoutIds);
+        System.out.println(scoutIds.size());
     }
 }
