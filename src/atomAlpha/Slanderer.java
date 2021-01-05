@@ -30,17 +30,14 @@ public class Slanderer {
             }
         }
         if (rc.canMove(scoutDirection)) {
-            rc.move(scoutDirection);
+            rc.move(Pathfinding.chooseScoutNextStep(rc, scoutDirection));
             // System.out.println("I moved!");
-        } else {
-            switch (scoutDirection){
-                case Direction.NORTH:
-                    if(!rc.onTheMap(rc.getLocation().add(1)){
-                        
-                    }
-                    break;
-            }
-        }
+        } /*
+           * else { switch (scoutDirection){ case Direction.NORTH:
+           * if(!rc.onTheMap(rc.getLocation().add(1)){
+           * 
+           * } break; } }
+           */
         if (rc.canSetFlag(turnCount)) {
             rc.setFlag(turnCount);
         }
