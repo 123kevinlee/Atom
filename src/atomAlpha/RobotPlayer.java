@@ -135,22 +135,22 @@ public strictfp class RobotPlayer {
         // System.out.println(flag);
         if (flag == 1) {
             if (rc.canMove(Direction.SOUTH)) {
-                rc.move(Direction.SOUTH);
+                rc.move(Pathfinder.chooseScoutNextStep(Direction.SOUTH, rc));
                 System.out.println("I moved!");
             }
         } else if (flag == 2) {
             if (rc.canMove(Direction.WEST)) {
-                rc.move(Direction.WEST);
+                rc.move(Pathfinder.chooseScoutNextStep(Direction.WEST, rc));
                 System.out.println("I moved!");
             }
         } else if (flag == 3) {
             if (rc.canMove(Direction.NORTH)) {
-                rc.move(Direction.NORTH);
+                rc.move(Pathfinder.chooseScoutNextStep(Direction.NORTH, rc));
                 System.out.println("I moved!");
             }
         } else if (flag == 4) {
             if (rc.canMove(Direction.EAST)) {
-                rc.move(Direction.EAST);
+                rc.move(Pathfinder.chooseScoutNextStep(Direction.EAST, rc));
                 System.out.println("I moved!");
             }
         }
