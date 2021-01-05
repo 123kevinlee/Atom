@@ -61,20 +61,28 @@ public strictfp class RobotPlayer {
         }
     }
 
+    public static int getRandomInteger(int maximum, int minimum) {
+        return ((int) (Math.random() * (maximum - minimum))) + minimum;
+    }
+
     static void runEnlightenmentCenter() throws GameActionException {
-        RobotType toBuild = randomSpawnableRobotType();
+        // RobotType toBuild = randomSpawnableRobotType();
         int influence = 50;
-        for (Direction dir : directions) {
-            if (rc.canBuildRobot(toBuild, dir, influence)) {
-                rc.buildRobot(toBuild, dir, influence);
-            } else {
-                break;
+        System.out.println("Influence: " + rc.getInfluence());
+        System.out.println(turnCount);
+
+        if (turnCount < 100) {
+            int dirI = getRandomInteger(0, 3);
+            if (rc.canBuildRobot(RobotType.SLANDERER, directions[dirI * 2], influence)) {
+                rc.buildRobot(RobotType.SLANDERER, directions[dirI * 2], influence);
             }
         }
-        if (rc.canBid(3)) {
-            System.out.println("bidding 3");
-            rc.bid(3);
-        }
+        /*
+         * for (Direction dir : directions) { if (rc.canBuildRobot(toBuild, dir,
+         * influence)) { rc.buildRobot(toBuild, dir, influence); } else { break; } } if
+         * (rc.canBid(3)) { System.out.println("bidding 3"); Pathfinding.test();
+         * rc.bid(3); }
+         */
     }
 
     static void runPolitician() throws GameActionException {
@@ -92,8 +100,62 @@ public strictfp class RobotPlayer {
     }
 
     static void runSlanderer() throws GameActionException {
-        if (tryMove(randomDirection()))
-            System.out.println("I moved!");
+
+        if (turnCount < 2) {
+            for (Direction dir : directions) {
+                if (!rc.canMove(dir) && rc.getCooldownTurns() == 0) {
+                    switch (dir) {
+                        case NORTH:
+                            if (rc.canSetFlag(1)) {
+                                rc.setFlag(1);
+                            }
+                            break;
+                        case EAST:
+                            if (rc.canSetFlag(2)) {
+                                rc.setFlag(2);
+                            }
+                            break;
+                        case SOUTH:
+                            if (rc.canSetFlag(3)) {
+                                rc.setFlag(3);
+                            }
+                            break;
+                        case WEST:
+                            if (rc.canSetFlag(4)) {
+                                rc.setFlag(4);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+        int flag = rc.getFlag(rc.getID());
+        // System.out.println(flag);
+        if (flag == 1) {
+            if (rc.canMove(Direction.SOUTH)) {
+                rc.move(Direction.SOUTH);
+                System.out.println("I moved!");
+            }
+        } else if (flag == 2) {
+            if (rc.canMove(Direction.WEST)) {
+                rc.move(Direction.WEST);
+                System.out.println("I moved!");
+            }
+        } else if (flag == 3) {
+            if (rc.canMove(Direction.NORTH)) {
+                rc.move(Direction.NORTH);
+                System.out.println("I moved!");
+            }
+        } else if (flag == 4) {
+            if (rc.canMove(Direction.EAST)) {
+                rc.move(Direction.EAST);
+                System.out.println("I moved!");
+            }
+        }
+        // if (tryMove(randomDirection()))
+        // System.out.println("I moved!");
     }
 
     static void runMuckraker() throws GameActionException {
