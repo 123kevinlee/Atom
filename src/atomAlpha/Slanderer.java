@@ -3,10 +3,12 @@ package atomAlpha;
 import battlecode.common.*;
 
 public class Slanderer {
-    static Direction scoutDirection;
+    public static Direction scoutDirection;
+
+    public static MapLocation originPoint;
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
-        // System.out.println(turnCount);
+        // scout code
         if (turnCount < 2) {
             for (Direction dir : Helper.directions) {
                 if (!rc.canMove(dir) && rc.getCooldownTurns() == 0) {
@@ -26,20 +28,50 @@ public class Slanderer {
                         default:
                             break;
                     }
+                    originPoint = Helper.determineOrigin(rc.getLocation(), scoutDirection);
+                    System.out.println(originPoint.x + " " + originPoint.y);
                 }
             }
         }
         if (rc.canMove(scoutDirection)) {
-            rc.move(Pathfinding.chooseScoutNextStep(rc, scoutDirection));
-            // System.out.println("I moved!");
-        } /*
-           * else { switch (scoutDirection){ case Direction.NORTH:
-           * if(!rc.onTheMap(rc.getLocation().add(1)){
-           * 
-           * } break; } }
-           */
-        if (rc.canSetFlag(turnCount)) {
-            rc.setFlag(turnCount);
+            rc.move(Pathfinding.chooseBestNextStep(rc, scoutDirection));
+        } else {
+            switch (scoutDirection) {
+                case NORTH:
+                    if (!rc.onTheMap(rc.getLocation().add(Direction.NORTH))) {
+                        System.out.println("WALL!");
+                        Helper.sendFlag(rc, 21);
+                    }
+                    break;
+                case EAST:
+                    if (!rc.onTheMap(rc.getLocation().add(Direction.EAST))) {
+                        System.out.println("WALL!");
+                        Helper.sendFlag(rc, 21);
+                    }
+                    break;
+                case SOUTH:
+                    if (!rc.onTheMap(rc.getLocation().add(Direction.SOUTH))) {
+                        System.out.println("WALL!");
+                        Helper.sendFlag(rc, 21);
+                    }
+                    break;
+                case WEST:
+                    if (!rc.onTheMap(rc.getLocation().add(Direction.WEST))) {
+                        System.out.println("WALL!");
+                        Helper.sendFlag(rc, 21);
+                    }
+                    break;
+            }
+        }
+        int sensorRadius = rc.getType().sensorRadiusSquared;
+        if (rc.canSenseRadiusSquared(sensorRadius)) {
+            for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, rc.getTeam().opponent())) {
+                if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
+                    System.out.println("BASE!");
+                    Helper.sendFlag(rc, 69);
+                }
+            }
         }
     }
+
 }
