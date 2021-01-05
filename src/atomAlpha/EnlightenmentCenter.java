@@ -12,7 +12,7 @@ public class EnlightenmentCenter {
     public static int[] coords = new int[4]; // 0=x1 1=y1 2=x2 3=y2
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
-        if (scoutingPhase) {
+        if (scoutingPhase && ) {
             int dirIndex = scoutCount % 4;
             System.out.println(scoutCount);
             int influence = 1;
