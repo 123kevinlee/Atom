@@ -10,10 +10,10 @@ public class EnlightenmentCenter {
     public static Set<Integer> scoutIds = new TreeSet<Integer>();
 
     public static int[] coords = new int[4]; // 0=x1 1=y1 2=x2 3=y2
-    public static int limit = 2;
+    public static int scoutLimit = 8;
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
-        if (scoutingPhase && scoutIds.size() < limit) {
+        if (scoutingPhase && scoutIds.size() < scoutLimit) {
             int dirIndex = scoutCount % 4;
             System.out.println(scoutCount);
             int influence = 1;

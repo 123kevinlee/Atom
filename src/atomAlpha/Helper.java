@@ -48,4 +48,10 @@ public class Helper {
         } else
             return false;
     }
+
+    public static void sendFlag(RobotController rc, int i) throws GameActionException {
+        if (rc.canSetFlag(i)) {
+            rc.setFlag(i);
+        }
+    }
 }

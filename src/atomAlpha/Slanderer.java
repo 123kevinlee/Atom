@@ -6,7 +6,7 @@ public class Slanderer {
     static Direction scoutDirection;
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
-        // System.out.println(turnCount);
+        // scout code
         if (turnCount < 2) {
             for (Direction dir : Helper.directions) {
                 if (!rc.canMove(dir) && rc.getCooldownTurns() == 0) {
@@ -31,15 +31,34 @@ public class Slanderer {
         }
         if (rc.canMove(scoutDirection)) {
             rc.move(Pathfinding.chooseScoutNextStep(rc, scoutDirection));
-            // System.out.println("I moved!");
-        } /*
-           * else { switch (scoutDirection){ case Direction.NORTH:
-           * if(!rc.onTheMap(rc.getLocation().add(1)){
-           * 
-           * } break; } }
-           */
-        if (rc.canSetFlag(turnCount)) {
-            rc.setFlag(turnCount);
+        } else {
+            switch (scoutDirection) {
+                case NORTH:
+                    if (!rc.onTheMap(rc.getLocation().add(Direction.NORTH))) {
+                        System.out.println("WALL!");
+                        Helper.sendFlag(rc, 21);
+                    }
+                    break;
+                case EAST:
+                    if (!rc.onTheMap(rc.getLocation().add(Direction.EAST))) {
+                        System.out.println("WALL!");
+                        Helper.sendFlag(rc, 21);
+                    }
+                    break;
+                case SOUTH:
+                    if (!rc.onTheMap(rc.getLocation().add(Direction.SOUTH))) {
+                        System.out.println("WALL!");
+                        Helper.sendFlag(rc, 21);
+                    }
+                    break;
+                case WEST:
+                    if (!rc.onTheMap(rc.getLocation().add(Direction.WEST))) {
+                        System.out.println("WALL!");
+                        Helper.sendFlag(rc, 21);
+                    }
+                    break;
+            }
         }
     }
+
 }
