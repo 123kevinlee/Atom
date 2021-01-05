@@ -6,7 +6,7 @@ public class Slanderer {
     static Direction scoutDirection;
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
-        System.out.println(turnCount);
+        // System.out.println(turnCount);
         if (turnCount < 2) {
             for (Direction dir : Helper.directions) {
                 if (!rc.canMove(dir) && rc.getCooldownTurns() == 0) {
@@ -32,6 +32,11 @@ public class Slanderer {
         if (rc.canMove(scoutDirection)) {
             rc.move(scoutDirection);
             // System.out.println("I moved!");
+        } else {
+
+        }
+        if (rc.canSetFlag(turnCount)) {
+            rc.setFlag(turnCount);
         }
     }
 }
