@@ -1,8 +1,8 @@
-package examplefuncsplayer;
+package atomAlpha;
 
 import battlecode.common.*;
 
-public strictfp class RobotPlayer {
+public strictfp class atomAlpha {
     static RobotController rc;
 
     static final RobotType[] spawnableRobot = { RobotType.POLITICIAN, RobotType.SLANDERER, RobotType.MUCKRAKER, };
@@ -22,7 +22,7 @@ public strictfp class RobotPlayer {
         // This is the RobotController object. You use it to perform actions from this
         // robot,
         // and to get information on its current status.
-        RobotPlayer.rc = rc;
+        atomAlpha.rc = rc;
 
         turnCount = 0;
 
