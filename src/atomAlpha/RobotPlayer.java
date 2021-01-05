@@ -2,7 +2,7 @@ package atomAlpha;
 
 import battlecode.common.*;
 
-public strictfp class atomAlpha {
+public strictfp class RobotPlayer {
     static RobotController rc;
 
     static final RobotType[] spawnableRobot = { RobotType.POLITICIAN, RobotType.SLANDERER, RobotType.MUCKRAKER, };
@@ -22,7 +22,7 @@ public strictfp class atomAlpha {
         // This is the RobotController object. You use it to perform actions from this
         // robot,
         // and to get information on its current status.
-        atomAlpha.rc = rc;
+        RobotPlayer.rc = rc;
 
         turnCount = 0;
 
@@ -70,6 +70,10 @@ public strictfp class atomAlpha {
             } else {
                 break;
             }
+        }
+        if (rc.canBid(3)) {
+            System.out.println("bidding 3");
+            rc.bid(3);
         }
     }
 
