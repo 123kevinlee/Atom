@@ -79,12 +79,6 @@ public strictfp class RobotPlayer {
                 rc.buildRobot(RobotType.SLANDERER, directions[dirI * 2], influence);
             }
         }
-        /*
-         * for (Direction dir : directions) { if (rc.canBuildRobot(toBuild, dir,
-         * influence)) { rc.buildRobot(toBuild, dir, influence); } else { break; } } if
-         * (rc.canBid(3)) { System.out.println("bidding 3"); Pathfinding.test();
-         * rc.bid(3); }
-         */
     }
 
     static void runPolitician() throws GameActionException {
@@ -102,33 +96,20 @@ public strictfp class RobotPlayer {
     }
 
     static void runSlanderer() throws GameActionException {
-
         if (turnCount < 2) {
             for (Direction dir : directions) {
                 if (!rc.canMove(dir) && rc.getCooldownTurns() == 0) {
                     switch (dir) {
                         case NORTH:
-                            // if (rc.canSetFlag(1)) {
-                            // rc.setFlag(1);
-                            // }
                             scoutDirection = Direction.SOUTH;
                             break;
                         case EAST:
-                            // if (rc.canSetFlag(2)) {
-                            // rc.setFlag(2);
-                            // }
                             scoutDirection = Direction.WEST;
                             break;
                         case SOUTH:
-                            // if (rc.canSetFlag(3)) {
-                            // rc.setFlag(3);
-                            // }
                             scoutDirection = Direction.NORTH;
                             break;
                         case WEST:
-                            // if (rc.canSetFlag(4)) {
-                            // rc.setFlag(4);
-                            // }
                             scoutDirection = Direction.EAST;
                             break;
                         default:
@@ -141,19 +122,6 @@ public strictfp class RobotPlayer {
             rc.move(scoutDirection);
             System.out.println("I moved!");
         }
-        /*
-         * int flag = rc.getFlag(rc.getID()); // System.out.println(flag); if (flag ==
-         * 1) { if (rc.canMove(Direction.SOUTH)) { rc.move(Direction.SOUTH);
-         * System.out.println("I moved!"); } } else if (flag == 2) { if
-         * (rc.canMove(Direction.WEST)) { rc.move(Direction.WEST);
-         * System.out.println("I moved!"); } } else if (flag == 3) { if
-         * (rc.canMove(Direction.NORTH)) { rc.move(Direction.NORTH);
-         * System.out.println("I moved!"); } } else if (flag == 4) { if
-         * (rc.canMove(Direction.EAST)) { rc.move(Direction.EAST);
-         * System.out.println("I moved!"); } }
-         */
-        // if (tryMove(randomDirection()))
-        // System.out.println("I moved!");
     }
 
     static void runMuckraker() throws GameActionException {
