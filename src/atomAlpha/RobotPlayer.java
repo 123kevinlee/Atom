@@ -19,6 +19,10 @@ public strictfp class RobotPlayer {
         RobotPlayer.rc = rc;
         turnCount = 0;
         // System.out.println("I'm a " + rc.getType() + " and I just got created!");
+        if (rc.getType() == RobotType.POLITICIAN) {
+            // Politician.getRole(rc);
+        }
+
         while (true) {
             turnCount += 1;
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze

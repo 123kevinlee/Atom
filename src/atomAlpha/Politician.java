@@ -18,4 +18,8 @@ public class Politician {
         }
         // System.out.println("I moved!");
     }
+
+    public static void getRole(RobotController rc) {
+
+    }
 }
