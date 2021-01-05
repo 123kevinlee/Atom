@@ -4,15 +4,7 @@ import battlecode.common.*;
 
 public strictfp class RobotPlayer {
     static RobotController rc;
-
-    static final RobotType[] spawnableRobot = { RobotType.POLITICIAN, RobotType.SLANDERER, RobotType.MUCKRAKER, };
-
-    static final Direction[] directions = { Direction.NORTH, Direction.NORTHEAST, Direction.EAST, Direction.SOUTHEAST,
-            Direction.SOUTH, Direction.SOUTHWEST, Direction.WEST, Direction.NORTHWEST, };
-
     static int turnCount;
-
-    static Direction scoutDirection;
 
     /**
      * run() is the method that is called when a robot is instantiated in the
@@ -25,30 +17,29 @@ public strictfp class RobotPlayer {
         // robot,
         // and to get information on its current status.
         RobotPlayer.rc = rc;
-
         turnCount = 0;
 
-        System.out.println("I'm a " + rc.getType() + " and I just got created!");
+        // System.out.println("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
             turnCount += 1;
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
-                // Here, we've separated the controls into a different method for each
-                // RobotType.
-                // You may rewrite this into your own control structure if you wish.
-                System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER:
-                        runEnlightenmentCenter();
+                        // runEnlightenmentCenter();
+                        EnlightenmentCenter.run(rc, turnCount);
                         break;
                     case POLITICIAN:
-                        runPolitician();
+                        Politician.run(rc, turnCount);
+                        // runPolitician();
                         break;
                     case SLANDERER:
-                        runSlanderer();
+                        Slanderer.run(rc, turnCount);
+                        // runSlanderer();
                         break;
                     case MUCKRAKER:
-                        runMuckraker();
+                        Muckraker.run(rc, turnCount);
+                        // runMuckraker();
                         break;
                 }
 
@@ -61,118 +52,5 @@ public strictfp class RobotPlayer {
                 e.printStackTrace();
             }
         }
-    }
-
-    public static int getRandomInteger(int maximum, int minimum) {
-        return ((int) (Math.random() * (maximum - minimum))) + minimum;
-    }
-
-    static void runEnlightenmentCenter() throws GameActionException {
-        // RobotType toBuild = randomSpawnableRobotType();
-        int influence = 50;
-        System.out.println("Influence: " + rc.getInfluence());
-        System.out.println(turnCount);
-
-        if (turnCount < 100) {
-            int dirI = getRandomInteger(0, 3);
-            if (rc.canBuildRobot(RobotType.SLANDERER, directions[dirI * 2], influence)) {
-                rc.buildRobot(RobotType.SLANDERER, directions[dirI * 2], influence);
-            }
-        }
-    }
-
-    static void runPolitician() throws GameActionException {
-        Team enemy = rc.getTeam().opponent();
-        int actionRadius = rc.getType().actionRadiusSquared;
-        RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemy);
-        if (attackable.length != 0 && rc.canEmpower(actionRadius)) {
-            System.out.println("empowering...");
-            rc.empower(actionRadius);
-            System.out.println("empowered");
-            return;
-        }
-        if (tryMove(randomDirection()))
-            System.out.println("I moved!");
-    }
-
-    static void runSlanderer() throws GameActionException {
-        if (turnCount < 2) {
-            for (Direction dir : directions) {
-                if (!rc.canMove(dir) && rc.getCooldownTurns() == 0) {
-                    switch (dir) {
-                        case NORTH:
-                            scoutDirection = Direction.SOUTH;
-                            break;
-                        case EAST:
-                            scoutDirection = Direction.WEST;
-                            break;
-                        case SOUTH:
-                            scoutDirection = Direction.NORTH;
-                            break;
-                        case WEST:
-                            scoutDirection = Direction.EAST;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-        if (rc.canMove(scoutDirection)) {
-            rc.move(scoutDirection);
-            System.out.println("I moved!");
-        }
-    }
-
-    static void runMuckraker() throws GameActionException {
-        Team enemy = rc.getTeam().opponent();
-        int actionRadius = rc.getType().actionRadiusSquared;
-        for (RobotInfo robot : rc.senseNearbyRobots(actionRadius, enemy)) {
-            if (robot.type.canBeExposed()) {
-                // It's a slanderer... go get them!
-                if (rc.canExpose(robot.location)) {
-                    System.out.println("e x p o s e d");
-                    rc.expose(robot.location);
-                    return;
-                }
-            }
-        }
-        if (tryMove(randomDirection()))
-            System.out.println("I moved!");
-    }
-
-    /**
-     * Returns a random Direction.
-     *
-     * @return a random Direction
-     */
-    static Direction randomDirection() {
-        return directions[(int) (Math.random() * directions.length)];
-    }
-
-    /**
-     * Returns a random spawnable RobotType
-     *
-     * @return a random RobotType
-     */
-    static RobotType randomSpawnableRobotType() {
-        return spawnableRobot[(int) (Math.random() * spawnableRobot.length)];
-    }
-
-    /**
-     * Attempts to move in a given direction.
-     *
-     * @param dir The intended direction of movement
-     * @return true if a move was performed
-     * @throws GameActionException
-     */
-    static boolean tryMove(Direction dir) throws GameActionException {
-        System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " "
-                + rc.canMove(dir));
-        if (rc.canMove(dir)) {
-            rc.move(dir);
-            return true;
-        } else
-            return false;
     }
 }
