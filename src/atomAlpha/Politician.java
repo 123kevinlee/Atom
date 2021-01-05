@@ -3,6 +3,10 @@ package atomAlpha;
 import battlecode.common.*;
 
 public class Politician {
+    public Politician() {
+
+    }
+    
     public static void run(RobotController rc, int turnCount) throws GameActionException {
         Team enemy = rc.getTeam().opponent();
         int actionRadius = rc.getType().actionRadiusSquared;
@@ -12,9 +16,6 @@ public class Politician {
             rc.empower(actionRadius);
             // System.out.println("empowered");
             return;
-        }
-        if (Helper.tryMove(rc, Helper.randomDirection())) {
-
         }
         // System.out.println("I moved!");
     }

@@ -5,7 +5,10 @@ import java.util.*;
 
 public class EnlightenmentCenter {
     public static boolean scoutingPhase = true;
+    public static boolean setGuard = false;
+    public static boolean rushPhase = false;
     public static int scoutCount = 0;
+    public static int guardCount = 0;
     public static boolean[] scoutReturn = { false, false, false, false }; // 0=N, 1=S, 2=E, 3=W
     public static Set<Integer> scoutIds = new TreeSet<Integer>();
 
@@ -15,6 +18,11 @@ public class EnlightenmentCenter {
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
         if (scoutingPhase && scoutIds.size() < scoutLimit) {
+            if (rc.canSetFlag(100)) {
+                rc.setFlag(100);
+                // scout slanderer
+            }
+
             int dirIndex = scoutCount % 4;
             System.out.println(scoutCount);
             int influence = 1;
@@ -43,6 +51,20 @@ public class EnlightenmentCenter {
                 scoutIds.remove(removeId);
             }
         }
+
         System.out.println(scoutIds.size());
+
+        if (setGuard == true) {
+            if (rc.canSetFlag(111)) {
+                rc.setFlag(111);
+                // defender politician
+            }
+            int influence = 10;
+            int dirIndex = guardCount % 4;
+            if (rc.csnBuildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence)) {
+                rc.buildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence);
+                guardCount++;
+            }
+        }
     }
 }
