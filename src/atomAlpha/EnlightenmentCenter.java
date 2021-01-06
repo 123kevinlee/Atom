@@ -10,16 +10,18 @@ public class EnlightenmentCenter {
     public static boolean earlyDefensive = false;
 
     public static int scoutCount = 0;
+    public static int scoutLimit = 8;
     public static int guardCount = 0;
     // public static boolean[] scoutReturn = { false, false, false, false }; // 0=N,
     // 1=S, 2=E, 3=W
-    public static Map<Integer, Direction> scoutIds = new TreeMap<Integer, Direction>();
+    public static Map<Integer, Direction> scoutIds = new HashMap<Integer, Direction>();
+    public static Map<Integer, String> scoutLastMessage = new HashMap<Integer, String>();
 
     public static int[] mapBorders = new int[4]; // 0=NORTH 1=EAST 2=SOUTH 3=WEST
-    public static ArrayList<int[]> enemyBases = new ArrayList<int[]>();
     public static boolean mapComplete = false;
-
-    public static int scoutLimit = 8;
+    public static ArrayList<int[]> enemyBases = new ArrayList<int[]>();
+    public static ArrayList<int[]> enemyCoords = new ArrayList<int[]>();
+    public static ArrayList<int[]> possibleEnemyBases = new ArrayList<int[]>();
 
     public static boolean begunInfluenceCalc = false;
     public static int lastInfluenceAmount = 0;
@@ -88,7 +90,11 @@ public class EnlightenmentCenter {
 
                             enemyBases.add(coords);
                             // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
-                        } else if (msg.charAt(0) == '4') {
+                        } else if (msg.charAt(0) == '3') {
+                            scoutLastMessage.put((int) key, msg);
+                        }
+
+                        else if (msg.charAt(0) == '4') {
                             // System.out.println("WALL: " + coords[0] + "," + coords[1]);
 
                             MapLocation currentLocation = rc.getLocation();
@@ -146,6 +152,9 @@ public class EnlightenmentCenter {
                     }
                 } else {
                     System.out.println(key + " DEAD");
+                    String lastMsg = scoutLastMessage.get(key);
+                    int[] coords = Communication.coordDecoder(lastMsg);
+
                     removeId = key;
                     // do a last known location for potential enemy bases
                 }
