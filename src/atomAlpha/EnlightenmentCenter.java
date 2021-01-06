@@ -178,13 +178,14 @@ public class EnlightenmentCenter {
                             default:
                                 break;
                         }
+                        // System.out.println(possibleEnemyBases.toString());
                         System.out.println("Possible Enemy Base:" + possibleEnemyBases.iterator().next()[0] + ","
                                 + possibleEnemyBases.iterator().next()[1]);
                     } else {
                         MapLocation baseLocation = rc.getLocation();
                         enemyCoords.add(new int[] { coords[0] + baseLocation.x, coords[1] + baseLocation.y });
-                        System.out.println("Possible Enemy Base:" + possibleEnemyBases.iterator().next()[0] + ","
-                                + possibleEnemyBases.iterator().next()[1]);
+                        System.out.println("Enemy Coord:" + enemyCoords.iterator().next()[0] + ","
+                                + enemyCoords.iterator().next()[1]);
                     }
 
                     removeId = key;
