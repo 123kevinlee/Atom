@@ -41,7 +41,13 @@ public class Pathfinding {
         }
         // System.out.println(pass.toString());
         Object[] keys = pass.keySet().toArray();
-        return (rc.getLocation().directionTo(pass.get(keys[keys.length - 1])));
+        if (keys.length != 0) {
+            return (rc.getLocation().directionTo(pass.get(keys[keys.length - 1])));
+        } else {
+            return Direction.CENTER;
+            // hit wall -- add logic later
+        }
+
     }
 
     public static void setStartLocation(RobotController rc) {
