@@ -7,7 +7,8 @@ public class Politician {
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
         Team enemy = rc.getTeam().opponent();
-        int actionRadius = rc.getType().actionRadiusSquared;
+        // int actionRadius = rc.getType().actionRadiusSquared;
+        int actionRadius = 1;
         RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemy);
         if (attackable.length != 0 && rc.canEmpower(actionRadius)) {
             // System.out.println("empowering...");
