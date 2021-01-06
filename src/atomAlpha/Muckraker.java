@@ -136,9 +136,10 @@ public class Muckraker {
                         if (rc.canSetFlag(rc.getFlag(robot.getID()))) {
                             role = Integer.toString(rc.getFlag(robot.getID()));
                             System.out.println(role);
+                            originPoint = robot.getLocation();
                             if (role.equals("100")) {
                                 scoutDirection = rc.getLocation().directionTo(robot.getLocation()).opposite();
-                                originPoint = robot.getLocation();
+                            } else {
                             }
                         }
                     }
