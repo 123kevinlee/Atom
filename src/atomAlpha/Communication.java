@@ -1,9 +1,5 @@
 package atomAlpha;
 
-import java.lang.invoke.SwitchPoint;
-
-import battlecode.common.*;
-
 public class Communication {
     public static int coordEncoder(String type, int dx, int dy) {
         String outMsg = "";
