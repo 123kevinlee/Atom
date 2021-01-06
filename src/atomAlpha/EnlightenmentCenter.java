@@ -148,7 +148,7 @@ public class EnlightenmentCenter {
                 int dx = enemyBases.get(0)[0] - currentLocation.x;
                 int dy = enemyBases.get(0)[1] - currentLocation.y;
                 if (rc.canSetFlag(Communication.coordEncoder("ENEMY", dx, dy))) {
-                    rc.setFlag(Communication.coordEncoder("ENEMY",dx,dy));
+                    rc.setFlag(Communication.coordEncoder("ENEMY", dx, dy));
                 }
                 int influence = 10;
                 Direction dir = rc.getLocation()
@@ -159,37 +159,5 @@ public class EnlightenmentCenter {
                 }
             }
         }
-    }
-
-    public static int encodeTarget(int[] coords) {
-        String out = "";
-        int x = coords[0];
-        int y = coords[1];
-        if (x < 0) {
-            out += "9";
-            x = Math.abs(x);
-        } else {
-            out += "8";
-        }
-
-        if (x < 10) {
-            out += "0" + x;
-        } else {
-            out += x;
-        }
-
-        if (y < 0) {
-            out += "9";
-        } else {
-            out += "8";
-        }
-
-        if (y < 10) {
-            out += "0" + y;
-        } else {
-            out += y;
-        }
-
-        return Integer.parseInt(out);
     }
 }
