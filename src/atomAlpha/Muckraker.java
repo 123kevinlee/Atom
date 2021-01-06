@@ -38,6 +38,7 @@ public class Muckraker {
                             end = true;
 
                             if (rc.canMove(scoutDirection.rotateRight().rotateRight())) {
+                                scoutDirection = scoutDirection.rotateRight().rotateRight())
                                 rc.move(scoutDirection.rotateRight().rotateRight());
                             }
                         }
@@ -53,6 +54,7 @@ public class Muckraker {
                             end = true;
 
                             if (rc.canMove(scoutDirection.rotateRight().rotateRight())) {
+                                scoutDirection = scoutDirection.rotateRight().rotateRight())
                                 rc.move(scoutDirection.rotateRight().rotateRight());
                             }
                         }
@@ -68,6 +70,7 @@ public class Muckraker {
                             end = true;
 
                             if (rc.canMove(scoutDirection.rotateRight().rotateRight())) {
+                                scoutDirection = scoutDirection.rotateRight().rotateRight())
                                 rc.move(scoutDirection.rotateRight().rotateRight());
                             }
                         }
@@ -83,6 +86,7 @@ public class Muckraker {
                             end = true;
 
                             if (rc.canMove(scoutDirection.rotateRight().rotateRight())) {
+                                scoutDirection = scoutDirection.rotateRight().rotateRight())
                                 rc.move(scoutDirection.rotateRight().rotateRight());
                             }
                         }
