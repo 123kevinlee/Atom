@@ -13,8 +13,11 @@ public class Muckraker {
         if (role.equals("100")) {
             System.out.println("MuckRaker set to scout mode");
             System.out.println(scoutDirection);
-            if (rc.canMove(Pathfinding.chooseBestNextStep(rc, scoutDirection))) {
-                rc.move(Pathfinding.chooseBestNextStep(rc, scoutDirection));
+
+            Direction nextDir = Pathfinding.chooseBestNextStep(rc, scoutDirection);
+
+            if (rc.canMove(nextDir)) {
+                rc.move(nextDir);
                 MapLocation currentLocation = rc.getLocation();
                 int dx = currentLocation.x - originPoint.x;
                 int dy = currentLocation.y - originPoint.y;
@@ -34,7 +37,9 @@ public class Muckraker {
                             Helper.sendFlag(rc, outMsg);
                             end = true;
 
-                            scoutDirection = Direction.CENTER;
+                            if (rc.canMove(scoutDirection.rotateRight().rotateRight())) {
+                                rc.move(scoutDirection.rotateRight().rotateRight());
+                            }
                         }
                         break;
                     case EAST:
@@ -47,7 +52,9 @@ public class Muckraker {
                             Helper.sendFlag(rc, outMsg);
                             end = true;
 
-                            scoutDirection = Direction.CENTER;
+                            if (rc.canMove(scoutDirection.rotateRight().rotateRight())) {
+                                rc.move(scoutDirection.rotateRight().rotateRight());
+                            }
                         }
                         break;
                     case SOUTH:
@@ -60,7 +67,9 @@ public class Muckraker {
                             Helper.sendFlag(rc, outMsg);
                             end = true;
 
-                            scoutDirection = Direction.CENTER;
+                            if (rc.canMove(scoutDirection.rotateRight().rotateRight())) {
+                                rc.move(scoutDirection.rotateRight().rotateRight());
+                            }
                         }
                         break;
                     case WEST:
@@ -73,7 +82,9 @@ public class Muckraker {
                             Helper.sendFlag(rc, outMsg);
                             end = true;
 
-                            scoutDirection = Direction.CENTER;
+                            if (rc.canMove(scoutDirection.rotateRight().rotateRight())) {
+                                rc.move(scoutDirection.rotateRight().rotateRight());
+                            }
                         }
                         break;
                     default:
