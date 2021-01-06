@@ -30,9 +30,10 @@ public class Politician {
             if (rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection))) {
                 rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
             }
-        }
+        } else if (role.equals("111"))
         // create a locking mechanism and chasing mechanism
-        if (rc.canSenseRadiusSquared(3) && rc.senseNearbyRobots(3, enemy) != null && rc.canEmpower(3) && role.equals("111")) {
+        if (rc.canSenseRadiusSquared(3) && rc.senseNearbyRobots(3, enemy) != null && rc.canEmpower(3)
+                && role.equals("111")) {
             rc.empower(3);
         }
         // System.out.println("I moved!");

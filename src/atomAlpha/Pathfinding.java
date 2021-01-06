@@ -38,6 +38,58 @@ public class Pathfinding {
                     pass.put(rc.sensePassability(testLoc), testLoc);
                 }
             }
+        } else if (dir == Direction.NORTHEAST) {
+            if (rc.onTheMap(testLoc) && !rc.isLocationOccupied(testLoc) && rc.getLocation().isAdjacentTo(testLoc)) {
+                testLoc = new MapLocation(myLoc.x, myLoc.y + 1);
+                pass.put(rc.sensePassability(testLoc), testLoc);
+            }
+            if (rc.onTheMap(testLoc) && !rc.isLocationOccupied(testLoc) && rc.getLocation().isAdjacentTo(testLoc)) {
+                testLoc = new MapLocation(myLoc.x + 1, myLoc.y + 1);
+                pass.put(rc.sensePassability(testLoc), testLoc);
+            }
+            if (rc.onTheMap(testLoc) && !rc.isLocationOccupied(testLoc) && rc.getLocation().isAdjacentTo(testLoc)) {
+                testLoc = new MapLocation(myLoc.x + 1, myLoc.y);
+                pass.put(rc.sensePassability(testLoc), testLoc);
+            }
+        } else if (dir == Direction.SOUTHEAST) {
+            if (rc.onTheMap(testLoc) && !rc.isLocationOccupied(testLoc) && rc.getLocation().isAdjacentTo(testLoc)) {
+                testLoc = new MapLocation(myLoc.x + 1, myLoc.y);
+                pass.put(rc.sensePassability(testLoc), testLoc);
+            }
+            if (rc.onTheMap(testLoc) && !rc.isLocationOccupied(testLoc) && rc.getLocation().isAdjacentTo(testLoc)) {
+                testLoc = new MapLocation(myLoc.x + 1, myLoc.y - 1);
+                pass.put(rc.sensePassability(testLoc), testLoc);
+            }
+            if (rc.onTheMap(testLoc) && !rc.isLocationOccupied(testLoc) && rc.getLocation().isAdjacentTo(testLoc)) {
+                testLoc = new MapLocation(myLoc.x, myLoc.y - 1);
+                pass.put(rc.sensePassability(testLoc), testLoc);
+            }
+        } else if (dir == Direction.SOUTHWEST) {
+            if (rc.onTheMap(testLoc) && !rc.isLocationOccupied(testLoc) && rc.getLocation().isAdjacentTo(testLoc)) {
+                testLoc = new MapLocation(myLoc.x, myLoc.y - 1);
+                pass.put(rc.sensePassability(testLoc), testLoc);
+            }
+            if (rc.onTheMap(testLoc) && !rc.isLocationOccupied(testLoc) && rc.getLocation().isAdjacentTo(testLoc)) {
+                testLoc = new MapLocation(myLoc.x - 1, myLoc.y - 1);
+                pass.put(rc.sensePassability(testLoc), testLoc);
+            }
+            if (rc.onTheMap(testLoc) && !rc.isLocationOccupied(testLoc) && rc.getLocation().isAdjacentTo(testLoc)) {
+                testLoc = new MapLocation(myLoc.x - 1, myLoc.y);
+                pass.put(rc.sensePassability(testLoc), testLoc);
+            }
+        } else if (dir == Direction.NORTHWEST) {
+            if (rc.onTheMap(testLoc) && !rc.isLocationOccupied(testLoc) && rc.getLocation().isAdjacentTo(testLoc)) {
+                testLoc = new MapLocation(myLoc.x - 1, myLoc.y);
+                pass.put(rc.sensePassability(testLoc), testLoc);
+            }
+            if (rc.onTheMap(testLoc) && !rc.isLocationOccupied(testLoc) && rc.getLocation().isAdjacentTo(testLoc)) {
+                testLoc = new MapLocation(myLoc.x - 1, myLoc.y + 1);
+                pass.put(rc.sensePassability(testLoc), testLoc);
+            }
+            if (rc.onTheMap(testLoc) && !rc.isLocationOccupied(testLoc) && rc.getLocation().isAdjacentTo(testLoc)) {
+                testLoc = new MapLocation(myLoc.x, myLoc.y + 1);
+                pass.put(rc.sensePassability(testLoc), testLoc);
+            }
         }
         // System.out.println(pass.toString());
         Object[] keys = pass.keySet().toArray();
@@ -48,6 +100,19 @@ public class Pathfinding {
             // hit wall -- add logic later
         }
 
+    }
+
+    public static void findDefenseLocation(RobotController rc, MapLocation baseLoc) {
+        MapLocation[] defenseSpots = {new MapLocation(baseloc.x + 3, baseLoc.y +3), new MapLocation(baseLoc.x + 3, baseLoc.y + 3), new MapLocation(baseLoc.x - 3, baseLoc.y - 3), new MapLocation(baseLoc.x - 3, baseLoc.y +3)};
+        MapLocation targetLoc;
+        for (int i = 0; i < 5; i++) {
+            if (!rc.isLocationOccupied(defenseSpots[i])) {
+                targetLoc = defenseSpots[i];
+            }
+        }
+        if (rc.canMove(chooseBestNextStep(rc, rc.directionTo(rc.getLoction(), targetLoc)))) {
+            rc.move(chooseBestNextStep(rc, rc.directionTo(rc.getLoction(), targetLoc)));
+        }
     }
 
     public static void setStartLocation(RobotController rc) {
