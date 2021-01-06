@@ -4,8 +4,8 @@ import battlecode.common.*;
 import java.util.*;
 
 public class EnlightenmentCenter {
-    public static boolean scoutingPhase = false;
-    public static boolean setGuard = true;
+    public static boolean scoutingPhase = true;
+    public static boolean setGuard = false;
     public static boolean rushPhase = false;
     public static boolean earlyDefensive = false;
 
