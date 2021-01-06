@@ -44,6 +44,7 @@ public strictfp class RobotPlayer {
                     case ENLIGHTENMENT_CENTER:
                         // runEnlightenmentCenter();
                         EnlightenmentCenter.run(rc, turnCount);
+                        System.out.println(Clock.getBytecodesLeft());
                         break;
                     case POLITICIAN:
                         Politician.run(rc, turnCount);
