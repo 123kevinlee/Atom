@@ -7,11 +7,11 @@ public class Slanderer {
 
     public static String role = "";
 
-    public static void run(RobotController rc, int turnCount) throws GameActionException {
+    public static void run(RobotController rc) throws GameActionException {
         // System.out.println(role);
         // scout code
-        if (turnCount < 2) {
-            for (Direction dir : Data.directions) {
+        if (rc.getRoundNum() - Data.initRound < 2) {
+            for (Direction dir : Direction.cardinalDirections()) {
                 if (!rc.canMove(dir) && rc.getCooldownTurns() == 0) {
                     switch (dir) {
                         case NORTH:
@@ -120,7 +120,7 @@ public class Slanderer {
         }
     }
 
-    public static void getRole(RobotController rc) throws GameActionException {
+    public static void init(RobotController rc) throws GameActionException {
         if (rc.canSenseRadiusSquared(1)) {
             for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
@@ -129,6 +129,7 @@ public class Slanderer {
                         if (rc.canSetFlag(rc.getFlag(Data.baseId))) {
                             role = Integer.toString(rc.getFlag(Data.baseId));
                             Data.originPoint = robot.getLocation();
+                            Data.initRound = rc.getRoundNum();
                         }
                     }
                 }

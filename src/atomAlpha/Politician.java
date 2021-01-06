@@ -5,7 +5,7 @@ import battlecode.common.*;
 public class Politician {
     public static String role = "";
 
-    public static void run(RobotController rc, int turnCount) throws GameActionException {
+    public static void run(RobotController rc) throws GameActionException {
 
         Team enemy = rc.getTeam().opponent();
 
@@ -68,7 +68,7 @@ public class Politician {
         // create a locking mechanism and chasing mechanism
     }
 
-    public static void getRole(RobotController rc) throws GameActionException {
+    public static void init(RobotController rc) throws GameActionException {
         if (rc.canSenseRadiusSquared(1)) {
             for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
@@ -77,6 +77,7 @@ public class Politician {
                         if (rc.canSetFlag(rc.getFlag(Data.baseId))) {
                             role = Integer.toString(rc.getFlag(Data.baseId));
                             Data.originPoint = robot.getLocation();
+                            Data.initRound = rc.getRoundNum();
                         }
                     }
                 }

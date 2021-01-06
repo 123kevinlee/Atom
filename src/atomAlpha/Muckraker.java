@@ -8,7 +8,7 @@ public class Muckraker {
     public static boolean end = false;
     public static String role = "";
 
-    public static void run(RobotController rc, int turnCount) throws GameActionException {
+    public static void run(RobotController rc) throws GameActionException {
         if (role.equals("100")) {
             System.out.println("MuckRaker set to scout mode");
             System.out.println(scoutDirection);
@@ -154,7 +154,7 @@ public class Muckraker {
         }
     }
 
-    public static void getRole(RobotController rc) throws GameActionException {
+    public static void init(RobotController rc) throws GameActionException {
         if (rc.canSenseRadiusSquared(1)) {
             for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
@@ -163,9 +163,9 @@ public class Muckraker {
                             role = Integer.toString(rc.getFlag(robot.getID()));
                             System.out.println(role);
                             Data.originPoint = robot.getLocation();
+                            Data.initRound = rc.getRoundNum();
                             if (role.equals("100")) {
                                 scoutDirection = rc.getLocation().directionTo(robot.getLocation()).opposite();
-                            } else {
                             }
                         }
                     }

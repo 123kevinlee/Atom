@@ -4,6 +4,9 @@ import battlecode.common.*;
 import java.util.*;
 
 public class EnlightenmentCenter {
+    static final Direction[] directions = { Direction.NORTH, Direction.NORTHEAST, Direction.EAST, Direction.SOUTHEAST,
+            Direction.SOUTH, Direction.SOUTHWEST, Direction.WEST, Direction.NORTHWEST, };
+
     public static boolean scoutingPhase = true;
     public static boolean setGuard = false;
     public static boolean rushPhase = false;
@@ -28,7 +31,7 @@ public class EnlightenmentCenter {
     public static int lastInfluenceAmount = 0;
     public static int lastInfluenceGain = 0;
 
-    public static void run(RobotController rc, int turnCount) throws GameActionException {
+    public static void run(RobotController rc) throws GameActionException {
         // Influence Calc
         if (!begunInfluenceCalc) {
             lastInfluenceAmount = rc.getInfluence();
@@ -60,7 +63,7 @@ public class EnlightenmentCenter {
 
             }
             int influence = Math.min(50, lastInfluenceAmount - bidAmount) / ((scoutWave + 1) % 2);
-            Direction designatedDirection = Data.directions[dirIndex * 2];
+            Direction designatedDirection = directions[dirIndex * 2];
 
             // if (scoutCount < scoutLimit && scoutWave % 2 == 0
             // && rc.canBuildRobot(RobotType.MUCKRAKER, designatedDirection, influence)) {
@@ -220,8 +223,8 @@ public class EnlightenmentCenter {
             }
             int influence = 10;
             int dirIndex = guardCount % 4;
-            if (rc.canBuildRobot(RobotType.POLITICIAN, Data.directions[dirIndex * 2 + 1], influence)) {
-                rc.buildRobot(RobotType.POLITICIAN, Data.directions[dirIndex * 2 + 1], influence);
+            if (rc.canBuildRobot(RobotType.POLITICIAN, directions[dirIndex * 2 + 1], influence)) {
+                rc.buildRobot(RobotType.POLITICIAN, directions[dirIndex * 2 + 1], influence);
                 guardCount++;
             }
         } else {
