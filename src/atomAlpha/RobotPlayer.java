@@ -28,6 +28,9 @@ public strictfp class RobotPlayer {
                 Slanderer.getRole(rc);
                 Pathfinding.setStartLocation(rc);
                 break;
+            case MUCKRAKER:
+                Muckraker.getRole(rc);
+                Pathfinding.setStartLocation(rc);
             default:
                 break;
         }

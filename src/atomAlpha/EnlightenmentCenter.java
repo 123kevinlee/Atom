@@ -130,7 +130,7 @@ public class EnlightenmentCenter {
         // System.out.println(mapBorders[0]);
         // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
 
-        if (setGuard == true) {
+/*         if (setGuard == true) {
             if (rc.canSetFlag(111)) {
                 rc.setFlag(111);
                 // defender politician
@@ -157,6 +157,21 @@ public class EnlightenmentCenter {
                     rc.buildRobot(RobotType.POLITICIAN, dir, influence);
                     guardCount++;
                 }
+            }
+        } */
+
+        if (enemyBases.size() > 0) {
+            // System.out.println("YAHOO2");
+            MapLocation currentLocation = rc.getLocation();
+            int dx = enemyBases.get(0)[0] - currentLocation.x;
+            int dy = enemyBases.get(0)[1] - currentLocation.y;
+            if (rc.canSetFlag(Communication.coordEncoder("ENEMY", dx, dy))) {
+                rc.setFlag(Communication.coordEncoder("ENEMY", dx, dy));
+            }
+            int influence = 10;
+            Direction dir = rc.getLocation().directionTo(new MapLocation(enemyBases.get(0)[0], enemyBases.get(0)[1]));
+            if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence)) {
+                rc.buildRobot(RobotType.MUCKRAKER, dir, influence);
             }
         }
     }
