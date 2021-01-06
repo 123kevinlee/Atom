@@ -39,7 +39,7 @@ public class Pathfinding {
                 }
             }
         }
-        System.out.println(pass.toString());
+        // System.out.println(pass.toString());
         Object[] keys = pass.keySet().toArray();
         return (rc.getLocation().directionTo(pass.get(keys[keys.length - 1])));
     }

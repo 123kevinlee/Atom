@@ -143,9 +143,12 @@ public class EnlightenmentCenter {
             }
         } else {
             if (enemyBases.size() > 0) {
-                //System.out.println("YAHOO2");
-                if (rc.canSetFlag(encodeTarget(enemyBases.get(0)))) {
-                    rc.setFlag(encodeTarget(enemyBases.get(0)));
+                // System.out.println("YAHOO2");
+                MapLocation currentLocation = rc.getLocation();
+                int dx = enemyBases.get(0)[0] - currentLocation.x;
+                int dy = enemyBases.get(0)[1] - currentLocation.y;
+                if (rc.canSetFlag(Communication.coordEncoder("ENEMY", dx, dy))) {
+                    rc.setFlag(Communication.coordEncoder("ENEMY",dx,dy));
                 }
                 int influence = 10;
                 Direction dir = rc.getLocation()
