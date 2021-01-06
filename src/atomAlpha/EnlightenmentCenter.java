@@ -18,14 +18,13 @@ public class EnlightenmentCenter {
     public static ArrayList<int[]> enemyBases = new ArrayList<int[]>();
     public static boolean mapComplete = false;
 
-    public static int scoutLimit = 20;
+    public static int scoutLimit = 12;
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
         if (scoutingPhase && scoutCount < scoutLimit) {
-            if (rc.canSetFlag(100)) {
-                rc.setFlag(100);
-                // scout slanderer
-            }
+            /*
+             * if (rc.canSetFlag(100)) { rc.setFlag(100); // scout slanderer }
+             */
 
             int dirIndex = scoutCount % 4;
             // System.out.println(scoutCount);
@@ -126,8 +125,8 @@ public class EnlightenmentCenter {
                 scoutIds.remove(removeId);
             }
         }
-        // System.out.println(mapBorders[0] + " " + mapBorders[1] + " " + mapBorders[2]
-        // + " " + mapBorders[3]);
+        // System.out.println(mapBorders[0]);
+        // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
 
         if (setGuard == true) {
             if (rc.canSetFlag(111)) {

@@ -44,7 +44,7 @@ public class Slanderer {
             switch (scoutDirection) {
                 case NORTH:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.NORTH))) {
-                        // System.out.println("WALL!");
+                        System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
                         int dx = currentLocation.x - originPoint.x;
                         int dy = currentLocation.y - originPoint.y;
@@ -56,7 +56,7 @@ public class Slanderer {
                     break;
                 case EAST:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.EAST))) {
-                        // System.out.println("WALL!");
+                        System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
                         int dx = currentLocation.x - originPoint.x;
                         int dy = currentLocation.y - originPoint.y;
@@ -68,7 +68,7 @@ public class Slanderer {
                     break;
                 case SOUTH:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.SOUTH))) {
-                        // System.out.println("WALL!");
+                        System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
                         int dx = currentLocation.x - originPoint.x;
                         int dy = currentLocation.y - originPoint.y;
@@ -80,7 +80,7 @@ public class Slanderer {
                     break;
                 case WEST:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.WEST))) {
-                        // System.out.println("WALL!");
+                        System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
                         int dx = currentLocation.x - originPoint.x;
                         int dy = currentLocation.y - originPoint.y;
