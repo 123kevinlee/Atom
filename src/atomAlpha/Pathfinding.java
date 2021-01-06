@@ -5,6 +5,7 @@ import battlecode.common.*;
 
 public class Pathfinding {
     public static MapLocation variableLoc;
+    public static bool defenseLocReached = false;
 
     public static Direction chooseBestNextStep(RobotController rc, Direction dir) throws GameActionException {
         MapLocation myLoc = rc.getLocation();
@@ -113,7 +114,12 @@ public class Pathfinding {
         if (rc.canMove(chooseBestNextStep(rc, rc.directionTo(rc.getLoction(), targetLoc)))) {
             rc.move(chooseBestNextStep(rc, rc.directionTo(rc.getLoction(), targetLoc)));
         }
+        if (rc.getLocation() == targetLoc) {
+            defenseLocReached = true;
+        }
     }
+
+    public static bool getDefenseReached() { return defenseLocReached; }
 
     public static void setStartLocation(RobotController rc) {
         variableLoc = rc.getLocation();

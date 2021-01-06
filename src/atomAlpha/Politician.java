@@ -4,6 +4,7 @@ import battlecode.common.*;
 
 public class Politician {
     public static String role = "";
+    public static MapLocation originPoint;
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
         Team enemy = rc.getTeam().opponent();
@@ -30,7 +31,9 @@ public class Politician {
             if (rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection))) {
                 rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
             }
-        } else if (role.equals("111"))
+        } else if (role.equals("111") && !Pathfinding.getDefenseReached()) {
+            Pathfinding.findDefenseLocation(rc, originPoint);
+        }
         // create a locking mechanism and chasing mechanism
         if (rc.canSenseRadiusSquared(3) && rc.senseNearbyRobots(3, enemy) != null && rc.canEmpower(3)
                 && role.equals("111")) {
@@ -46,6 +49,7 @@ public class Politician {
                     if (rc.canGetFlag(robot.getID())) {
                         if (rc.canSetFlag(rc.getFlag(robot.getID()))) {
                             role = Integer.toString(rc.getFlag(robot.getID()));
+                            originPoint = robot.getLocation();
                         }
                     }
                 }
