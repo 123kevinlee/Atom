@@ -60,7 +60,7 @@ public class EnlightenmentCenter {
 
             }
             int influence = Math.min(50, lastInfluenceAmount - bidAmount) / ((scoutWave + 1) % 2);
-            Direction designatedDirection = Helper.directions[dirIndex * 2];
+            Direction designatedDirection = Data.directions[dirIndex * 2];
 
             // if (scoutCount < scoutLimit && scoutWave % 2 == 0
             // && rc.canBuildRobot(RobotType.MUCKRAKER, designatedDirection, influence)) {
@@ -220,8 +220,8 @@ public class EnlightenmentCenter {
             }
             int influence = 10;
             int dirIndex = guardCount % 4;
-            if (rc.canBuildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence)) {
-                rc.buildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence);
+            if (rc.canBuildRobot(RobotType.POLITICIAN, Data.directions[dirIndex * 2 + 1], influence)) {
+                rc.buildRobot(RobotType.POLITICIAN, Data.directions[dirIndex * 2 + 1], influence);
                 guardCount++;
             }
         } else {

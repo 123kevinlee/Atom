@@ -72,9 +72,11 @@ public class Politician {
         if (rc.canSenseRadiusSquared(1)) {
             for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
-                    if (rc.canGetFlag(robot.getID())) {
-                        if (rc.canSetFlag(rc.getFlag(robot.getID()))) {
-                            role = Integer.toString(rc.getFlag(robot.getID()));
+                    Data.baseId = robot.getID();
+                    if (rc.canGetFlag(Data.baseId)) {
+                        if (rc.canSetFlag(rc.getFlag(Data.baseId))) {
+                            role = Integer.toString(rc.getFlag(Data.baseId));
+                            Data.originPoint = robot.getLocation();
                         }
                     }
                 }

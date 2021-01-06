@@ -5,15 +5,13 @@ import battlecode.common.*;
 public class Slanderer {
     public static Direction scoutDirection;
 
-    public static MapLocation originPoint;
-
     public static String role = "";
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
         // System.out.println(role);
         // scout code
         if (turnCount < 2) {
-            for (Direction dir : Helper.directions) {
+            for (Direction dir : Data.directions) {
                 if (!rc.canMove(dir) && rc.getCooldownTurns() == 0) {
                     switch (dir) {
                         case NORTH:
@@ -37,20 +35,24 @@ public class Slanderer {
         if (rc.canMove(Pathfinding.chooseBestNextStep(rc, scoutDirection))) {
             rc.move(Pathfinding.chooseBestNextStep(rc, scoutDirection));
             MapLocation currentLocation = rc.getLocation();
-            int dx = currentLocation.x - originPoint.x;
-            int dy = currentLocation.y - originPoint.y;
+            int dx = currentLocation.x - Data.originPoint.x;
+            int dy = currentLocation.y - Data.originPoint.y;
             int outMsg = Communication.coordEncoder("LIKELY", dx, dy);
-            Helper.sendFlag(rc, outMsg);
+            if (rc.canSetFlag(outMsg)) {
+                rc.setFlag(outMsg);
+            }
         } else {
             switch (scoutDirection) {
                 case NORTH:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.NORTH))) {
                         System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
-                        int dx = currentLocation.x - originPoint.x;
-                        int dy = currentLocation.y - originPoint.y;
+                        int dx = currentLocation.x - Data.originPoint.x;
+                        int dy = currentLocation.y - Data.originPoint.y;
                         int outMsg = Communication.coordEncoder("WALL", dx, dy);
-                        Helper.sendFlag(rc, outMsg);
+                        if (rc.canSetFlag(outMsg)) {
+                            rc.setFlag(outMsg);
+                        }
 
                         scoutDirection = Direction.CENTER;
                     }
@@ -59,10 +61,12 @@ public class Slanderer {
                     if (!rc.onTheMap(rc.getLocation().add(Direction.EAST))) {
                         System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
-                        int dx = currentLocation.x - originPoint.x;
-                        int dy = currentLocation.y - originPoint.y;
+                        int dx = currentLocation.x - Data.originPoint.x;
+                        int dy = currentLocation.y - Data.originPoint.y;
                         int outMsg = Communication.coordEncoder("WALL", dx, dy);
-                        Helper.sendFlag(rc, outMsg);
+                        if (rc.canSetFlag(outMsg)) {
+                            rc.setFlag(outMsg);
+                        }
 
                         scoutDirection = Direction.CENTER;
                     }
@@ -71,10 +75,12 @@ public class Slanderer {
                     if (!rc.onTheMap(rc.getLocation().add(Direction.SOUTH))) {
                         System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
-                        int dx = currentLocation.x - originPoint.x;
-                        int dy = currentLocation.y - originPoint.y;
+                        int dx = currentLocation.x - Data.originPoint.x;
+                        int dy = currentLocation.y - Data.originPoint.y;
                         int outMsg = Communication.coordEncoder("WALL", dx, dy);
-                        Helper.sendFlag(rc, outMsg);
+                        if (rc.canSetFlag(outMsg)) {
+                            rc.setFlag(outMsg);
+                        }
 
                         scoutDirection = Direction.CENTER;
                     }
@@ -83,10 +89,12 @@ public class Slanderer {
                     if (!rc.onTheMap(rc.getLocation().add(Direction.WEST))) {
                         System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
-                        int dx = currentLocation.x - originPoint.x;
-                        int dy = currentLocation.y - originPoint.y;
+                        int dx = currentLocation.x - Data.originPoint.x;
+                        int dy = currentLocation.y - Data.originPoint.y;
                         int outMsg = Communication.coordEncoder("WALL", dx, dy);
-                        Helper.sendFlag(rc, outMsg);
+                        if (rc.canSetFlag(outMsg)) {
+                            rc.setFlag(outMsg);
+                        }
 
                         scoutDirection = Direction.CENTER;
                     }
@@ -100,11 +108,13 @@ public class Slanderer {
             for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, rc.getTeam().opponent())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
                     MapLocation baseLocation = robot.getLocation();
-                    int dx = baseLocation.x - originPoint.x;
-                    int dy = baseLocation.y - originPoint.y;
+                    int dx = baseLocation.x - Data.originPoint.x;
+                    int dy = baseLocation.y - Data.originPoint.y;
                     int outMsg = Communication.coordEncoder("ENEMY", dx, dy);
                     System.out.println("Found Enemy Base:" + outMsg);
-                    Helper.sendFlag(rc, outMsg);
+                    if (rc.canSetFlag(outMsg)) {
+                        rc.setFlag(outMsg);
+                    }
                 }
             }
         }
@@ -114,10 +124,11 @@ public class Slanderer {
         if (rc.canSenseRadiusSquared(1)) {
             for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
-                    if (rc.canGetFlag(robot.getID())) {
-                        if (rc.canSetFlag(rc.getFlag(robot.getID()))) {
-                            role = Integer.toString(rc.getFlag(robot.getID()));
-                            originPoint = robot.getLocation();
+                    Data.baseId = robot.getID();
+                    if (rc.canGetFlag(Data.baseId)) {
+                        if (rc.canSetFlag(rc.getFlag(Data.baseId))) {
+                            role = Integer.toString(rc.getFlag(Data.baseId));
+                            Data.originPoint = robot.getLocation();
                         }
                     }
                 }
