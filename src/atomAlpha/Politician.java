@@ -16,13 +16,13 @@ public class Politician {
         // System.out.println("I moved!");
     }
 
-    public static void getRole(RobotController rc) {
+    public static void getRole(RobotController rc) throws GameActionException {
         if (rc.canSenseRadiusSquared(1)) {
             for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
-                    if (rc.canGetFlag(robot.getID)) {
-                        if (rc.canSetFlag(rc.getFlag(robot.getID))) {
-                            rc.setFlag(rc.getFlag(robot.getID));
+                    if (rc.canGetFlag(robot.getID())) {
+                        if (rc.canSetFlag(rc.getFlag(robot.getID()))) {
+                            rc.setFlag(rc.getFlag(robot.getID()));
                         }
                     }
                 }

@@ -18,7 +18,7 @@ public class EnlightenmentCenter {
     public static ArrayList<int[]> enemyBases = new ArrayList<int[]>();
     public static boolean mapComplete = false;
 
-    public static int scoutLimit = 12;
+    public static int scoutLimit = 13;
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
         if (scoutingPhase && scoutCount < scoutLimit) {
@@ -78,6 +78,8 @@ public class EnlightenmentCenter {
                                     break;
                                 case WEST:
                                     mapBorders[3] = currentLocation.x + coords[0];
+                                    break;
+                                default:
                                     break;
                             }
 

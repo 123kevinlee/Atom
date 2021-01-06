@@ -90,6 +90,8 @@ public class Slanderer {
                         scoutDirection = Direction.CENTER;
                     }
                     break;
+                default:
+                    break;
             }
         }
         int sensorRadius = rc.getType().sensorRadiusSquared;
