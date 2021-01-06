@@ -32,8 +32,6 @@ public class Slanderer {
                         default:
                             break;
                     }
-                    originPoint = Helper.determineOrigin(rc.getLocation(), scoutDirection);
-                    // System.out.println(originPoint.x + " " + originPoint.y);
                 }
             }
         }
@@ -120,6 +118,7 @@ public class Slanderer {
                     if (rc.canGetFlag(robot.getID())) {
                         if (rc.canSetFlag(rc.getFlag(robot.getID()))) {
                             role = Integer.toString(rc.getFlag(robot.getID()));
+                            originPoint = robot.getLocation();
                         }
                     }
                 }

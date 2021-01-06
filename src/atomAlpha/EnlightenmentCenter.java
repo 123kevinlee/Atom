@@ -19,7 +19,7 @@ public class EnlightenmentCenter {
     public static ArrayList<int[]> enemyBases = new ArrayList<int[]>();
     public static boolean mapComplete = false;
 
-    public static int scoutLimit = 13;
+    public static int scoutLimit = 8;
 
     public static boolean begunInfluenceCalc = false;
     public static int lastInfluenceAmount = 0;
@@ -34,15 +34,16 @@ public class EnlightenmentCenter {
             lastInfluenceGain = rc.getInfluence() - lastInfluenceAmount;
             lastInfluenceAmount = rc.getInfluence();
         }
-        System.out.println(lastInfluenceAmount);
+        // System.out.println(lastInfluenceAmount);
         // base bid on gain and amount needed to be spent later
 
-        if (scoutingPhase && scoutCount < scoutLimit) {
+        if (scoutingPhase) {
             int dirIndex = scoutCount % 4;
-            // System.out.println(scoutCount);
 
             int lowestPossibleBid = 3; // don't know what to set this to for now 5?
-            int bidAmount = Math.max((int) Math.floor(lastInfluenceAmount * 1 / 15), lowestPossibleBid);
+            // int bidAmount = Math.max((int) Math.floor(lastInfluenceAmount * 1 / 15),
+            // lowestPossibleBid);
+            int bidAmount = 0;
             if (rc.canBid(bidAmount)) {
                 rc.bid(bidAmount);
                 System.out.println("Bid: " + bidAmount);
@@ -53,11 +54,11 @@ public class EnlightenmentCenter {
 
             // after first round of scouts - maybe build a defense against rush politicans
 
-            if (rc.canBuildRobot(RobotType.SLANDERER, designatedDirection, influence)) {
+            if (scoutCount < scoutLimit && rc.canBuildRobot(RobotType.MUCKRAKER, designatedDirection, influence)) {
                 if (rc.canSetFlag(100)) {
                     rc.setFlag(100);
                 }
-                rc.buildRobot(RobotType.SLANDERER, designatedDirection, influence);
+                rc.buildRobot(RobotType.MUCKRAKER, designatedDirection, influence);
                 System.out.println("Created Scout with " + influence + " influence");
                 scoutCount++;
                 if (rc.canSenseRadiusSquared(1)) {
@@ -83,7 +84,7 @@ public class EnlightenmentCenter {
                             MapLocation currentLocation = rc.getLocation();
                             coords[0] += currentLocation.x;
                             coords[1] += currentLocation.y;
-                            System.out.println("ENEMY BASE: " + coords[0] + "," + coords[1]);
+                            // System.out.println("ENEMY BASE: " + coords[0] + "," + coords[1]);
 
                             enemyBases.add(coords);
                             // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
@@ -177,7 +178,9 @@ public class EnlightenmentCenter {
                 }
 
                 int lowestPossibleBid = 3; // don't know what to set this to for now 5?
-                int bidAmount = Math.max((int) Math.floor(lastInfluenceAmount * 1 / 10), lowestPossibleBid);
+                // int bidAmount = Math.max((int) Math.floor(lastInfluenceAmount * 1 / 10),
+                // lowestPossibleBid);
+                int bidAmount = 0;
                 if (rc.canBid(bidAmount)) {
                     rc.bid(bidAmount);
                     System.out.println("Bid: " + bidAmount);
