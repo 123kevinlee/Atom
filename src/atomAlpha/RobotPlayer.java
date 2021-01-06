@@ -20,7 +20,7 @@ public strictfp class RobotPlayer {
         turnCount = 0;
         // System.out.println("I'm a " + rc.getType() + " and I just got created!");
         if (rc.getType() == RobotType.POLITICIAN) {
-            // Politician.getRole(rc);
+            Politician.getRole(rc);
         }
 
         while (true) {
