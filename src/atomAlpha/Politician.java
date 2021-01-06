@@ -3,6 +3,8 @@ package atomAlpha;
 import battlecode.common.*;
 
 public class Politician {
+    public static String role = "";
+
     public static void run(RobotController rc, int turnCount) throws GameActionException {
         Team enemy = rc.getTeam().opponent();
         int actionRadius = rc.getType().actionRadiusSquared;
@@ -22,7 +24,7 @@ public class Politician {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
                     if (rc.canGetFlag(robot.getID())) {
                         if (rc.canSetFlag(rc.getFlag(robot.getID()))) {
-                            rc.setFlag(rc.getFlag(robot.getID()));
+                            role = Integer.toString(rc.getFlag(robot.getID()));
                         }
                     }
                 }

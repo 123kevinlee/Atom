@@ -7,7 +7,11 @@ public class Slanderer {
 
     public static MapLocation originPoint;
 
+    public static String role = "";
+
     public static void run(RobotController rc, int turnCount) throws GameActionException {
+        // System.out.println(role);
+
         // scout code
         if (turnCount < 2) {
             for (Direction dir : Helper.directions) {
@@ -104,6 +108,20 @@ public class Slanderer {
                     int outMsg = Communication.coordEncoder("ENEMY", dx, dy);
                     System.out.println("Found Enemy Base:" + outMsg);
                     Helper.sendFlag(rc, outMsg);
+                }
+            }
+        }
+    }
+
+    public static void getRole(RobotController rc) throws GameActionException {
+        if (rc.canSenseRadiusSquared(1)) {
+            for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
+                if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
+                    if (rc.canGetFlag(robot.getID())) {
+                        if (rc.canSetFlag(rc.getFlag(robot.getID()))) {
+                            role = Integer.toString(rc.getFlag(robot.getID()));
+                        }
+                    }
                 }
             }
         }
