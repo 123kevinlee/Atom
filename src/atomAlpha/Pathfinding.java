@@ -5,6 +5,7 @@ import battlecode.common.*;
 
 public class Pathfinding {
     public static MapLocation startLoc;
+
     public static Direction chooseBestNextStep(RobotController rc, Direction dir) throws GameActionException {
         MapLocation myLoc = rc.getLocation();
         MapLocation testLoc;
