@@ -141,15 +141,19 @@ public class EnlightenmentCenter {
                 rc.buildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence);
                 guardCount++;
             }
-        }
-
-        if (enemyBases.size() > 0) {
-            if (rc.canSetFlag(encodeTarget(enemyBases.get(0)))) {
-                rc.setFlag(encodeTarget(enemyBases.get(0)));
-            }
         } else {
-            if (rc.canSetFlag(0)) {
-                rc.setFlag(0);
+            if (enemyBases.size() > 0) {
+                //System.out.println("YAHOO2");
+                if (rc.canSetFlag(encodeTarget(enemyBases.get(0)))) {
+                    rc.setFlag(encodeTarget(enemyBases.get(0)));
+                }
+                int influence = 10;
+                Direction dir = rc.getLocation()
+                        .directionTo(new MapLocation(enemyBases.get(0)[0], enemyBases.get(0)[1]));
+                if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence)) {
+                    rc.buildRobot(RobotType.POLITICIAN, dir, influence);
+                    guardCount++;
+                }
             }
         }
     }
