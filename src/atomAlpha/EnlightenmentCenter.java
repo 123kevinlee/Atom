@@ -22,9 +22,9 @@ public class EnlightenmentCenter {
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
         if (scoutingPhase && scoutCount < scoutLimit) {
-            /*
-             * if (rc.canSetFlag(100)) { rc.setFlag(100); // scout slanderer }
-             */
+            if (rc.canSetFlag(100)) {
+                rc.setFlag(100);
+            }
 
             int dirIndex = scoutCount % 4;
             // System.out.println(scoutCount);
@@ -142,5 +142,47 @@ public class EnlightenmentCenter {
                 guardCount++;
             }
         }
+
+        if (enemyBases.size() > 0) {
+            if (rc.canSetFlag(encodeTarget(enemyBases.get(0)))) {
+                rc.setFlag(encodeTarget(enemyBases.get(0)));
+            }
+        } else {
+            if (rc.canSetFlag(0)) {
+                rc.setFlag(0);
+            }
+        }
+    }
+
+    public static int encodeTarget(int[] coords) {
+        String out = "";
+        int x = coords[0];
+        int y = coords[1];
+        if (x < 0) {
+            out += "9";
+            x = Math.abs(x);
+        } else {
+            out += "8";
+        }
+
+        if (x < 10) {
+            out += "0" + x;
+        } else {
+            out += x;
+        }
+
+        if (y < 0) {
+            out += "9";
+        } else {
+            out += "8";
+        }
+
+        if (y < 10) {
+            out += "0" + y;
+        } else {
+            out += y;
+        }
+
+        return Integer.parseInt(out);
     }
 }
