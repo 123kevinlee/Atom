@@ -33,7 +33,7 @@ public class Slanderer {
                 }
             }
         }
-        if (rc.canMove(scoutDirection)) {
+        if (rc.canMove(Pathfinding.chooseBestNextStep(rc, scoutDirection))) {
             rc.move(Pathfinding.chooseBestNextStep(rc, scoutDirection));
             MapLocation currentLocation = rc.getLocation();
             int dx = currentLocation.x - originPoint.x;
