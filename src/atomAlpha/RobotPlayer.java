@@ -22,6 +22,7 @@ public strictfp class RobotPlayer {
         switch (rc.getType()) {
             case POLITICIAN:
                 Politician.getRole(rc);
+                Pathfinding.setStartLocation(rc);
                 break;
 
             case SLANDERER:

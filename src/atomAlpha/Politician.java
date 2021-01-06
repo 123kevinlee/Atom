@@ -26,10 +26,11 @@ public class Politician {
             MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
             Direction targetDirection = currentLocation.directionTo(targetLocation);
 
-            if (rc.canMove(targetDirection)) {
-                rc.move(targetDirection);
+            if (rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection))) {
+                rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
             }
         }
+        // create a locking mechanism and chasing mechanism
     }
 
     public static void getRole(RobotController rc) throws GameActionException {
