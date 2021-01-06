@@ -17,6 +17,7 @@ public class Politician {
 
         RobotInfo[] attackable = rc.senseNearbyRobots(myLoc, detectionRadiusSquared, enemy);
 
+        System.out.println(role);
         if (role.length() == 7) {
 
             // create a locking mechanism and chasing mechanism
