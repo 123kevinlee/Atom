@@ -11,7 +11,6 @@ public class Slanderer {
 
     public static void run(RobotController rc, int turnCount) throws GameActionException {
         // System.out.println(role);
-
         // scout code
         if (turnCount < 2) {
             for (Direction dir : Helper.directions) {

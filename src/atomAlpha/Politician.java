@@ -17,6 +17,12 @@ public class Politician {
 
         RobotInfo[] attackable = rc.senseNearbyRobots(myLoc, detectionRadiusSquared, enemy);
 
+        /*
+         * int thisId = rc.getID(); if (role.equals("")) { // this means it just
+         * converted from slanderer if (rc.canGetFlag(thisId)) { role =
+         * Integer.toString(rc.getFlag(thisId)); } // this flag isn't the target }
+         */
+
         System.out.println(role);
         if (role.length() == 7) {
 
@@ -48,7 +54,7 @@ public class Politician {
             }
 
             System.out.println("I moved!");
-            int[] coords = Communication.coordDecoder(role);
+            int[] coords = Communication.coordDecoder(role); // coords of enemy base or whatever target
             MapLocation currentLocation = rc.getLocation();
             coords[0] += currentLocation.x;
             coords[1] += currentLocation.y;
