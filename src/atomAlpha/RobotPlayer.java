@@ -19,6 +19,23 @@ public strictfp class RobotPlayer {
         RobotPlayer.rc = rc;
         turnCount = 0;
         // System.out.println("I'm a " + rc.getType() + " and I just got created!");
+        switch (rc.getType()) {
+            case POLITICIAN:
+                Politician.getRole(rc);
+                Pathfinding.setStartLocation(rc);
+                break;
+
+            case SLANDERER:
+                Slanderer.getRole(rc);
+                Pathfinding.setStartLocation(rc);
+                break;
+            case MUCKRAKER:
+                Muckraker.getRole(rc);
+                Pathfinding.setStartLocation(rc);
+            default:
+                break;
+        }
+
         while (true) {
             turnCount += 1;
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
