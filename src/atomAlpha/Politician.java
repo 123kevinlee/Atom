@@ -15,6 +15,7 @@ public class Politician {
             // System.out.println("empowered");
             return;
         }
+<<<<<<< HEAD
         if (role.length() == 7) {
             System.out.println("I moved!");
             int[] coords = Communication.coordDecoder(role);
@@ -31,6 +32,12 @@ public class Politician {
             }
         }
         // create a locking mechanism and chasing mechanism
+=======
+        if (rc.canSenseRadiusSquared(3) && rc.senseNearbyRobots(3, enemy) != null && rc.canEmpower(3) && role.equals("111")) {
+            rc.empower(3);
+        }
+        // System.out.println("I moved!");
+>>>>>>> 51c976703a5fffe31a606f939ae23087af3c9e51
     }
 
     public static void getRole(RobotController rc) throws GameActionException {
