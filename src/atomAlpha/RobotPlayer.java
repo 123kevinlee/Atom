@@ -19,12 +19,6 @@ public strictfp class RobotPlayer {
         RobotPlayer.rc = rc;
         turnCount = 0;
         // System.out.println("I'm a " + rc.getType() + " and I just got created!");
-<<<<<<< HEAD
-        if (rc.getType() == RobotType.POLITICIAN) {
-            Politician.getRole(rc);
-        } else if (rc.getType() == RobotType.SLANDERER) {
-            Pathfinding.setStartLocation(rc);
-=======
         switch (rc.getType()) {
             case POLITICIAN:
                 Politician.getRole(rc);
@@ -32,10 +26,10 @@ public strictfp class RobotPlayer {
 
             case SLANDERER:
                 Slanderer.getRole(rc);
+                Pathfinding.setStartLocation(rc);
                 break;
             default:
                 break;
->>>>>>> dev
         }
 
         while (true) {
