@@ -15,6 +15,9 @@ public class Politician {
             // System.out.println("empowered");
             return;
         }
+        if (rc.canSenseRadiusSquared(3) && rc.senseNearbyRobots(3, enemy) != null && rc.canEmpower(3) && role.equals("111")) {
+            rc.empower(3);
+        }
         // System.out.println("I moved!");
     }
 
