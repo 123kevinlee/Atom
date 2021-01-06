@@ -29,36 +29,65 @@ public class Slanderer {
                             break;
                     }
                     originPoint = Helper.determineOrigin(rc.getLocation(), scoutDirection);
-                    System.out.println(originPoint.x + " " + originPoint.y);
+                    // System.out.println(originPoint.x + " " + originPoint.y);
                 }
             }
         }
         if (rc.canMove(scoutDirection)) {
             rc.move(Pathfinding.chooseBestNextStep(rc, scoutDirection));
+            MapLocation currentLocation = rc.getLocation();
+            int dx = currentLocation.x - originPoint.x;
+            int dy = currentLocation.y - originPoint.y;
+            int outMsg = Communication.coordEncoder("LIKELY", dx, dy);
+            Helper.sendFlag(rc, outMsg);
         } else {
             switch (scoutDirection) {
                 case NORTH:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.NORTH))) {
-                        System.out.println("WALL!");
-                        Helper.sendFlag(rc, 21);
+                        // System.out.println("WALL!");
+                        MapLocation currentLocation = rc.getLocation();
+                        int dx = currentLocation.x - originPoint.x;
+                        int dy = currentLocation.y - originPoint.y;
+                        int outMsg = Communication.coordEncoder("WALL", dx, dy);
+                        Helper.sendFlag(rc, outMsg);
+
+                        scoutDirection = Direction.CENTER;
                     }
                     break;
                 case EAST:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.EAST))) {
-                        System.out.println("WALL!");
-                        Helper.sendFlag(rc, 21);
+                        // System.out.println("WALL!");
+                        MapLocation currentLocation = rc.getLocation();
+                        int dx = currentLocation.x - originPoint.x;
+                        int dy = currentLocation.y - originPoint.y;
+                        int outMsg = Communication.coordEncoder("WALL", dx, dy);
+                        Helper.sendFlag(rc, outMsg);
+
+                        scoutDirection = Direction.CENTER;
                     }
                     break;
                 case SOUTH:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.SOUTH))) {
-                        System.out.println("WALL!");
-                        Helper.sendFlag(rc, 21);
+                        // System.out.println("WALL!");
+                        MapLocation currentLocation = rc.getLocation();
+                        int dx = currentLocation.x - originPoint.x;
+                        int dy = currentLocation.y - originPoint.y;
+                        int outMsg = Communication.coordEncoder("WALL", dx, dy);
+                        Helper.sendFlag(rc, outMsg);
+
+                        scoutDirection = Direction.CENTER;
                     }
                     break;
                 case WEST:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.WEST))) {
-                        System.out.println("WALL!");
-                        Helper.sendFlag(rc, 21);
+                        // System.out.println("WALL!");
+                        MapLocation currentLocation = rc.getLocation();
+                        int dx = currentLocation.x - originPoint.x;
+                        int dy = currentLocation.y - originPoint.y;
+                        int outMsg = Communication.coordEncoder("WALL", dx, dy);
+                        Helper.sendFlag(rc, outMsg);
+
+                        scoutDirection = Direction.CENTER;
                     }
                     break;
             }
@@ -67,11 +96,14 @@ public class Slanderer {
         if (rc.canSenseRadiusSquared(sensorRadius)) {
             for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, rc.getTeam().opponent())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
-                    System.out.println("BASE!");
-                    Helper.sendFlag(rc, 69);
+                    MapLocation baseLocation = robot.getLocation();
+                    int dx = baseLocation.x - originPoint.x;
+                    int dy = baseLocation.y - originPoint.y;
+                    int outMsg = Communication.coordEncoder("ENEMY", dx, dy);
+                    System.out.println("Found Enemy Base:" + outMsg);
+                    Helper.sendFlag(rc, outMsg);
                 }
             }
         }
     }
-
 }
