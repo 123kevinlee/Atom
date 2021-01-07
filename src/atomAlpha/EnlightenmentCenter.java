@@ -4,28 +4,38 @@ import battlecode.common.*;
 import java.util.*;
 
 public class EnlightenmentCenter {
+    static final Direction[] directions = { Direction.NORTH, Direction.NORTHEAST, Direction.EAST, Direction.SOUTHEAST,
+            Direction.SOUTH, Direction.SOUTHWEST, Direction.WEST, Direction.NORTHWEST, };
+
     public static boolean scoutingPhase = true;
     public static boolean setGuard = false;
     public static boolean rushPhase = false;
     public static boolean earlyDefensive = false;
+    public static boolean firstFarmers = true;
 
     public static int scoutCount = 0;
+    public static int scoutLimit = 8;
     public static int guardCount = 0;
+    public static int begFarmerLimit = 4;
+    public static int farmerCount = 0;
     // public static boolean[] scoutReturn = { false, false, false, false }; // 0=N,
     // 1=S, 2=E, 3=W
-    public static Map<Integer, Direction> scoutIds = new TreeMap<Integer, Direction>();
+    public static Map<Integer, Direction> scoutIds = new HashMap<Integer, Direction>();
+    public static Map<Integer, String> scoutLastMessage = new HashMap<Integer, String>();
 
     public static int[] mapBorders = new int[4]; // 0=NORTH 1=EAST 2=SOUTH 3=WEST
-    public static ArrayList<int[]> enemyBases = new ArrayList<int[]>();
     public static boolean mapComplete = false;
-
-    public static int scoutLimit = 8;
+    public static LinkedHashSet<int[]> enemyBases = new LinkedHashSet<int[]>();
+    public static LinkedHashSet<int[]> enemyCoords = new LinkedHashSet<int[]>();
+    public static LinkedHashSet<int[]> possibleEnemyBases = new LinkedHashSet<int[]>();
 
     public static boolean begunInfluenceCalc = false;
     public static int lastInfluenceAmount = 0;
     public static int lastInfluenceGain = 0;
 
-    public static void run(RobotController rc, int turnCount) throws GameActionException {
+    public static int votes = 0;
+
+    public static void run(RobotController rc) throws GameActionException {
         // Influence Calc
         if (!begunInfluenceCalc) {
             lastInfluenceAmount = rc.getInfluence();
@@ -49,15 +59,29 @@ public class EnlightenmentCenter {
                 System.out.println("Bid: " + bidAmount);
             }
 
-            int influence = lastInfluenceAmount - bidAmount;
-            Direction designatedDirection = Helper.directions[dirIndex * 2];
+            int influence = 50;
+            Direction designatedDirection = directions[dirIndex * 2];
 
-            // after first round of scouts - maybe build a defense against rush politicans
-
+            /*
+             * Direction safeDir = Direction.CENTER; int safeX = 0; int safeY = 0; for (int
+             * i = 0; i < 4; i++) { if (i == 0 || i == 2) { safeX = mapBorders[i]; } if (i
+             * == 1 || i == 3) { safeY = mapBorders[i]; } }
+             * 
+             * if (safeX != 0 && safeY != 0) { safeDir = Data.originPoint.directionTo(new
+             * MapLocation(safeX, safeY)); }
+             * 
+             * int farmerInfluence = (rc.getInfluence() - bidAmount); if (scoutCount > 4 &&
+             * farmerCount <= begFarmerLimit && safeDir != Direction.CENTER &&
+             * rc.canBuildRobot(RobotType.SLANDERER, safeDir, farmerInfluence)) {
+             * rc.buildRobot(RobotType.MUCKRAKER, safeDir, farmerInfluence);
+             * System.out.println("Created Farmer with " + farmerInfluence + " influence");
+             * farmerCount++; }
+             */
             if (scoutCount < scoutLimit && rc.canBuildRobot(RobotType.MUCKRAKER, designatedDirection, influence)) {
                 if (rc.canSetFlag(100)) {
                     rc.setFlag(100);
                 }
+
                 rc.buildRobot(RobotType.MUCKRAKER, designatedDirection, influence);
                 System.out.println("Created Scout with " + influence + " influence");
                 scoutCount++;
@@ -88,7 +112,11 @@ public class EnlightenmentCenter {
 
                             enemyBases.add(coords);
                             // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
-                        } else if (msg.charAt(0) == '4') {
+                        } else if (msg.charAt(0) == '3') {
+                            scoutLastMessage.put((int) key, msg);
+                        }
+
+                        else if (msg.charAt(0) == '4') {
                             // System.out.println("WALL: " + coords[0] + "," + coords[1]);
 
                             MapLocation currentLocation = rc.getLocation();
@@ -146,8 +174,44 @@ public class EnlightenmentCenter {
                     }
                 } else {
                     System.out.println(key + " DEAD");
+                    String lastMsg = scoutLastMessage.get(key);
+                    if (lastMsg != null && lastMsg.length() != 0) {
+                        int[] coords = Communication.coordDecoder(lastMsg);
+                        if (mapComplete) {
+                            Direction dir = scoutIds.get(key);
+                            MapLocation currentLocation = rc.getLocation();
+                            switch (dir) {
+                                case NORTH:
+                                    possibleEnemyBases.add(new int[] { currentLocation.x,
+                                            mapBorders[0] - (currentLocation.y - mapBorders[2]) });
+                                    break;
+                                case EAST:
+                                    possibleEnemyBases.add(new int[] {
+                                            mapBorders[1] - (currentLocation.x - mapBorders[3]), currentLocation.y });
+                                    break;
+                                case SOUTH:
+                                    possibleEnemyBases.add(new int[] { currentLocation.x,
+                                            mapBorders[2] + (mapBorders[0] - currentLocation.y) });
+                                    break;
+                                case WEST:
+                                    possibleEnemyBases.add(new int[] {
+                                            mapBorders[3] + (mapBorders[1] - currentLocation.x), currentLocation.y });
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                            // System.out.println(possibleEnemyBases.toString());
+                            System.out.println("Possible Enemy Base:" + possibleEnemyBases.iterator().next()[0] + ","
+                                    + possibleEnemyBases.iterator().next()[1]);
+                        } else {
+                            MapLocation baseLocation = rc.getLocation();
+                            enemyCoords.add(new int[] { coords[0] + baseLocation.x, coords[1] + baseLocation.y });
+                            System.out.println("Enemy Coord:" + enemyCoords.iterator().next()[0] + ","
+                                    + enemyCoords.iterator().next()[1]);
+                        }
+                    }
                     removeId = key;
-                    // do a last known location for potential enemy bases
                 }
             }
             if (removeId != null) {
@@ -157,25 +221,24 @@ public class EnlightenmentCenter {
         // System.out.println(mapBorders[0]);
         // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
 
-        if (setGuard == true) {
+        if (setGuard == true)
+
+        {
             if (rc.canSetFlag(111)) {
                 rc.setFlag(111); // defender politician
             }
             int influence = 10;
             int dirIndex = guardCount % 4;
-            if (rc.canBuildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence)) {
-                rc.buildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence);
+            if (rc.canBuildRobot(RobotType.MUCKRAKER, directions[dirIndex * 2 + 1], influence)) {
+                rc.buildRobot(RobotType.MUCKRAKER, directions[dirIndex * 2 + 1], influence);
                 guardCount++;
             }
         } else {
             if (enemyBases.size() > 0) {
                 // System.out.println("YAHOO2");
                 MapLocation currentLocation = rc.getLocation();
-                int dx = enemyBases.get(0)[0] - currentLocation.x;
-                int dy = enemyBases.get(0)[1] - currentLocation.y;
-                if (rc.canSetFlag(Communication.coordEncoder("ENEMY", dx, dy))) {
-                    rc.setFlag(Communication.coordEncoder("ENEMY", dx, dy));
-                }
+                int dx = enemyBases.iterator().next()[0] - currentLocation.x;
+                int dy = enemyBases.iterator().next()[1] - currentLocation.y;
 
                 int lowestPossibleBid = 3; // don't know what to set this to for now 5?
                 // int bidAmount = Math.max((int) Math.floor(lastInfluenceAmount * 1 / 10),
@@ -194,12 +257,25 @@ public class EnlightenmentCenter {
                 }
                 // int influence = (int) Math.floor((lastInfluenceGain - bidAmount) * (1 / 4));
                 Direction dir = rc.getLocation()
-                        .directionTo(new MapLocation(enemyBases.get(0)[0], enemyBases.get(0)[1]));
-                if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence)) {
-                    rc.buildRobot(RobotType.POLITICIAN, dir, influence);
+                        .directionTo(new MapLocation(enemyBases.iterator().next()[0], enemyBases.iterator().next()[1]));
+                if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence)) {
+                    if (rc.canSetFlag(Communication.coordEncoder("ENEMY", dx, dy))) {
+                        rc.setFlag(Communication.coordEncoder("ENEMY", dx, dy));
+                    }
+
+                    rc.buildRobot(RobotType.MUCKRAKER, dir, influence);
                     guardCount++;
                 }
             }
+        }
+
+        if (enemyBases.size() == 0 && possibleEnemyBases.size() > 0) {
+            // do something
+        } else if (enemyBases.size() == 0 && possibleEnemyBases.size() > 0) {
+
+        } else {
+            // when there's practically no info
+            // more defensive and if there are enemy unit coords -- light search attacks?
         }
 
         /*

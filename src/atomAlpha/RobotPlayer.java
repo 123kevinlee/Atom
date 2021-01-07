@@ -4,7 +4,6 @@ import battlecode.common.*;
 
 public strictfp class RobotPlayer {
     static RobotController rc;
-    static int turnCount;
 
     /**
      * run() is the method that is called when a robot is instantiated in the
@@ -12,50 +11,43 @@ public strictfp class RobotPlayer {
      **/
     @SuppressWarnings("unused")
     public static void run(RobotController rc) throws GameActionException {
-
-        // This is the RobotController object. You use it to perform actions from this
-        // robot,
-        // and to get information on its current status.
         RobotPlayer.rc = rc;
-        turnCount = 0;
-        // System.out.println("I'm a " + rc.getType() + " and I just got created!");
         switch (rc.getType()) {
             case POLITICIAN:
-                Politician.getRole(rc);
+                Politician.init(rc);
                 Pathfinding.setStartLocation(rc);
                 break;
 
             case SLANDERER:
-                Slanderer.getRole(rc);
+                Slanderer.init(rc);
                 Pathfinding.setStartLocation(rc);
                 break;
             case MUCKRAKER:
-                Muckraker.getRole(rc);
+                Muckraker.init(rc);
                 Pathfinding.setStartLocation(rc);
             default:
                 break;
         }
 
         while (true) {
-            turnCount += 1;
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER:
                         // runEnlightenmentCenter();
-                        EnlightenmentCenter.run(rc, turnCount);
+                        EnlightenmentCenter.run(rc);
                         // System.out.println("Bytecode Left:" + Clock.getBytecodesLeft());
                         break;
                     case POLITICIAN:
-                        Politician.run(rc, turnCount);
+                        Politician.run(rc);
                         // runPolitician();
                         break;
                     case SLANDERER:
-                        Slanderer.run(rc, turnCount);
+                        Slanderer.run(rc);
                         // runSlanderer();
                         break;
                     case MUCKRAKER:
-                        Muckraker.run(rc, turnCount);
+                        Muckraker.run(rc);
                         // runMuckraker();
                         break;
                 }
