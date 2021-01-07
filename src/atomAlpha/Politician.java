@@ -10,7 +10,9 @@ public class Politician {
         Team enemy = rc.getTeam().opponent();
         // int actionRadius = rc.getType().actionRadiusSquared;
         int actionRadius = 1;
-        // RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemy);
+        int defenseRadius = 9;
+        RobotInfo[] defensible = rc.senseNearbyRobots(defenseRadius, enemy);
+        RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemy);
         // if (attackable.length != 0 && rc.canEmpower(actionRadius)) {
         //     // System.out.println("empowering...");
         //     rc.empower(actionRadius);
@@ -36,11 +38,11 @@ public class Politician {
             Pathfinding.findDefenseLocation(rc, originPoint);
         }
         // create a locking mechanism and chasing mechanism
-        // if (rc.canSenseRadiusSquared(3) && rc.senseNearbyRobots(3, enemy) != null && rc.canEmpower(3)
-        //         && role.equals("111")) {
-        //             System.out.println("EMPOWER");
-        //     rc.empower(3);
-        // }
+        if (rc.canSenseRadiusSquared(9) && defensible.length > 0 && rc.canEmpower(9)
+                && role.equals("111")) {
+                    System.out.println("EMPOWER");
+            rc.empower(9);
+        }
         // System.out.println("I moved!");
     }
 

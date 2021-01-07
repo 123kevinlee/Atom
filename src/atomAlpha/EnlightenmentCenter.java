@@ -9,6 +9,8 @@ public class EnlightenmentCenter {
     public static boolean rushPhase = false;
     public static boolean earlyDefensive = false;
 
+    public static boolean guardsFull = false;
+
     public static int scoutCount = 0;
     public static int guardCount = 0;
     // public static boolean[] scoutReturn = { false, false, false, false }; // 0=N,
@@ -66,6 +68,10 @@ public class EnlightenmentCenter {
                         scoutIds.put(robot.getID(), designatedDirection);
                     }
                 }
+            }
+
+            if (scoutCount >= scoutLimit && !guardsFull) {
+                setGuard = true;
             }
 
             Object removeId = null;
@@ -158,17 +164,18 @@ public class EnlightenmentCenter {
         // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
 
         if (setGuard == true) {
-            if (rc.canSetFlag(111)) {
-                rc.setFlag(111); // defender politician
-            }
             int influence = 10;
             int dirIndex = guardCount % 4;
+            if (rc.canSetFlag(111) && rc.canBuildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence)) {
+                rc.setFlag(111); // defender politician
+            }
             if (rc.canBuildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence)) {
                 rc.buildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence);
                 guardCount++;
             }
-            if (guardCount >= 4) {
+            if (guardCount > 4) {
                 setGuard = false;
+                guardsFull = true;
             }
         } else {
             if (enemyBases.size() > 0) {
