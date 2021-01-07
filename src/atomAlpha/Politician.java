@@ -17,11 +17,12 @@ public class Politician {
 
         RobotInfo[] attackable = rc.senseNearbyRobots(myLoc, detectionRadiusSquared, enemy);
 
-        /*
-         * int thisId = rc.getID(); if (role.equals("")) { // this means it just
-         * converted from slanderer if (rc.canGetFlag(thisId)) { role =
-         * Integer.toString(rc.getFlag(thisId)); } // this flag isn't the target }
-         */
+        int thisId = rc.getID();
+        if (role.equals("")) { // this means it justconverted from slanderer
+            if (rc.canGetFlag(Data.baseId)) {
+                // command center stuff
+            } // this flag isn't the target }
+        }
 
         System.out.println(role);
         if (role.length() == 7) {

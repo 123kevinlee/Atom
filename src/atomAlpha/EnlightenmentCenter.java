@@ -11,11 +11,13 @@ public class EnlightenmentCenter {
     public static boolean setGuard = false;
     public static boolean rushPhase = false;
     public static boolean earlyDefensive = false;
+    public static boolean firstFarmers = true;
 
     public static int scoutCount = 0;
     public static int scoutLimit = 8;
-    public static int scoutWave = 0;
     public static int guardCount = 0;
+    public static int begFarmerLimit = 4;
+    public static int farmerCount = 0;
     // public static boolean[] scoutReturn = { false, false, false, false }; // 0=N,
     // 1=S, 2=E, 3=W
     public static Map<Integer, Direction> scoutIds = new HashMap<Integer, Direction>();
@@ -30,6 +32,8 @@ public class EnlightenmentCenter {
     public static boolean begunInfluenceCalc = false;
     public static int lastInfluenceAmount = 0;
     public static int lastInfluenceGain = 0;
+
+    public static int votes = 0;
 
     public static void run(RobotController rc) throws GameActionException {
         // Influence Calc
@@ -55,18 +59,24 @@ public class EnlightenmentCenter {
                 System.out.println("Bid: " + bidAmount);
             }
 
-            // after first round of scouts - maybe build a defense against rush politicans
-            if (scoutWave == 0) {
-
-            }
-            if (scoutWave == 2) {
-
-            }
-            int influence = Math.min(50, lastInfluenceAmount - bidAmount) / ((scoutWave + 1) % 2);
+            int influence = 50;
             Direction designatedDirection = directions[dirIndex * 2];
 
-            // if (scoutCount < scoutLimit && scoutWave % 2 == 0
-            // && rc.canBuildRobot(RobotType.MUCKRAKER, designatedDirection, influence)) {
+            /*
+             * Direction safeDir = Direction.CENTER; int safeX = 0; int safeY = 0; for (int
+             * i = 0; i < 4; i++) { if (i == 0 || i == 2) { safeX = mapBorders[i]; } if (i
+             * == 1 || i == 3) { safeY = mapBorders[i]; } }
+             * 
+             * if (safeX != 0 && safeY != 0) { safeDir = Data.originPoint.directionTo(new
+             * MapLocation(safeX, safeY)); }
+             * 
+             * int farmerInfluence = (rc.getInfluence() - bidAmount); if (scoutCount > 4 &&
+             * farmerCount <= begFarmerLimit && safeDir != Direction.CENTER &&
+             * rc.canBuildRobot(RobotType.SLANDERER, safeDir, farmerInfluence)) {
+             * rc.buildRobot(RobotType.MUCKRAKER, safeDir, farmerInfluence);
+             * System.out.println("Created Farmer with " + farmerInfluence + " influence");
+             * farmerCount++; }
+             */
             if (scoutCount < scoutLimit && rc.canBuildRobot(RobotType.MUCKRAKER, designatedDirection, influence)) {
                 if (rc.canSetFlag(100)) {
                     rc.setFlag(100);
@@ -80,10 +90,6 @@ public class EnlightenmentCenter {
                         scoutIds.put(robot.getID(), designatedDirection);
                     }
                 }
-            } else if (scoutWave % 2 != 0) {
-                /*
-                 * if (rc.canSetFlag(100)) { rc.setFlag(100); }
-                 */ // gonna need a number for farmers
             }
 
             Object removeId = null;
@@ -223,8 +229,8 @@ public class EnlightenmentCenter {
             }
             int influence = 10;
             int dirIndex = guardCount % 4;
-            if (rc.canBuildRobot(RobotType.POLITICIAN, directions[dirIndex * 2 + 1], influence)) {
-                rc.buildRobot(RobotType.POLITICIAN, directions[dirIndex * 2 + 1], influence);
+            if (rc.canBuildRobot(RobotType.MUCKRAKER, directions[dirIndex * 2 + 1], influence)) {
+                rc.buildRobot(RobotType.MUCKRAKER, directions[dirIndex * 2 + 1], influence);
                 guardCount++;
             }
         } else {
@@ -233,9 +239,6 @@ public class EnlightenmentCenter {
                 MapLocation currentLocation = rc.getLocation();
                 int dx = enemyBases.iterator().next()[0] - currentLocation.x;
                 int dy = enemyBases.iterator().next()[1] - currentLocation.y;
-                if (rc.canSetFlag(Communication.coordEncoder("ENEMY", dx, dy))) {
-                    rc.setFlag(Communication.coordEncoder("ENEMY", dx, dy));
-                }
 
                 int lowestPossibleBid = 3; // don't know what to set this to for now 5?
                 // int bidAmount = Math.max((int) Math.floor(lastInfluenceAmount * 1 / 10),
@@ -255,8 +258,12 @@ public class EnlightenmentCenter {
                 // int influence = (int) Math.floor((lastInfluenceGain - bidAmount) * (1 / 4));
                 Direction dir = rc.getLocation()
                         .directionTo(new MapLocation(enemyBases.iterator().next()[0], enemyBases.iterator().next()[1]));
-                if (rc.canBuildRobot(RobotType.POLITICIAN, dir, influence)) {
-                    rc.buildRobot(RobotType.POLITICIAN, dir, influence);
+                if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence)) {
+                    if (rc.canSetFlag(Communication.coordEncoder("ENEMY", dx, dy))) {
+                        rc.setFlag(Communication.coordEncoder("ENEMY", dx, dy));
+                    }
+
+                    rc.buildRobot(RobotType.MUCKRAKER, dir, influence);
                     guardCount++;
                 }
             }
