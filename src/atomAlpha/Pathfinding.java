@@ -105,28 +105,33 @@ public class Pathfinding {
     }
 
     public static void findDefenseLocation(RobotController rc, MapLocation baseLoc) throws GameActionException {
-        MapLocation targetLoc = null;
-        MapLocation[] defenseSpots = new MapLocation[]{ new MapLocation(baseLoc.x + 3, baseLoc.y +3), new MapLocation(baseLoc.x + 3, baseLoc.y - 3), 
-            new MapLocation(baseLoc.x - 3, baseLoc.y - 3), new MapLocation(baseLoc.x - 3, baseLoc.y +3) };
-        if (rc.getLocation() == targetLoc) {
-            defenseLocReached = true;
-            System.out.println("REACHED TARGET LOCATION");
-            return;
-        }            
-        for (int i = 0; i < defenseSpots.length; i++) {
-            if (!rc.isLocationOccupied(defenseSpots[i])) {
-                targetLoc = defenseSpots[i];
-                break;
+        Map<MapLocation, MapLocation> spots = new TreeMap<MapLocation, MapLocation>() {{
+            put(baseLoc.translate(1, 1), baseLoc.translate(3, 3));
+            put(baseLoc.translate(1, -1), baseLoc.translate(3, -3));
+            put(baseLoc.translate(-1, -1), baseLoc.translate(-3, -3));
+            put(baseLoc.translate(-1, 1), baseLoc.translate(-3, 3));
+        }};
+        Object[] keys = spots.keySet().toArray();
+        if (targetLoc == null) {
+            for (int i = 0; i < keys.length; i++) {
+                if (rc.getLocation().equals(keys[i])) {
+                    targetLoc = spots.get(keys[i]);
+                }
             }
-        }
+        }         
         System.out.println(targetLoc);
         if (targetLoc != null) {
             if (rc.canMove(rc.getLocation().directionTo(targetLoc))) {
+                System.out.println("TRY TO MOVE");
                 rc.move(rc.getLocation().directionTo(targetLoc));
             } else if (rc.canMove(chooseBestNextStep(rc, rc.getLocation().directionTo(targetLoc)))) {
                 rc.move(chooseBestNextStep(rc, rc.getLocation().directionTo(targetLoc)));
             }
         }
+        if (rc.getLocation().equals(targetLoc)) {
+            defenseLocReached = true;
+            System.out.println("REACHED TARGET LOCATION");
+        } 
     }
 
     public static boolean getDefenseReached() throws GameActionException { return defenseLocReached; }
