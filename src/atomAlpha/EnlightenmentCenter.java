@@ -25,9 +25,9 @@ public class EnlightenmentCenter {
 
     public static int[] mapBorders = new int[4]; // 0=NORTH 1=EAST 2=SOUTH 3=WEST
     public static boolean mapComplete = false;
-    public static LinkedHashSet<int[]> enemyBases = new LinkedHashSet<int[]>();
-    public static LinkedHashSet<int[]> enemyCoords = new LinkedHashSet<int[]>();
-    public static LinkedHashSet<int[]> possibleEnemyBases = new LinkedHashSet<int[]>();
+    public static LinkedHashSet<MapLocation> enemyBases = new LinkedHashSet<MapLocation>();
+    public static Map<Direction, MapLocation> enemyCoords = new TreeMap<Direction, MapLocation>();
+    public static LinkedHashSet<MapLocation> possibleEnemyBases = new LinkedHashSet<MapLocation>();
 
     public static boolean begunInfluenceCalc = false;
     public static int lastInfluenceAmount = 0;
@@ -59,7 +59,7 @@ public class EnlightenmentCenter {
                 System.out.println("Bid: " + bidAmount);
             }
 
-            int influence = 50;
+            int influence = 1;
             Direction designatedDirection = directions[dirIndex * 2];
 
             /*
@@ -108,9 +108,9 @@ public class EnlightenmentCenter {
                             MapLocation currentLocation = rc.getLocation();
                             coords[0] += currentLocation.x;
                             coords[1] += currentLocation.y;
-                            // System.out.println("ENEMY BASE: " + coords[0] + "," + coords[1]);
+                            System.out.println("ENEMY BASE: " + coords[0] + "," + coords[1]);
 
-                            enemyBases.add(coords);
+                            enemyBases.add(new MapLocation(coords[0], coords[1]));
                             // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
                         } else if (msg.charAt(0) == '3') {
                             scoutLastMessage.put((int) key, msg);
@@ -169,6 +169,41 @@ public class EnlightenmentCenter {
                                     }
                                 }
                                 mapComplete = true;
+
+                                if (enemyCoords.size() > 0) {
+                                    Object[] baseKeys = enemyCoords.keySet().toArray();
+                                    currentLocation = rc.getLocation();
+                                    for (Object bKey : baseKeys) {
+                                        switch ((Direction) bKey) {
+                                            case NORTH:
+                                                possibleEnemyBases.add(new MapLocation(currentLocation.x,
+                                                        mapBorders[0] - (currentLocation.y - mapBorders[2])));
+                                                break;
+                                            case EAST:
+                                                possibleEnemyBases.add(new MapLocation(
+                                                        mapBorders[1] - (currentLocation.x - mapBorders[3]),
+                                                        currentLocation.y));
+                                                break;
+                                            case SOUTH:
+                                                possibleEnemyBases.add(new MapLocation(currentLocation.x,
+                                                        mapBorders[2] + (mapBorders[0] - currentLocation.y)));
+                                                break;
+                                            case WEST:
+                                                possibleEnemyBases.add(new MapLocation(
+                                                        mapBorders[3] + (mapBorders[1] - currentLocation.x),
+                                                        currentLocation.y));
+                                                break;
+
+                                            default:
+                                                break;
+                                        }
+                                        System.out.println("Possible Enemy Base:"
+                                                + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1]
+                                                        .toString());
+                                    }
+
+                                    // System.out.println(possibleEnemyBases.toString());
+                                }
                             }
                         }
                     }
@@ -182,33 +217,34 @@ public class EnlightenmentCenter {
                             MapLocation currentLocation = rc.getLocation();
                             switch (dir) {
                                 case NORTH:
-                                    possibleEnemyBases.add(new int[] { currentLocation.x,
-                                            mapBorders[0] - (currentLocation.y - mapBorders[2]) });
+                                    possibleEnemyBases.add(new MapLocation(currentLocation.x,
+                                            mapBorders[0] - (currentLocation.y - mapBorders[2])));
                                     break;
                                 case EAST:
-                                    possibleEnemyBases.add(new int[] {
-                                            mapBorders[1] - (currentLocation.x - mapBorders[3]), currentLocation.y });
+                                    possibleEnemyBases.add(new MapLocation(
+                                            mapBorders[1] - (currentLocation.x - mapBorders[3]), currentLocation.y));
                                     break;
                                 case SOUTH:
-                                    possibleEnemyBases.add(new int[] { currentLocation.x,
-                                            mapBorders[2] + (mapBorders[0] - currentLocation.y) });
+                                    possibleEnemyBases.add(new MapLocation(currentLocation.x,
+                                            mapBorders[2] + (mapBorders[0] - currentLocation.y)));
                                     break;
                                 case WEST:
-                                    possibleEnemyBases.add(new int[] {
-                                            mapBorders[3] + (mapBorders[1] - currentLocation.x), currentLocation.y });
+                                    possibleEnemyBases.add(new MapLocation(
+                                            mapBorders[3] + (mapBorders[1] - currentLocation.x), currentLocation.y));
                                     break;
 
                                 default:
                                     break;
                             }
                             // System.out.println(possibleEnemyBases.toString());
-                            System.out.println("Possible Enemy Base:" + possibleEnemyBases.iterator().next()[0] + ","
-                                    + possibleEnemyBases.iterator().next()[1]);
+                            System.out.println("Possible Enemy Base:"
+                                    + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
                         } else {
                             MapLocation baseLocation = rc.getLocation();
-                            enemyCoords.add(new int[] { coords[0] + baseLocation.x, coords[1] + baseLocation.y });
-                            System.out.println("Enemy Coord:" + enemyCoords.iterator().next()[0] + ","
-                                    + enemyCoords.iterator().next()[1]);
+                            enemyCoords.put(scoutIds.get(key),
+                                    new MapLocation(coords[0] + baseLocation.x, coords[1] + baseLocation.y));
+                            Object[] baseKeys = enemyCoords.keySet().toArray();
+                            System.out.println("Enemy Coord:" + enemyCoords.get(baseKeys[0]).toString());
                         }
                     }
                     removeId = key;
@@ -237,8 +273,9 @@ public class EnlightenmentCenter {
             if (enemyBases.size() > 0) {
                 // System.out.println("YAHOO2");
                 MapLocation currentLocation = rc.getLocation();
-                int dx = enemyBases.iterator().next()[0] - currentLocation.x;
-                int dy = enemyBases.iterator().next()[1] - currentLocation.y;
+                MapLocation baseLocation = (MapLocation) enemyBases.toArray()[enemyBases.size() - 1];
+                int dx = baseLocation.x - currentLocation.x;
+                int dy = baseLocation.y - currentLocation.y;
 
                 int lowestPossibleBid = 3; // don't know what to set this to for now 5?
                 // int bidAmount = Math.max((int) Math.floor(lastInfluenceAmount * 1 / 10),
@@ -256,8 +293,7 @@ public class EnlightenmentCenter {
                     influence = 60;
                 }
                 // int influence = (int) Math.floor((lastInfluenceGain - bidAmount) * (1 / 4));
-                Direction dir = rc.getLocation()
-                        .directionTo(new MapLocation(enemyBases.iterator().next()[0], enemyBases.iterator().next()[1]));
+                Direction dir = rc.getLocation().directionTo(new MapLocation(baseLocation.x, baseLocation.y));
                 if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, influence)) {
                     if (rc.canSetFlag(Communication.coordEncoder("ENEMY", dx, dy))) {
                         rc.setFlag(Communication.coordEncoder("ENEMY", dx, dy));
