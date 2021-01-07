@@ -9,7 +9,7 @@ public class Muckraker {
     public static String role = "";
 
     public static void run(RobotController rc) throws GameActionException {
-        if (role.equals("100")) {
+        if (role.equals("100")) { // scout
             System.out.println("MuckRaker set to scout mode");
             System.out.println(scoutDirection);
 
