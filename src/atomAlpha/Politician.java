@@ -18,15 +18,26 @@ public class Politician {
         RobotInfo[] attackable = rc.senseNearbyRobots(myLoc, detectionRadiusSquared, enemy);
         if (role.length() == 7) {
 
-            // create a locking mechanism and chasing mechanism
-            // marks the last known location of the closest enemy bot, no flags needed
-            // moves in the direction of this location, if within sensor radius, blows up
-            // if the enemy bot is already destroyed, the bot must resume trying to blow up
-            // the enlightment center
+            /* create a locking mechanism and chasing mechanism
+               marks the last known location of the closest enemy bot, no flags needed
+               moves in the direction of this location, if within sensor radius, blows up
+               if the enemy bot is already destroyed, the bot must resume trying to blow up
+               the enlightment center.
+            */
             if (attackable.length != 0 && chaseCount != -1) {
                 System.out.println("TRACKING");
 
-                RobotInfo closeEnemy = attackable[0];
+                //The int below discerns which enemy to attack first in the RobotInfo array
+                int priorityEnemy = 0;
+
+                for (int i = 0; i < attackable.length; i++ ){
+                    if(attackable[i].getType() == 'ENLIGHTENMENT_CENTER'){
+                        priorityEnemy = i;
+                        break;
+                    }
+                }
+
+                RobotInfo closeEnemy = attackable[priorityEnemy];
                 MapLocation track = closeEnemy.getLocation();
                 int[] tracked = new int[2];
                 tracked[0] += track.x;
@@ -59,7 +70,8 @@ public class Politician {
                 rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
             }
         }
-        // create a locking mechanism and chasing mechanism
+
+        //This is for the defending politicians, as they do not need RobotInfo
         if (rc.canSenseRadiusSquared(3) && rc.senseNearbyRobots(3, enemy) != null && rc.canEmpower(3)
                 && role.equals("111")) {
             rc.empower(3);
