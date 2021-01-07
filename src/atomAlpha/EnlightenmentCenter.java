@@ -4,8 +4,8 @@ import battlecode.common.*;
 import java.util.*;
 
 public class EnlightenmentCenter {
-    public static boolean scoutingPhase = true;
-    public static boolean setGuard = false;
+    public static boolean scoutingPhase = false;
+    public static boolean setGuard = true;
     public static boolean rushPhase = false;
     public static boolean earlyDefensive = false;
 
@@ -166,6 +166,9 @@ public class EnlightenmentCenter {
             if (rc.canBuildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence)) {
                 rc.buildRobot(RobotType.POLITICIAN, Helper.directions[dirIndex * 2 + 1], influence);
                 guardCount++;
+            }
+            if (guardCount >= 4) {
+                setGuard = false;
             }
         } else {
             if (enemyBases.size() > 0) {
