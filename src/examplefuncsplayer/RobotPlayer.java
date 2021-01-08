@@ -10,8 +10,6 @@ public strictfp class RobotPlayer {
     static final Direction[] directions = { Direction.NORTH, Direction.NORTHEAST, Direction.EAST, Direction.SOUTHEAST,
             Direction.SOUTH, Direction.SOUTHWEST, Direction.WEST, Direction.NORTHWEST, };
 
-    static int turnCount;
-
     /**
      * run() is the method that is called when a robot is instantiated in the
      * Battlecode world. If this method returns, the robot dies!
@@ -24,11 +22,8 @@ public strictfp class RobotPlayer {
         // and to get information on its current status.
         RobotPlayer.rc = rc;
 
-        turnCount = 0;
-
         // System.out.println("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
-            turnCount += 1;
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 // Here, we've separated the controls into a different method for each
