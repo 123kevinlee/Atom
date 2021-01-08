@@ -87,7 +87,7 @@ public class Politician {
             }
         }
         if (role.equals("111") && Pathfinding.getDefenseReached() == false && rc.isReady()) {
-            Pathfinding.findDefenseLocation(rc, originPoint);
+            Pathfinding.findDefenseLocation(rc, Data.originPoint);
         }
         // create a locking mechanism and chasing mechanism
         if (rc.canSenseRadiusSquared(9) && defensible.length > 0 && rc.canEmpower(9) && role.equals("111")) {
@@ -99,8 +99,8 @@ public class Politician {
     }
 
     public static void init(RobotController rc) throws GameActionException {
-        if (rc.canSenseRadiusSquared(1)) {
-            for (RobotInfo robot : rc.senseNearbyRobots(2, rc.getTeam())) {
+        if (rc.canSenseRadiusSquared(3)) {
+            for (RobotInfo robot : rc.senseNearbyRobots(3, rc.getTeam())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
                     Data.baseId = robot.getID();
                     if (rc.canGetFlag(Data.baseId)) {

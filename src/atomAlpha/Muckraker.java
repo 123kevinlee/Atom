@@ -39,11 +39,7 @@ public class Muckraker {
                                 rc.setFlag(outMsg);
                             }
                             end = true;
-
-                            if (rc.canMove(scoutDirection.rotateRight().rotateRight())) {
-                                scoutDirection = scoutDirection.rotateRight().rotateRight();
-                                rc.move(scoutDirection.rotateRight().rotateRight());
-                            }
+                            turnRight(rc);
                         }
                         break;
                     case EAST:
@@ -57,11 +53,7 @@ public class Muckraker {
                                 rc.setFlag(outMsg);
                             }
                             end = true;
-
-                            if (rc.canMove(scoutDirection.rotateRight().rotateRight())) {
-                                scoutDirection = scoutDirection.rotateRight().rotateRight();
-                                rc.move(scoutDirection.rotateRight().rotateRight());
-                            }
+                            turnRight(rc);
                         }
                         break;
                     case SOUTH:
@@ -75,11 +67,7 @@ public class Muckraker {
                                 rc.setFlag(outMsg);
                             }
                             end = true;
-
-                            if (rc.canMove(scoutDirection.rotateRight().rotateRight())) {
-                                scoutDirection = scoutDirection.rotateRight().rotateRight();
-                                rc.move(scoutDirection.rotateRight().rotateRight());
-                            }
+                            turnRight(rc);
                         }
                         break;
                     case WEST:
@@ -93,11 +81,7 @@ public class Muckraker {
                                 rc.setFlag(outMsg);
                             }
                             end = true;
-
-                            if (rc.canMove(scoutDirection.rotateRight().rotateRight())) {
-                                scoutDirection = scoutDirection.rotateRight().rotateRight();
-                                rc.move(scoutDirection.rotateRight().rotateRight());
-                            }
+                            turnRight(rc);
                         }
                         break;
                     default:
@@ -151,6 +135,15 @@ public class Muckraker {
                     rc.move(targetDirection);
                 }
             }
+        }
+    }
+
+    public static void turnRight(RobotController rc) throws GameActionException {
+        Pathfinding.setStartLocation(rc);
+        scoutDirection = scoutDirection.rotateRight().rotateRight();
+        Direction nextMove = Pathfinding.chooseBestNextStep(rc, scoutDirection);
+        if (rc.canMove(nextMove)) {
+            rc.move(nextMove);
         }
     }
 
