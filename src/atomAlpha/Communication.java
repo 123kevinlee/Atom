@@ -13,6 +13,9 @@ public class Communication {
             case "WALL":
                 outMsg += "4";
                 break;
+            case "CORNER":
+                outMsg += "5";
+                break;
         }
         Boolean xNeg = dx < 0;
         Boolean yNeg = dy < 0;

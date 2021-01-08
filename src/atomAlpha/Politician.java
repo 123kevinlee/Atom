@@ -86,10 +86,9 @@ public class Politician {
         // System.out.println("I moved!");
         // create a locking mechanism and chasing mechanism
     }
-
     public static void init(RobotController rc) throws GameActionException {
-        if (rc.canSenseRadiusSquared(1)) {
-            for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
+        if (rc.canSenseRadiusSquared(3)) {
+            for (RobotInfo robot : rc.senseNearbyRobots(3, rc.getTeam())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
                     Data.baseId = robot.getID();
                     if (rc.canGetFlag(Data.baseId)) {

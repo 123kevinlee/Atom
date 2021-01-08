@@ -155,8 +155,8 @@ public class Muckraker {
     }
 
     public static void init(RobotController rc) throws GameActionException {
-        if (rc.canSenseRadiusSquared(1)) {
-            for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
+        if (rc.canSenseRadiusSquared(3)) {
+            for (RobotInfo robot : rc.senseNearbyRobots(3, rc.getTeam())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
                     if (rc.canGetFlag(robot.getID())) {
                         if (rc.canSetFlag(rc.getFlag(robot.getID()))) {

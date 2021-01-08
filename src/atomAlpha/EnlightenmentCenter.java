@@ -9,12 +9,12 @@ public class EnlightenmentCenter {
 
     public static boolean scoutingPhase = true;
     public static boolean setGuard = false;
-    public static boolean rushPhase = false;
+    public static boolean rushPhase = true;
     public static boolean earlyDefensive = false;
     public static boolean firstFarmers = true;
 
     public static int scoutCount = 0;
-    public static int scoutLimit = 8;
+    public static int scoutLimit = 4;
     public static int guardCount = 0;
     public static int begFarmerLimit = 4;
     public static int farmerCount = 0;
@@ -62,21 +62,6 @@ public class EnlightenmentCenter {
             int influence = 1;
             Direction designatedDirection = directions[dirIndex * 2];
 
-            /*
-             * Direction safeDir = Direction.CENTER; int safeX = 0; int safeY = 0; for (int
-             * i = 0; i < 4; i++) { if (i == 0 || i == 2) { safeX = mapBorders[i]; } if (i
-             * == 1 || i == 3) { safeY = mapBorders[i]; } }
-             * 
-             * if (safeX != 0 && safeY != 0) { safeDir = Data.originPoint.directionTo(new
-             * MapLocation(safeX, safeY)); }
-             * 
-             * int farmerInfluence = (rc.getInfluence() - bidAmount); if (scoutCount > 4 &&
-             * farmerCount <= begFarmerLimit && safeDir != Direction.CENTER &&
-             * rc.canBuildRobot(RobotType.SLANDERER, safeDir, farmerInfluence)) {
-             * rc.buildRobot(RobotType.MUCKRAKER, safeDir, farmerInfluence);
-             * System.out.println("Created Farmer with " + farmerInfluence + " influence");
-             * farmerCount++; }
-             */
             if (scoutCount < scoutLimit && rc.canBuildRobot(RobotType.MUCKRAKER, designatedDirection, influence)) {
                 if (rc.canSetFlag(100)) {
                     rc.setFlag(100);
@@ -123,16 +108,27 @@ public class EnlightenmentCenter {
 
                             switch (scoutIds.get(key)) {
                                 case NORTH:
-                                    mapBorders[0] = currentLocation.y + coords[1];
+                                    if(mapBorders[0] == 0){
+                                        mapBorders[0] = currentLocation.y + coords[1];
+                                    }
                                     break;
                                 case EAST:
-                                    mapBorders[1] = currentLocation.x + coords[0];
+                                    if(mapBorders[1] == 0){
+                                        mapBorders[1] = currentLocation.x + coords[0];
+                                    }
                                     break;
                                 case SOUTH:
-                                    mapBorders[2] = currentLocation.y + coords[1];
+                                    if(mapBorders[2] == 0){
+                                        mapBorders[2] = currentLocation.y + coords[1];
+                                        System.out.println("y val : " + mapBorders[2]);
+                                    }
+                                    
                                     break;
                                 case WEST:
+                                    if(mapBorders[3] == 0){
                                     mapBorders[3] = currentLocation.x + coords[0];
+                                    System.out.println("x val : " + mapBorders[3]);
+                                    }
                                     break;
                                 default:
                                     break;
@@ -257,9 +253,119 @@ public class EnlightenmentCenter {
         // System.out.println(mapBorders[0]);
         // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
 
-        if (setGuard == true)
+        //MAKE SURE THAT THE CODE BELOW IS UPDATED when the world map is complete!
+        if(firstFarmers == true){
+            // if(rc.canSetFlag(901)) {
+            //     rc.setFlag(901);
+            // }
 
-        {
+
+            int farmerInfluence = 10;
+            MapLocation Base = rc.getLocation();
+            Direction safeDir = Direction.CENTER;
+
+            //stores a location within the mapBorders array
+            int arrayLocX = -1;
+            int arrayLocY = -1;
+
+            int cornerCoordX = 0;
+            int cornerCoordY = 0;
+
+            if(mapBorders[0] == 0 || mapBorders[2] == 0){
+                for(int i = 0; i < mapBorders.length; i+=2){
+                    if(mapBorders[i] !=0){
+                        arrayLocY = i;
+                        // distanceY = Math.abs(Base.y - mapBorders[i]);
+                    }
+                }
+            } else{
+                int minBorder = Math.abs(mapBorders[0]);
+                arrayLocY = 0;
+
+                for(int i = 0; i < mapBorders.length; i+=2){
+                    if(Math.abs(mapBorders[i]) < minBorder){
+                        arrayLocY = i;
+                    }
+                }
+            }
+
+            //System.out.println(arrayLocY);
+
+            if(mapBorders[1] == 0 || mapBorders[3] == 0){
+                for(int i = 1; i < mapBorders.length; i+=2){
+                    if(mapBorders[i] !=0){
+                        arrayLocX = i;
+                        // distanceX = Math.abs(Base.x - mapBorders[i]);
+                    }
+                }
+            } else{
+                int minBorder = Math.abs(mapBorders[1]);
+                arrayLocX = 1;
+
+                for(int i = 1; i < mapBorders.length; i+=2){
+                    if(Math.abs(mapBorders[i]) < minBorder){
+                        arrayLocX = i;
+                    }
+                }
+            }
+
+            //System.out.println("array N/S :" + arrayLocY + ", array E/W : " + arrayLocX);
+
+            if(arrayLocY != -1 && arrayLocX != -1){
+                cornerCoordY = mapBorders[arrayLocY];
+                cornerCoordX = mapBorders[arrayLocX];
+            }
+
+            if (cornerCoordX != 0 && cornerCoordY != 0){
+                //System.out.println("The closest corner is " + mapBorders[arrayLocY] + " , " + mapBorders[arrayLocX]);
+                MapLocation safeCorner = new MapLocation(cornerCoordX, cornerCoordY);
+                safeDir = Base.directionTo(safeCorner);
+
+                System.out.println("The safe direction is: " + safeDir);
+
+                MapLocation currentLocation = rc.getLocation();
+                int dx = safeCorner.x - currentLocation.x;
+                int dy = safeCorner.y - currentLocation.y;
+
+                if (scoutCount > 3 && farmerCount <= begFarmerLimit && safeDir != Direction.CENTER && rc.canBuildRobot(RobotType.SLANDERER, safeDir, farmerInfluence)) {
+                    if (rc.canSetFlag(Communication.coordEncoder("CORNER", dx, dy))) {
+                        rc.setFlag(Communication.coordEncoder("CORNER", dx, dy));
+                    }
+
+
+                    rc.buildRobot(RobotType.SLANDERER, safeDir, farmerInfluence);
+                    System.out.println("Created Farmer with " + farmerInfluence + " influence in the " + safeDir + " Direction" + ", dx : " + dx + ", dy: " + dy);
+                    farmerCount++;
+                }
+            }
+
+        }
+
+        
+        /*
+             * Direction safeDir = Direction.CENTER; 
+             *  int safeX = 0; 
+             *  int safeY = 0; 
+             *  for (int i = 0; i < 4; i++) { 
+             *     if (i == 0 || i == 2) { 
+             *      safeX = mapBorders[i]; 
+             *   } if (i == 1 || i == 3) { 
+             *      safeY = mapBorders[i]; 
+             *  }
+             * }
+             * 
+             * if (safeX != 0 && safeY != 0) { safeDir = Data.originPoint.directionTo(new
+             * MapLocation(safeX, safeY)); }
+             * 
+             * int farmerInfluence = (rc.getInfluence() - bidAmount); if (scoutCount > 4 &&
+             * farmerCount <= begFarmerLimit && safeDir != Direction.CENTER &&
+             * rc.canBuildRobot(RobotType.SLANDERER, safeDir, farmerInfluence)) {
+             * rc.buildRobot(RobotType.MUCKRAKER, safeDir, farmerInfluence);
+             * System.out.println("Created Farmer with " + farmerInfluence + " influence");
+             * farmerCount++; }
+             */
+
+        if (setGuard == true) {
             if (rc.canSetFlag(111)) {
                 rc.setFlag(111); // defender politician
             }
