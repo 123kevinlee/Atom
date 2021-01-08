@@ -28,6 +28,7 @@ public class EnlightenmentCenter {
                                                                 // only contribute with absolute units -- nothing based
                                                                 // on their direction
     public static Map<Integer, String> scoutLastMessage = new HashMap<Integer, String>();
+    public static Set<Integer> farmerIds = new HashSet<Integer>();
     public static int[] mapBorders = new int[4]; // 0=NORTH 1=EAST 2=SOUTH 3=WEST
     public static boolean mapComplete = false;
     public static LinkedHashSet<MapLocation> enemyBases = new LinkedHashSet<MapLocation>();
@@ -36,6 +37,21 @@ public class EnlightenmentCenter {
 
     public static void run(RobotController rc) throws GameActionException {
         calculateInfluenceGain(rc);
+
+        int removeId = 0;
+        for (Integer id : farmerIds) {
+            if (!rc.canGetFlag(id)) { // farmer died
+                farmerIds.remove(id);
+            } else {
+                String flag = Integer.toString(rc.getFlag(id));
+                if (!flag.equals("0")) {
+                    removeId = id;
+                }
+            }
+        }
+        farmerIds.remove(removeId);
+
+        System.out.println(farmerIds.size());
 
         if (scoutingPhase) {
             scoutPhase(rc);
@@ -132,6 +148,11 @@ public class EnlightenmentCenter {
                     // the " + safeDir
                     // + " Direction" + ", dx : " + dx + ", dy: " + dy);
                     farmerCount++;
+                    if (rc.canSenseRadiusSquared(3)) {
+                        for (RobotInfo robot : rc.senseNearbyRobots(3, rc.getTeam())) {
+                            farmerIds.add(robot.getID());
+                        }
+                    }
                 }
             }
             if (farmerCount == begFarmerLimit) {
@@ -180,8 +201,8 @@ public class EnlightenmentCenter {
             rc.buildRobot(RobotType.MUCKRAKER, designatedDirection, influence);
             // System.out.println("Created Scout with " + influence + " influence");
             scoutCount++;
-            if (rc.canSenseRadiusSquared(1)) {
-                for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
+            if (rc.canSenseRadiusSquared(3)) {
+                for (RobotInfo robot : rc.senseNearbyRobots(3, rc.getTeam())) {
                     if (!scoutIds.keySet().contains(robot.getID())) {
                         scoutIds.put(robot.getID(), designatedDirection);
                     }

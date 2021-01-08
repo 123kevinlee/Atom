@@ -27,9 +27,12 @@ public class Politician {
         // return;
         // }
 
-        System.out.println(role);
+        // System.out.println(role);
 
         if (role.equals("")) { // this means it justconverted from slanderer
+            if (rc.canSetFlag(1)) {
+                rc.setFlag(1);
+            }
             if (attackable.length != 0 && chaseCount != -1) {
                 System.out.println("TRACKING");
 
@@ -166,6 +169,12 @@ public class Politician {
 
         else if (role.equals("111")) {
             if (Pathfinding.getDefenseReached() == false && rc.isReady()) {
+                if (!rc.getLocation().equals(Data.originPoint.add(Direction.NORTHEAST))
+                        || !rc.getLocation().equals(Data.originPoint.add(Direction.NORTHWEST))
+                        || !rc.getLocation().equals(Data.originPoint.add(Direction.SOUTHEAST))
+                        || !rc.getLocation().equals(Data.originPoint.add(Direction.SOUTHWEST))) {
+                    // Pathfinding.chooseRandomDefenseLocation(rc, Data.originPoint);
+                }
                 Pathfinding.findDefenseLocation(rc, Data.originPoint);
             }
             // create a locking mechanism and chasing mechanism
