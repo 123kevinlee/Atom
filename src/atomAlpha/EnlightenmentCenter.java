@@ -33,6 +33,10 @@ public class EnlightenmentCenter {
     public static Map<Direction, MapLocation> enemyCoords = new TreeMap<Direction, MapLocation>();
     public static LinkedHashSet<MapLocation> possibleEnemyBases = new LinkedHashSet<MapLocation>();
 
+    public static HashMap<MapLocation, Boolean> openSpots = new HashMap<MapLocation, Boolean>();
+    public static boolean openSpotsSet = false;
+    public static int delayTurn = 0;
+
     public static void run(RobotController rc) throws GameActionException {
         calculateInfluenceGain(rc);
 
@@ -341,25 +345,36 @@ public class EnlightenmentCenter {
          */
 
         if (guardCount > 3) {
-            RobotInfo[] bots = rc.senseNearbyRobots();
-            for (RobotInfo robot : bots) {
-                int robotId = robot.getID();
-                if (rc.canGetFlag(robotId) && rc.getFlag(robotId) == 111) {
-                    guardCount--;
-                    guardsFull = false;
+            if (delayTurn > 0) {
+                RobotInfo[] bots = rc.senseNearbyRobots();
+                System.out.println(bots);
+                int count = 0;
+                for (RobotInfo robot : bots) {
+                    int robotId = robot.getID();
+                    if (rc.canGetFlag(robotId) && rc.getFlag(robotId) == 111) {
+                        count++;
+                        System.out.println("CHECKING GUARD COUNT AND IT IS " + count);
+                    }
+                }
+                if (count <= 3) {
+                    guardCount = count;
                     setGuard = true;
+                    System.out.println("CREATE NEW GUARD");
+                    delayTurn = 0;
                 }
             }
+            delayTurn++;
+        }
+        MapLocation baseLoc = Data.originPoint;
+        MapLocation[] defenseSpots = new MapLocation[] {baseLoc.translate(3, 3), baseLoc.translate(3, -3), baseLoc.translate(-3, -3), baseLoc.translate(-3, 3)};
+        if (!openSpotsSet) {
+            openSpots.put(baseLoc.translate(3, 3), false);
+            openSpots.put(baseLoc.translate(3, -3), false);
+            openSpots.put(baseLoc.translate(-3, -3), false);
+            openSpots.put(baseLoc.translate(-3, 3), false);    
+            openSpotsSet = true;        
         }
         if (setGuard == true) {
-            MapLocation baseLoc = Data.originPoint;
-            MapLocation[] defenseSpots = new MapLocation[] {baseLoc.translate(3, 3), baseLoc.translate(3, -3), baseLoc.translate(-3, -3), baseLoc.translate(-3, 3)};
-            HashMap<MapLocation, Boolean> openSpots = new HashMap<MapLocation, Boolean>() {{
-                put(baseLoc.translate(3, 3), false);
-                put(baseLoc.translate(3, -3), false);
-                put(baseLoc.translate(-3, -3), false);
-                put(baseLoc.translate(-3, 3), false);            
-            }};
             Object[] openKeys = openSpots.keySet().toArray();
             HashMap<MapLocation, Direction> spots = new HashMap<MapLocation, Direction>();
             if (!openSpots.get(baseLoc.translate(3, 3))) { spots.put(baseLoc.translate(3, 3), Direction.NORTHEAST); }
@@ -370,11 +385,11 @@ public class EnlightenmentCenter {
             int influence = 15;
             for (int i = 0; i < spots.size(); i++) {
                 MapLocation loc = (MapLocation) keys[i];
-                System.out.println("DEFENSE LOCATION: " + loc);
                 if (rc.canSetFlag(111) && rc.canBuildRobot(RobotType.POLITICIAN, spots.get(loc), influence)) {
                     rc.setFlag(111); // defender politician
                     rc.buildRobot(RobotType.POLITICIAN, spots.get(loc), influence);
                     guardCount++;
+                    System.out.println("THE GUARD COUNT IS " + guardCount);
                     openSpots.replace(loc, false, true);
                     spots.remove(loc);
                     if (guardCount > 3) {
@@ -383,11 +398,6 @@ public class EnlightenmentCenter {
                     }
                     break;
                 }
-            }
-
-            if (guardCount > 3) {
-                setGuard = false;
-                guardsFull = true;
             }
         } else {
             if (enemyBases.size() > 0) {

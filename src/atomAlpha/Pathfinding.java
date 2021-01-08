@@ -106,7 +106,7 @@ public class Pathfinding {
     }
 
     public static void findDefenseLocation(RobotController rc, MapLocation baseLoc) throws GameActionException {
-        Map<MapLocation, MapLocation> spots = new TreeMap<MapLocation, MapLocation>() {
+        HashMap<MapLocation, MapLocation> spots = new HashMap<MapLocation, MapLocation>() {
             {
                 put(baseLoc.translate(1, 1), baseLoc.translate(3, 3));
                 put(baseLoc.translate(1, -1), baseLoc.translate(3, -3));
@@ -135,6 +135,13 @@ public class Pathfinding {
             defenseLocReached = true;
             System.out.println("REACHED TARGET LOCATION");
         }
+    }
+
+    public static MapLocation chooseRandomDefenseLocation(RobotController rc, MapLocation baseLoc) throws GameActionException {
+        MapLocation[] defenseSpots = new MapLocation[] { baseLoc.translate(3, 3), baseLoc.translate(3, -3), baseLoc.translate(-3, -3), baseLoc.translate(-3, 3) };
+        int randSpot = (int) (Math.random() * 3);
+        targetLoc = defenseSpots[randSpot];
+        return targetLoc;
     }
 
     public static boolean getDefenseReached() throws GameActionException {
