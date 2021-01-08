@@ -3,21 +3,30 @@ package atomAlpha;
 import battlecode.common.*;
 
 public class Politician {
-    public static String role = "";
+    public static String role = "empty";
+    public static MapLocation originPoint;
 
     public static void run(RobotController rc) throws GameActionException {
 
-        Team enemy = rc.getTeam().opponent();
-
         MapLocation myLoc = rc.getLocation();
-
         int detectionRadiusSquared = 25;
         int actionRadiusSquared = 9;
+
         int chaseCount = 0;
+        int actionRadius = 1;
+        int defenseRadius = 9;
 
-        RobotInfo[] attackable = rc.senseNearbyRobots(myLoc, detectionRadiusSquared, enemy);
+        Team enemy = rc.getTeam().opponent();
 
-        int thisId = rc.getID();
+        RobotInfo[] defensible = rc.senseNearbyRobots(defenseRadius, enemy);
+        RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemy);
+        // if (attackable.length != 0 && rc.canEmpower(actionRadius)) {
+        // // System.out.println("empowering...");
+        // rc.empower(actionRadius);
+        // // System.out.println("empowered");
+        // return;
+        // }
+
         if (role.equals("")) { // this means it justconverted from slanderer
             if (rc.canGetFlag(Data.baseId)) {
                 // command center stuff
@@ -77,11 +86,13 @@ public class Politician {
                 rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
             }
         }
-
-        // This is for the defending politicians, as they do not need RobotInfo
-        if (rc.canSenseRadiusSquared(3) && rc.senseNearbyRobots(3, enemy) != null && rc.canEmpower(3)
-                && role.equals("111")) {
-            rc.empower(3);
+        if (role.equals("111") && Pathfinding.getDefenseReached() == false && rc.isReady()) {
+            Pathfinding.findDefenseLocation(rc, Data.originPoint);
+        }
+        // create a locking mechanism and chasing mechanism
+        if (rc.canSenseRadiusSquared(9) && defensible.length > 0 && rc.canEmpower(9) && role.equals("111")) {
+            System.out.println("EMPOWER");
+            rc.empower(9);
         }
         // System.out.println("I moved!");
         // create a locking mechanism and chasing mechanism
