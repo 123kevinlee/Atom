@@ -21,10 +21,10 @@ public class Politician {
         RobotInfo[] defensible = rc.senseNearbyRobots(defenseRadius, enemy);
         RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemy);
         // if (attackable.length != 0 && rc.canEmpower(actionRadius)) {
-        //     // System.out.println("empowering...");
-        //     rc.empower(actionRadius);
-        //     // System.out.println("empowered");
-        //     return;
+        // // System.out.println("empowering...");
+        // rc.empower(actionRadius);
+        // // System.out.println("empowered");
+        // return;
         // }
 
         if (role.equals("")) { // this means it justconverted from slanderer
@@ -85,20 +85,13 @@ public class Politician {
             if (rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection))) {
                 rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
             }
-        } 
+        }
         if (role.equals("111") && Pathfinding.getDefenseReached() == false && rc.isReady()) {
             Pathfinding.findDefenseLocation(rc, originPoint);
         }
-<<<<<<< HEAD
         // create a locking mechanism and chasing mechanism
-        if (rc.canSenseRadiusSquared(9) && defensible.length > 0 && rc.canEmpower(9)
-=======
-
-        // This is for the defending politicians, as they do not need RobotInfo
-        if (rc.canSenseRadiusSquared(3) && rc.senseNearbyRobots(3, enemy) != null && rc.canEmpower(3)
->>>>>>> dev
-                && role.equals("111")) {
-                    System.out.println("EMPOWER");
+        if (rc.canSenseRadiusSquared(9) && defensible.length > 0 && rc.canEmpower(9) && role.equals("111")) {
+            System.out.println("EMPOWER");
             rc.empower(9);
         }
         // System.out.println("I moved!");
@@ -109,11 +102,6 @@ public class Politician {
         if (rc.canSenseRadiusSquared(1)) {
             for (RobotInfo robot : rc.senseNearbyRobots(2, rc.getTeam())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
-<<<<<<< HEAD
-                    if (rc.canGetFlag(robot.getID())) {                     
-                        role = Integer.toString(rc.getFlag(robot.getID()));
-                        originPoint = robot.getLocation();                        
-=======
                     Data.baseId = robot.getID();
                     if (rc.canGetFlag(Data.baseId)) {
                         if (rc.canSetFlag(rc.getFlag(Data.baseId))) {
@@ -121,7 +109,6 @@ public class Politician {
                             Data.originPoint = robot.getLocation();
                             Data.initRound = rc.getRoundNum();
                         }
->>>>>>> dev
                     }
                 }
             }

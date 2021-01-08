@@ -4,8 +4,6 @@ import battlecode.common.*;
 import java.util.*;
 
 public class EnlightenmentCenter {
-<<<<<<< HEAD
-=======
     static final Direction[] directions = { Direction.NORTH, Direction.NORTHEAST, Direction.EAST, Direction.SOUTHEAST,
             Direction.SOUTH, Direction.SOUTHWEST, Direction.WEST, Direction.NORTHWEST, };
 
@@ -13,7 +11,6 @@ public class EnlightenmentCenter {
     public static int lastInfluenceGain = 0;
     public static int lastVotes = 0;
 
->>>>>>> dev
     public static boolean scoutingPhase = true;
     public static boolean setGuard = false;
     public static boolean rushPhase = false;
@@ -234,9 +231,9 @@ public class EnlightenmentCenter {
             if (rc.canSetFlag(111) && rc.canBuildRobot(RobotType.POLITICIAN, directions[dirIndex * 2 + 1], influence)) {
                 rc.setFlag(111); // defender politician
                 rc.buildRobot(RobotType.POLITICIAN, directions[dirIndex * 2 + 1], influence);
-                guardCount++; 
+                guardCount++;
             }
-                
+
             if (guardCount > 4) {
                 setGuard = false;
                 guardsFull = true;
