@@ -13,7 +13,7 @@ public class EnlightenmentCenter {
 
     public static boolean scoutingPhase = true;
     public static boolean setGuard = false;
-    public static boolean rushPhase = true;
+    public static boolean rushPhase = false;
     public static boolean earlyDefensive = false;
     public static boolean firstFarmers = true;
 
@@ -340,13 +340,49 @@ public class EnlightenmentCenter {
          * farmerCount++; }
          */
 
+        if (guardCount > 3) {
+            RobotInfo[] bots = rc.senseNearbyRobots();
+            for (RobotInfo robot : bots) {
+                int robotId = robot.getID();
+                if (rc.canGetFlag(robotId) && rc.getFlag(robotId) == 111) {
+                    guardCount--;
+                    guardsFull = false;
+                    setGuard = true;
+                }
+            }
+        }
         if (setGuard == true) {
-            int influence = 10;
-            int dirIndex = guardCount % 4;
-            if (rc.canSetFlag(111) && rc.canBuildRobot(RobotType.POLITICIAN, directions[dirIndex * 2 + 1], influence)) {
-                rc.setFlag(111); // defender politician
-                rc.buildRobot(RobotType.POLITICIAN, directions[dirIndex * 2 + 1], influence);
-                guardCount++;
+            MapLocation baseLoc = Data.originPoint;
+            MapLocation[] defenseSpots = new MapLocation[] {baseLoc.translate(3, 3), baseLoc.translate(3, -3), baseLoc.translate(-3, -3), baseLoc.translate(-3, 3)};
+            HashMap<MapLocation, Boolean> openSpots = new HashMap<MapLocation, Boolean>() {{
+                put(baseLoc.translate(3, 3), false);
+                put(baseLoc.translate(3, -3), false);
+                put(baseLoc.translate(-3, -3), false);
+                put(baseLoc.translate(-3, 3), false);            
+            }};
+            Object[] openKeys = openSpots.keySet().toArray();
+            HashMap<MapLocation, Direction> spots = new HashMap<MapLocation, Direction>();
+            if (!openSpots.get(baseLoc.translate(3, 3))) { spots.put(baseLoc.translate(3, 3), Direction.NORTHEAST); }
+            if (!openSpots.get(baseLoc.translate(3, -3))) { spots.put(baseLoc.translate(3, -3), Direction.SOUTHEAST); }
+            if (!openSpots.get(baseLoc.translate(-3, -3))) { spots.put(baseLoc.translate(-3, -3), Direction.SOUTHWEST); }
+            if (!openSpots.get(baseLoc.translate(-3, 3))) { spots.put(baseLoc.translate(-3, 3), Direction.NORTHWEST); }
+            Object[] keys = spots.keySet().toArray();
+            int influence = 15;
+            for (int i = 0; i < spots.size(); i++) {
+                MapLocation loc = (MapLocation) keys[i];
+                System.out.println("DEFENSE LOCATION: " + loc);
+                if (rc.canSetFlag(111) && rc.canBuildRobot(RobotType.POLITICIAN, spots.get(loc), influence)) {
+                    rc.setFlag(111); // defender politician
+                    rc.buildRobot(RobotType.POLITICIAN, spots.get(loc), influence);
+                    guardCount++;
+                    openSpots.replace(loc, false, true);
+                    spots.remove(loc);
+                    if (guardCount > 3) {
+                        setGuard = false;
+                        guardsFull = true;
+                    }
+                    break;
+                }
             }
 
             if (guardCount > 3) {

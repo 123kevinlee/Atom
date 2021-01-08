@@ -104,6 +104,7 @@ public class Politician {
                     Data.baseId = robot.getID();
                     if (rc.canGetFlag(Data.baseId)) {
                         if (rc.canSetFlag(rc.getFlag(Data.baseId))) {
+                            rc.setFlag(rc.getFlag(Data.baseId));
                             role = Integer.toString(rc.getFlag(Data.baseId));
                             Data.originPoint = robot.getLocation();
                             Data.initRound = rc.getRoundNum();
