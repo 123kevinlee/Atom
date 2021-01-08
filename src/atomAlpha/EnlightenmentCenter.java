@@ -349,7 +349,7 @@ public class EnlightenmentCenter {
                 guardCount++;
             }
 
-            if (guardCount > 4) {
+            if (guardCount > 3) {
                 setGuard = false;
                 guardsFull = true;
             }
