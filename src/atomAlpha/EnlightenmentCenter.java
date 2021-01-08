@@ -40,152 +40,154 @@ public class EnlightenmentCenter {
         calculateFarmers(rc);
 
         if (scoutingPhase) {
-            int dirIndex = scoutCount % 4;
-            int influence = 1;
-            Direction designatedDirection = directions[dirIndex * 2];
+            scoutPhase(rc);
+            // int dirIndex = scoutCount % 4;
+            // int influence = 1;
+            // Direction designatedDirection = Data.directions[dirIndex * 2];
 
-            if (scoutCount < scoutLimit && rc.canBuildRobot(RobotType.MUCKRAKER, designatedDirection, influence)) {
-                if (rc.canSetFlag(100)) {
-                    rc.setFlag(100);
-                }
+            // if (scoutCount < scoutLimit && rc.canBuildRobot(RobotType.MUCKRAKER,
+            // designatedDirection, influence)) {
+            // if (rc.canSetFlag(100)) {
+            // rc.setFlag(100);
+            // }
 
-                rc.buildRobot(RobotType.MUCKRAKER, designatedDirection, influence);
-                System.out.println("Created Scout with " + influence + " influence");
-                scoutCount++;
-                if (rc.canSenseRadiusSquared(1)) {
-                    for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
-                        scoutIds.put(robot.getID(), designatedDirection);
-                    }
-                }
-            }
+            // rc.buildRobot(RobotType.MUCKRAKER, designatedDirection, influence);
+            // System.out.println("Created Scout with " + influence + " influence");
+            // scoutCount++;
+            // if (rc.canSenseRadiusSquared(1)) {
+            // for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
+            // scoutIds.put(robot.getID(), designatedDirection);
+            // }
+            // }
+            // }
 
-            if (scoutCount >= scoutLimit && !guardsFull) {
-                setGuard = true;
-            }
+            // if (scoutCount >= scoutLimit && !guardsFull) {
+            // setGuard = true;
+            // }
 
-            Object removeId = null;
-            Object[] keys = scoutIds.keySet().toArray();
+            // Object removeId = null;
+            // Object[] keys = scoutIds.keySet().toArray();
 
-            for (Object key : keys) {
-                if (rc.canGetFlag((int) key)) {
-                    int flag = rc.getFlag((int) key);
-                    if (flag != 0) {
-                        // System.out.println("id: " + key + " msg:" + flag);
+            // for (Object key : keys) {
+            // if (rc.canGetFlag((int) key)) {
+            // int flag = rc.getFlag((int) key);
+            // if (flag != 0) {
+            // // System.out.println("id: " + key + " msg:" + flag);
 
-                        String msg = Integer.toString(flag);
-                        int[] coords = Communication.coordDecoder(msg);
+            // String msg = Integer.toString(flag);
+            // int[] coords = Communication.coordDecoder(msg);
 
-                        if (msg.charAt(0) == '2') {
-                            MapLocation currentLocation = rc.getLocation();
-                            coords[0] += currentLocation.x;
-                            coords[1] += currentLocation.y;
-                            System.out.println("ENEMY BASE: " + coords[0] + "," + coords[1]);
+            // if (msg.charAt(0) == '2') {
+            // MapLocation currentLocation = rc.getLocation();
+            // coords[0] += currentLocation.x;
+            // coords[1] += currentLocation.y;
+            // System.out.println("ENEMY BASE: " + coords[0] + "," + coords[1]);
 
-                            enemyBases.add(new MapLocation(coords[0], coords[1]));
-                            // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
-                        } else if (msg.charAt(0) == '3') {
-                            scoutLastMessage.put((int) key, msg);
-                        }
+            // enemyBases.add(new MapLocation(coords[0], coords[1]));
+            // // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
+            // } else if (msg.charAt(0) == '3') {
+            // scoutLastMessage.put((int) key, msg);
+            // }
 
-                        else if (msg.charAt(0) == '4') {
-                            // System.out.println("WALL: " + coords[0] + "," + coords[1]);
+            // else if (msg.charAt(0) == '4') {
+            // // System.out.println("WALL: " + coords[0] + "," + coords[1]);
 
-                            MapLocation currentLocation = rc.getLocation();
+            // MapLocation currentLocation = rc.getLocation();
 
-                            switch (scoutIds.get(key)) {
-                                case NORTH:
-                                    if (mapBorders[0] == 0) {
-                                        mapBorders[0] = currentLocation.y + coords[1];
-                                        System.out.println("y val north: " + mapBorders[1]);
-                                    }
-                                    break;
-                                case EAST:
-                                    if (mapBorders[1] == 0) {
-                                        mapBorders[1] = currentLocation.x + coords[0];
-                                        System.out.println("y val East: " + mapBorders[2]);
-                                    }
-                                    break;
-                                case SOUTH:
-                                    if (mapBorders[2] == 0) {
-                                        mapBorders[2] = currentLocation.y + coords[1];
-                                        System.out.println("y val south: " + mapBorders[2]);
-                                    }
+            // switch (scoutIds.get(key)) {
+            // case NORTH:
+            // if (mapBorders[0] == 0) {
+            // mapBorders[0] = currentLocation.y + coords[1];
+            // System.out.println("y val north: " + mapBorders[1]);
+            // }
+            // break;
+            // case EAST:
+            // if (mapBorders[1] == 0) {
+            // mapBorders[1] = currentLocation.x + coords[0];
+            // System.out.println("y val East: " + mapBorders[2]);
+            // }
+            // break;
+            // case SOUTH:
+            // if (mapBorders[2] == 0) {
+            // mapBorders[2] = currentLocation.y + coords[1];
+            // System.out.println("y val south: " + mapBorders[2]);
+            // }
 
-                                    break;
-                                case WEST:
-                                    if (mapBorders[3] == 0) {
-                                        mapBorders[3] = currentLocation.x + coords[0];
-                                        System.out.println("x val West: " + mapBorders[3]);
-                                    }
-                                    break;
-                                default:
-                                    break;
-                            }
+            // break;
+            // case WEST:
+            // if (mapBorders[3] == 0) {
+            // mapBorders[3] = currentLocation.x + coords[0];
+            // System.out.println("x val West: " + mapBorders[3]);
+            // }
+            // break;
+            // default:
+            // break;
+            // }
 
-                            // method to find last border using the other 3 border values
-                            int zeroCount = 0;
-                            for (int i = 0; i < mapBorders.length; i++) {
-                                if (mapBorders[i] == 0) {
-                                    zeroCount++;
-                                }
-                            }
-                            if (zeroCount == 1 && !mapComplete) {
-                                System.out.println("Calculating World Map...");
-                                int missingIndex = 0;
-                                for (int i = 0; i < mapBorders.length; i++) {
-                                    if (mapBorders[i] == 0) {
-                                        missingIndex = i;
-                                    }
-                                }
-                                if (missingIndex % 2 == 0) { // North Or South
-                                    int width = Math.abs(mapBorders[1] - mapBorders[3]);
-                                    if (missingIndex == 0) {
-                                        mapBorders[missingIndex] = mapBorders[2] + width;
-                                    } else if (missingIndex == 2) {
-                                        mapBorders[missingIndex] = mapBorders[0] - width;
-                                    }
-                                } else {
-                                    int height = Math.abs(mapBorders[0] - mapBorders[2]);
-                                    if (missingIndex == 1) {
-                                        mapBorders[missingIndex] = mapBorders[3] + height;
-                                    } else if (missingIndex == 3) {
-                                        mapBorders[missingIndex] = mapBorders[1] - height;
-                                    }
-                                }
-                                mapComplete = true;
+            // // method to find last border using the other 3 border values
+            // int zeroCount = 0;
+            // for (int i = 0; i < mapBorders.length; i++) {
+            // if (mapBorders[i] == 0) {
+            // zeroCount++;
+            // }
+            // }
+            // if (zeroCount == 1 && !mapComplete) {
+            // System.out.println("Calculating World Map...");
+            // int missingIndex = 0;
+            // for (int i = 0; i < mapBorders.length; i++) {
+            // if (mapBorders[i] == 0) {
+            // missingIndex = i;
+            // }
+            // }
+            // if (missingIndex % 2 == 0) { // North Or South
+            // int width = Math.abs(mapBorders[1] - mapBorders[3]);
+            // if (missingIndex == 0) {
+            // mapBorders[missingIndex] = mapBorders[2] + width;
+            // } else if (missingIndex == 2) {
+            // mapBorders[missingIndex] = mapBorders[0] - width;
+            // }
+            // } else {
+            // int height = Math.abs(mapBorders[0] - mapBorders[2]);
+            // if (missingIndex == 1) {
+            // mapBorders[missingIndex] = mapBorders[3] + height;
+            // } else if (missingIndex == 3) {
+            // mapBorders[missingIndex] = mapBorders[1] - height;
+            // }
+            // }
+            // mapComplete = true;
 
-                                if (enemyCoords.size() > 0) {
-                                    Object[] baseKeys = enemyCoords.keySet().toArray();
-                                    currentLocation = rc.getLocation();
-                                    for (Object bKey : baseKeys) {
-                                        switch ((Direction) bKey) {
-                                            case NORTH:
-                                                possibleEnemyBases.add(new MapLocation(currentLocation.x,
-                                                        mapBorders[0] - (currentLocation.y - mapBorders[2])));
-                                                break;
-                                            case EAST:
-                                                possibleEnemyBases.add(new MapLocation(
-                                                        mapBorders[1] - (currentLocation.x - mapBorders[3]),
-                                                        currentLocation.y));
-                                                break;
-                                            case SOUTH:
-                                                possibleEnemyBases.add(new MapLocation(currentLocation.x,
-                                                        mapBorders[2] + (mapBorders[0] - currentLocation.y)));
-                                                break;
-                                            case WEST:
-                                                possibleEnemyBases.add(new MapLocation(
-                                                        mapBorders[3] + (mapBorders[1] - currentLocation.x),
-                                                        currentLocation.y));
-                                                break;
+            // if (enemyCoords.size() > 0) {
+            // Object[] baseKeys = enemyCoords.keySet().toArray();
+            // currentLocation = rc.getLocation();
+            // for (Object bKey : baseKeys) {
+            // switch ((Direction) bKey) {
+            // case NORTH:
+            // possibleEnemyBases.add(new MapLocation(currentLocation.x,
+            // mapBorders[0] - (currentLocation.y - mapBorders[2])));
+            // break;
+            // case EAST:
+            // possibleEnemyBases.add(new MapLocation(
+            // mapBorders[1] - (currentLocation.x - mapBorders[3]),
+            // currentLocation.y));
+            // break;
+            // case SOUTH:
+            // possibleEnemyBases.add(new MapLocation(currentLocation.x,
+            // mapBorders[2] + (mapBorders[0] - currentLocation.y)));
+            // break;
+            // case WEST:
+            // possibleEnemyBases.add(new MapLocation(
+            // mapBorders[3] + (mapBorders[1] - currentLocation.x),
+            // currentLocation.y));
+            // break;
 
-                                            default:
-                                                break;
-                                        }
-                                        System.out.println("Possible Enemy Base:"
-                                                + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1]
-                                                        .toString());
-                                    }
-           // scoutPhase(rc);
+            // default:
+            // break;
+            // }
+            // System.out.println("Possible Enemy Base:"
+            // + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1]
+            // .toString());
+            // }
+            // scoutPhase(rc);
         }
 
         if (scoutIds.size() > 0) {
@@ -201,7 +203,8 @@ public class EnlightenmentCenter {
             MapLocation Base = rc.getLocation();
             Direction safeDir = Direction.CENTER;
 
-            // stores a location within the mapBorders array, which will store the closest wall to the EC
+            // stores a location within the mapBorders array, which will store the closest
+            // wall to the EC
             int arrayLocX = -1;
             int arrayLocY = -1;
 
@@ -246,54 +249,60 @@ public class EnlightenmentCenter {
                 }
             }
 
-            // //Obtaining the closest border value even if adjacent borders are unidentified
-            // if (Math.abs(Base.y - mapBorders[0]) == 0 || Math.abs(Base.y - mapBorders[2]) == 0) {
-            //     for (int i = 0; i < mapBorders.length; i += 2) {
-            //         if (Math.abs(Base.y - mapBorders[i]) > 0) {
-            //             arrayLocY = i;
-            //             // distanceY = Math.abs(Base.y - mapBorders[i]);
-            //         }
-            //     }
-            // } else { //if the border values are all defined, this code will find the true closest border
-            //     int minBorder = Math.abs(Base.y - mapBorders[0]);
-            //     arrayLocY = 0;
+            // //Obtaining the closest border value even if adjacent borders are
+            // unidentified
+            // if (Math.abs(Base.y - mapBorders[0]) == 0 || Math.abs(Base.y - mapBorders[2])
+            // == 0) {
+            // for (int i = 0; i < mapBorders.length; i += 2) {
+            // if (Math.abs(Base.y - mapBorders[i]) > 0) {
+            // arrayLocY = i;
+            // // distanceY = Math.abs(Base.y - mapBorders[i]);
+            // }
+            // }
+            // } else { //if the border values are all defined, this code will find the true
+            // closest border
+            // int minBorder = Math.abs(Base.y - mapBorders[0]);
+            // arrayLocY = 0;
 
-            //     for (int i = 0; i < mapBorders.length; i += 2) {
-            //         if (Math.abs(Base.y - mapBorders[i]) < minBorder) {
-            //             arrayLocY = i;
-            //         }
-            //     }
+            // for (int i = 0; i < mapBorders.length; i += 2) {
+            // if (Math.abs(Base.y - mapBorders[i]) < minBorder) {
+            // arrayLocY = i;
+            // }
+            // }
             // }
 
             // // System.out.println(arrayLocY);
 
-            // // Obtaining the closest border value for x even if adjacent borders are unidentified
-            // if (Math.abs(Base.x - mapBorders[1]) == 0 || Math.abs(Base.x - mapBorders[3]) == 0) {
-            //     for (int i = 1; i < mapBorders.length; i += 2) {
-            //         if (Math.abs(Base.x - mapBorders[i]) > 0) {
-            //             arrayLocX = i;
-            //             // distanceX = Math.abs(Base.x - mapBorders[i]);
-            //         }
-            //     }
-            // } else { //if the border values are all defined, this code will find the true closest border
-            //     int minBorder = Math.abs(Base.x - mapBorders[1]);
-            //     arrayLocX = 1;
+            // // Obtaining the closest border value for x even if adjacent borders are
+            // unidentified
+            // if (Math.abs(Base.x - mapBorders[1]) == 0 || Math.abs(Base.x - mapBorders[3])
+            // == 0) {
+            // for (int i = 1; i < mapBorders.length; i += 2) {
+            // if (Math.abs(Base.x - mapBorders[i]) > 0) {
+            // arrayLocX = i;
+            // // distanceX = Math.abs(Base.x - mapBorders[i]);
+            // }
+            // }
+            // } else { //if the border values are all defined, this code will find the true
+            // closest border
+            // int minBorder = Math.abs(Base.x - mapBorders[1]);
+            // arrayLocX = 1;
 
-            //     for (int i = 1; i < mapBorders.length; i += 2) {
-            //         if (Math.abs(Base.x - mapBorders[i]) < minBorder) {
-            //             arrayLocX = i;
-            //         }
-            //     }
+            // for (int i = 1; i < mapBorders.length; i += 2) {
+            // if (Math.abs(Base.x - mapBorders[i]) < minBorder) {
+            // arrayLocX = i;
+            // }
+            // }
             // }
 
             System.out.println("array N/S :" + arrayLocY + ", array E/W : " + arrayLocX);
 
             // if (arrayLocY != -1 && arrayLocX != -1) {
-            //     cornerCoordY = mapBorders[arrayLocY];
-            //     cornerCoordX = mapBorders[arrayLocX];
+            // cornerCoordY = mapBorders[arrayLocY];
+            // cornerCoordX = mapBorders[arrayLocX];
             // }
 
-            //If the location in the mapBorders array was actually obtained and extant
+            // If the location in the mapBorders array was actually obtained and extant
             if (arrayLocY != -1 && arrayLocX != -1) {
                 cornerCoordY = mapBorders[arrayLocY];
                 cornerCoordX = mapBorders[arrayLocX];
