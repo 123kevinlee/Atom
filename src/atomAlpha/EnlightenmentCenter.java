@@ -4,8 +4,6 @@ import battlecode.common.*;
 import java.util.*;
 
 public class EnlightenmentCenter {
-    static final Direction[] directions = { Direction.NORTH, Direction.NORTHEAST, Direction.EAST, Direction.SOUTHEAST,
-            Direction.SOUTH, Direction.SOUTHWEST, Direction.WEST, Direction.NORTHWEST, };
 
     public static int lastInfluenceAmount = 0;
     public static int lastInfluenceGain = 0;
@@ -22,7 +20,7 @@ public class EnlightenmentCenter {
     public static int scoutCount = 0;
     public static int scoutLimit = 4;
     public static int guardCount = 0;
-    public static int begFarmerLimit = 4;
+    public static int begFarmerLimit = 5;
     public static int farmerCount = 0;
 
     public static Map<Integer, Direction> scoutIds = new HashMap<Integer, Direction>();
@@ -136,10 +134,12 @@ public class EnlightenmentCenter {
                     farmerCount++;
                 }
             }
-
+            if (farmerCount == begFarmerLimit) {
+                firstFarmers = false;
+            }
         }
 
-        if (setGuard == true) {
+        else if (setGuard == true) {
             createDefensePhase(rc);
         } else if (enemyBases.size() > 0) {
 
@@ -170,7 +170,7 @@ public class EnlightenmentCenter {
     public static void scoutPhase(RobotController rc) throws GameActionException {
         int dirIndex = scoutCount % 4;
         int influence = 1;
-        Direction designatedDirection = directions[dirIndex * 2];
+        Direction designatedDirection = Data.directions[dirIndex * 2];
 
         if (scoutCount < scoutLimit && rc.canBuildRobot(RobotType.MUCKRAKER, designatedDirection, influence)) {
             if (rc.canSetFlag(100)) {
@@ -386,9 +386,10 @@ public class EnlightenmentCenter {
     public static void createDefensePhase(RobotController rc) throws GameActionException {
         int influence = 10;
         int dirIndex = guardCount % 4;
-        if (rc.canSetFlag(111) && rc.canBuildRobot(RobotType.POLITICIAN, directions[dirIndex * 2 + 1], influence)) {
+        if (rc.canSetFlag(111)
+                && rc.canBuildRobot(RobotType.POLITICIAN, Data.directions[dirIndex * 2 + 1], influence)) {
             rc.setFlag(111); // defender politician
-            rc.buildRobot(RobotType.POLITICIAN, directions[dirIndex * 2 + 1], influence);
+            rc.buildRobot(RobotType.POLITICIAN, Data.directions[dirIndex * 2 + 1], influence);
             guardCount++;
         }
 
