@@ -26,6 +26,9 @@ public class EnlightenmentCenter {
     public static int farmerCount = 0;
 
     public static Map<Integer, Direction> scoutIds = new HashMap<Integer, Direction>();
+    public static Set<Integer> waller = new HashSet<Integer>(); // fricking waller direction is annoying so they can
+                                                                // only contribute with absolute units -- nothing based
+                                                                // on their direction
     public static Map<Integer, String> scoutLastMessage = new HashMap<Integer, String>();
     public static int[] mapBorders = new int[4]; // 0=NORTH 1=EAST 2=SOUTH 3=WEST
     public static boolean mapComplete = false;
@@ -114,7 +117,7 @@ public class EnlightenmentCenter {
                 MapLocation safeCorner = new MapLocation(cornerCoordX, cornerCoordY);
                 safeDir = Base.directionTo(safeCorner);
 
-                System.out.println("The safe direction is: " + safeDir);
+                // ("The safe direction is: " + safeDir);
 
                 MapLocation currentLocation = rc.getLocation();
                 int dx = safeCorner.x - currentLocation.x;
@@ -127,8 +130,9 @@ public class EnlightenmentCenter {
                     }
 
                     rc.buildRobot(RobotType.SLANDERER, safeDir, farmerInfluence);
-                    System.out.println("Created Farmer with " + farmerInfluence + " influence in the " + safeDir
-                            + " Direction" + ", dx : " + dx + ", dy: " + dy);
+                    // System.out.println("Created Farmer with " + farmerInfluence + " influence in
+                    // the " + safeDir
+                    // + " Direction" + ", dx : " + dx + ", dy: " + dy);
                     farmerCount++;
                 }
             }
@@ -174,11 +178,13 @@ public class EnlightenmentCenter {
             }
 
             rc.buildRobot(RobotType.MUCKRAKER, designatedDirection, influence);
-            System.out.println("Created Scout with " + influence + " influence");
+            // System.out.println("Created Scout with " + influence + " influence");
             scoutCount++;
             if (rc.canSenseRadiusSquared(1)) {
                 for (RobotInfo robot : rc.senseNearbyRobots(1, rc.getTeam())) {
-                    scoutIds.put(robot.getID(), designatedDirection);
+                    if (!scoutIds.keySet().contains(robot.getID())) {
+                        scoutIds.put(robot.getID(), designatedDirection);
+                    }
                 }
             }
         }
@@ -206,7 +212,7 @@ public class EnlightenmentCenter {
                         MapLocation currentLocation = rc.getLocation();
                         coords[0] += currentLocation.x;
                         coords[1] += currentLocation.y;
-                        System.out.println("ENEMY BASE: " + coords[0] + "," + coords[1]);
+                        // System.out.println("ENEMY BASE: " + coords[0] + "," + coords[1]);
 
                         enemyBases.add(new MapLocation(coords[0], coords[1]));
                         // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
@@ -214,8 +220,10 @@ public class EnlightenmentCenter {
                         scoutLastMessage.put((int) key, msg);
                     }
 
-                    else if (msg.charAt(0) == '4') {
-                        // System.out.println("WALL: " + coords[0] + "," + coords[1]);
+                    else if (msg.charAt(0) == '4' && !waller.contains(key)) {
+                        // System.out.println("ScoutID:" + key + "ScoutDirection:" + scoutIds.get(key) +
+                        // "WALL: "
+                        // + coords[0] + "," + coords[1]);
 
                         MapLocation currentLocation = rc.getLocation();
 
@@ -223,33 +231,39 @@ public class EnlightenmentCenter {
                             case NORTH:
                                 if (mapBorders[0] == 0) {
                                     mapBorders[0] = currentLocation.y + coords[1];
-                                    scoutIds.put((int) key, scoutIds.get(key).rotateRight().rotateRight());
+                                    // scoutIds.put((int) key, Direction.EAST);
+                                    waller.add((int) key);
                                 }
                                 break;
                             case EAST:
                                 if (mapBorders[1] == 0) {
                                     mapBorders[1] = currentLocation.x + coords[0];
-                                    scoutIds.put((int) key, scoutIds.get(key).rotateRight().rotateRight());
+                                    // scoutIds.put((int) key, Direction.SOUTH);
+                                    waller.add((int) key);
                                 }
                                 break;
                             case SOUTH:
                                 if (mapBorders[2] == 0) {
                                     mapBorders[2] = currentLocation.y + coords[1];
-                                    System.out.println("y val : " + mapBorders[2]);
-                                    scoutIds.put((int) key, scoutIds.get(key).rotateRight().rotateRight());
+                                    // System.out.println("y val : " + mapBorders[2]);
+                                    // scoutIds.put((int) key, Direction.WEST);
+                                    waller.add((int) key);
                                 }
 
                                 break;
                             case WEST:
                                 if (mapBorders[3] == 0) {
                                     mapBorders[3] = currentLocation.x + coords[0];
-                                    System.out.println("x val : " + mapBorders[3]);
-                                    scoutIds.put((int) key, scoutIds.get(key).rotateRight().rotateRight());
+                                    // System.out.println("x val : " + mapBorders[3]);
+                                    // scoutIds.put((int) key, Direction.NORTH);
+                                    waller.add((int) key);
                                 }
                                 break;
                             default:
                                 break;
                         }
+
+                        System.out.println("Waller:" + waller.toString());
 
                         // method to find last border using the other 3 border values
                         int zeroCount = 0;
@@ -259,7 +273,7 @@ public class EnlightenmentCenter {
                             }
                         }
                         if (zeroCount == 1 && !mapComplete) {
-                            System.out.println("Calculating World Map...");
+                            // System.out.println("Calculating World Map...");
                             int missingIndex = 0;
                             for (int i = 0; i < mapBorders.length; i++) {
                                 if (mapBorders[i] == 0) {
@@ -310,8 +324,8 @@ public class EnlightenmentCenter {
                                         default:
                                             break;
                                     }
-                                    System.out.println("Possible Enemy Base:"
-                                            + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
+                                    // System.out.println("Possible Enemy Base:"
+                                    // + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
                                 }
 
                                 // System.out.println(possibleEnemyBases.toString());
@@ -320,11 +334,11 @@ public class EnlightenmentCenter {
                     }
                 }
             } else {
-                System.out.println(key + " DEAD");
+                // System.out.println(key + " DEAD");
                 String lastMsg = scoutLastMessage.get(key);
                 if (lastMsg != null && lastMsg.length() != 0) {
                     int[] coords = Communication.coordDecoder(lastMsg);
-                    if (mapComplete) {
+                    if (mapComplete && !waller.contains(key)) {
                         Direction dir = scoutIds.get(key);
                         MapLocation currentLocation = rc.getLocation();
                         switch (dir) {
@@ -349,14 +363,15 @@ public class EnlightenmentCenter {
                                 break;
                         }
                         // System.out.println(possibleEnemyBases.toString());
-                        System.out.println("Possible Enemy Base:"
-                                + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
+                        // System.out.println("Possible Enemy Base:"
+                        // + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
                     } else {
-                        MapLocation baseLocation = rc.getLocation();
-                        enemyCoords.put(scoutIds.get(key),
-                                new MapLocation(coords[0] + baseLocation.x, coords[1] + baseLocation.y));
-                        Object[] baseKeys = enemyCoords.keySet().toArray();
-                        System.out.println("Enemy Coord:" + enemyCoords.get(baseKeys[0]).toString());
+                        if (!waller.contains(key)) {
+                            MapLocation baseLocation = rc.getLocation();
+                            enemyCoords.put(scoutIds.get(key),
+                                    new MapLocation(coords[0] + baseLocation.x, coords[1] + baseLocation.y));
+                        }
+                        // System.out.println("Enemy Coord:" + enemyCoords.get(baseKeys[0]).toString());
                     }
                 }
                 removeId = key;
@@ -365,6 +380,7 @@ public class EnlightenmentCenter {
         if (removeId != null) {
             scoutIds.remove(removeId);
         }
+        System.out.println(mapBorders[0] + " " + mapBorders[1] + " " + mapBorders[2] + " " + mapBorders[3]);
     }
 
     public static void createDefensePhase(RobotController rc) throws GameActionException {

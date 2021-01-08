@@ -94,7 +94,7 @@ public class Pathfinding {
                 pass.put(rc.sensePassability(testLoc), testLoc);
             }
         }
-        System.out.println(pass.toString());
+        // System.out.println(pass.toString());
         Object[] keys = pass.keySet().toArray();
         if (keys.length != 0) {
             return (rc.getLocation().directionTo(pass.get(keys[keys.length - 1])));
@@ -122,10 +122,10 @@ public class Pathfinding {
                 }
             }
         }
-        System.out.println(targetLoc);
+        // System.out.println(targetLoc);
         if (targetLoc != null) {
             if (rc.canMove(rc.getLocation().directionTo(targetLoc))) {
-                System.out.println("TRY TO MOVE");
+                // System.out.println("TRY TO MOVE");
                 rc.move(rc.getLocation().directionTo(targetLoc));
             } else if (rc.canMove(chooseBestNextStep(rc, rc.getLocation().directionTo(targetLoc)))) {
                 rc.move(chooseBestNextStep(rc, rc.getLocation().directionTo(targetLoc)));
@@ -133,7 +133,7 @@ public class Pathfinding {
         }
         if (rc.getLocation().equals(targetLoc)) {
             defenseLocReached = true;
-            System.out.println("REACHED TARGET LOCATION");
+            // System.out.println("REACHED TARGET LOCATION");
         }
     }
 

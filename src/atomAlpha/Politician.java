@@ -33,7 +33,7 @@ public class Politician {
             } // this flag isn't the target }
         }
 
-        System.out.println(role);
+        // System.out.println(role);
         if (role.length() == 7) {
 
             /*
@@ -97,6 +97,7 @@ public class Politician {
         // System.out.println("I moved!");
         // create a locking mechanism and chasing mechanism
     }
+
     public static void init(RobotController rc) throws GameActionException {
         if (rc.canSenseRadiusSquared(3)) {
             for (RobotInfo robot : rc.senseNearbyRobots(3, rc.getTeam())) {

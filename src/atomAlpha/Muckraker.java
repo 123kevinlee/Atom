@@ -40,12 +40,13 @@ public class Muckraker {
             }
         }
 
-        System.out.println("MuckRaker set to scout mode");
-        System.out.println(scoutDirection);
+        // System.out.println("MuckRaker set to scout mode");
+        // System.out.println(scoutDirection);
 
         Direction nextDir = Pathfinding.chooseBestNextStep(rc, scoutDirection);
 
         if (rc.canMove(nextDir)) {
+            System.out.println(scoutDirection);
             rc.move(nextDir);
             MapLocation currentLocation = rc.getLocation();
             int dx = currentLocation.x - Data.originPoint.x;
@@ -70,6 +71,7 @@ public class Muckraker {
                         }
                         end = true;
                         turnRight(rc);
+                        System.out.println(scoutDirection + " " + currentLocation.toString());
                     }
                     break;
                 case EAST:
@@ -84,6 +86,7 @@ public class Muckraker {
                         }
                         end = true;
                         turnRight(rc);
+                        System.out.println(scoutDirection + " " + currentLocation.toString());
                     }
                     break;
                 case SOUTH:
@@ -98,6 +101,7 @@ public class Muckraker {
                         }
                         end = true;
                         turnRight(rc);
+                        System.out.println(scoutDirection + " " + currentLocation.toString());
                     }
                     break;
                 case WEST:
@@ -112,6 +116,7 @@ public class Muckraker {
                         }
                         end = true;
                         turnRight(rc);
+                        System.out.println(scoutDirection + " " + currentLocation.toString());
                     }
                     break;
                 default:
@@ -153,7 +158,7 @@ public class Muckraker {
             }
         }
         if (role.length() == 7) {
-            System.out.println("I moved!");
+            // System.out.println("I moved!");
             int[] coords = Communication.coordDecoder(role);
             MapLocation currentLocation = rc.getLocation();
             coords[0] += currentLocation.x;

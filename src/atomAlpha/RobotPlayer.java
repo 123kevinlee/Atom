@@ -40,22 +40,22 @@ public strictfp class RobotPlayer {
                     case ENLIGHTENMENT_CENTER:
                         // runEnlightenmentCenter();
                         EnlightenmentCenter.run(rc);
-                        System.out.println(Clock.getBytecodesLeft());
+                        // System.out.println(Clock.getBytecodesLeft());
                         // System.out.println("Bytecode Left:" + Clock.getBytecodesLeft());
                         break;
                     case POLITICIAN:
                         Politician.run(rc);
-                        System.out.println(Clock.getBytecodesLeft());
+                        // System.out.println(Clock.getBytecodesLeft());
                         // runPolitician();
                         break;
                     case SLANDERER:
                         Slanderer.run(rc);
-                        System.out.println(Clock.getBytecodesLeft());
+                        // System.out.println(Clock.getBytecodesLeft());
                         // runSlanderer();
                         break;
                     case MUCKRAKER:
                         Muckraker.run(rc);
-                        System.out.println(Clock.getBytecodesLeft());
+                        // System.out.println(Clock.getBytecodesLeft());
                         // runMuckraker();
                         break;
 
