@@ -10,131 +10,9 @@ public class Muckraker {
 
     public static void run(RobotController rc) throws GameActionException {
         if (role.equals("100")) { // scout
-            System.out.println("MuckRaker set to scout mode");
-            System.out.println(scoutDirection);
-
-            Direction nextDir = Pathfinding.chooseBestNextStep(rc, scoutDirection);
-
-            if (rc.canMove(nextDir)) {
-                rc.move(nextDir);
-                MapLocation currentLocation = rc.getLocation();
-                int dx = currentLocation.x - Data.originPoint.x;
-                int dy = currentLocation.y - Data.originPoint.y;
-                int outMsg = Communication.coordEncoder("LIKELY", dx, dy);
-                if (!end) {
-                    if (rc.canSetFlag(outMsg)) {
-                        rc.setFlag(outMsg);
-                    }
-                }
-            } else {
-                switch (scoutDirection) {
-                    case NORTH:
-                        if (!rc.onTheMap(rc.getLocation().add(Direction.NORTH))) {
-                            System.out.println("WALL!");
-                            MapLocation currentLocation = rc.getLocation();
-                            int dx = currentLocation.x - Data.originPoint.x;
-                            int dy = currentLocation.y - Data.originPoint.y;
-                            int outMsg = Communication.coordEncoder("WALL", dx, dy);
-                            if (rc.canSetFlag(outMsg)) {
-                                rc.setFlag(outMsg);
-                            }
-                            end = true;
-                            turnRight(rc);
-                        }
-                        break;
-                    case EAST:
-                        if (!rc.onTheMap(rc.getLocation().add(Direction.EAST))) {
-                            System.out.println("WALL!");
-                            MapLocation currentLocation = rc.getLocation();
-                            int dx = currentLocation.x - Data.originPoint.x;
-                            int dy = currentLocation.y - Data.originPoint.y;
-                            int outMsg = Communication.coordEncoder("WALL", dx, dy);
-                            if (rc.canSetFlag(outMsg)) {
-                                rc.setFlag(outMsg);
-                            }
-                            end = true;
-                            turnRight(rc);
-                        }
-                        break;
-                    case SOUTH:
-                        if (!rc.onTheMap(rc.getLocation().add(Direction.SOUTH))) {
-                            System.out.println("WALL!");
-                            MapLocation currentLocation = rc.getLocation();
-                            int dx = currentLocation.x - Data.originPoint.x;
-                            int dy = currentLocation.y - Data.originPoint.y;
-                            int outMsg = Communication.coordEncoder("WALL", dx, dy);
-                            if (rc.canSetFlag(outMsg)) {
-                                rc.setFlag(outMsg);
-                            }
-                            end = true;
-                            turnRight(rc);
-                        }
-                        break;
-                    case WEST:
-                        if (!rc.onTheMap(rc.getLocation().add(Direction.WEST))) {
-                            System.out.println("WALL!");
-                            MapLocation currentLocation = rc.getLocation();
-                            int dx = currentLocation.x - Data.originPoint.x;
-                            int dy = currentLocation.y - Data.originPoint.y;
-                            int outMsg = Communication.coordEncoder("WALL", dx, dy);
-                            if (rc.canSetFlag(outMsg)) {
-                                rc.setFlag(outMsg);
-                            }
-                            end = true;
-                            turnRight(rc);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-            int sensorRadius = rc.getType().sensorRadiusSquared;
-            if (rc.canSenseRadiusSquared(sensorRadius)) {
-                for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, rc.getTeam().opponent())) {
-                    if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
-                        MapLocation baseLocation = robot.getLocation();
-                        int dx = baseLocation.x - Data.originPoint.x;
-                        int dy = baseLocation.y - Data.originPoint.y;
-                        int outMsg = Communication.coordEncoder("ENEMY", dx, dy);
-                        System.out.println("Found Enemy Base:" + outMsg);
-                        if (rc.canSetFlag(outMsg)) {
-                            rc.setFlag(outMsg);
-                        }
-                        end = true;
-                    }
-                }
-            }
+            scoutMode(rc);
         } else {
-            Team enemy = rc.getTeam().opponent();
-            int actionRadius = rc.getType().actionRadiusSquared;
-
-            if (rc.canSenseRadiusSquared(actionRadius)) {
-                for (RobotInfo robot : rc.senseNearbyRobots(actionRadius, enemy)) {
-                    if (robot.type.canBeExposed()) {
-                        // It's a slanderer... go get them!
-                        if (rc.canExpose(robot.location)) {
-                            // System.out.println("e x p o s e d");
-                            rc.expose(robot.location);
-                            return;
-                        }
-                    }
-                }
-            }
-            if (role.length() == 7) {
-                System.out.println("I moved!");
-                int[] coords = Communication.coordDecoder(role);
-                MapLocation currentLocation = rc.getLocation();
-                coords[0] += currentLocation.x;
-                coords[1] += currentLocation.y;
-                System.out.println("ENEMY TARGET: " + coords[0] + "," + coords[1]);
-
-                MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
-                Direction targetDirection = currentLocation.directionTo(targetLocation);
-
-                if (rc.canMove(targetDirection)) {
-                    rc.move(targetDirection);
-                }
-            }
+            attackMode(rc);
         }
     }
 
@@ -144,6 +22,150 @@ public class Muckraker {
         Direction nextMove = Pathfinding.chooseBestNextStep(rc, scoutDirection);
         if (rc.canMove(nextMove)) {
             rc.move(nextMove);
+        }
+    }
+
+    public static void scoutMode(RobotController rc) throws GameActionException {
+        Team enemy = rc.getTeam().opponent();
+        if (rc.canSenseRobot(12)) {
+            for (RobotInfo robot : rc.senseNearbyRobots(12, enemy)) {
+                if (robot.type.canBeExposed()) {
+                    // It's a slanderer... go get them!
+                    if (rc.canExpose(robot.location)) {
+                        // System.out.println("e x p o s e d");
+                        rc.expose(robot.location);
+                        return;
+                    }
+                }
+            }
+        }
+
+        System.out.println("MuckRaker set to scout mode");
+        System.out.println(scoutDirection);
+
+        Direction nextDir = Pathfinding.chooseBestNextStep(rc, scoutDirection);
+
+        if (rc.canMove(nextDir)) {
+            rc.move(nextDir);
+            MapLocation currentLocation = rc.getLocation();
+            int dx = currentLocation.x - Data.originPoint.x;
+            int dy = currentLocation.y - Data.originPoint.y;
+            int outMsg = Communication.coordEncoder("LIKELY", dx, dy);
+            if (!end) {
+                if (rc.canSetFlag(outMsg)) {
+                    rc.setFlag(outMsg);
+                }
+            }
+        } else {
+            switch (scoutDirection) {
+                case NORTH:
+                    if (!rc.onTheMap(rc.getLocation().add(Direction.NORTH))) {
+                        System.out.println("WALL!");
+                        MapLocation currentLocation = rc.getLocation();
+                        int dx = currentLocation.x - Data.originPoint.x;
+                        int dy = currentLocation.y - Data.originPoint.y;
+                        int outMsg = Communication.coordEncoder("WALL", dx, dy);
+                        if (rc.canSetFlag(outMsg)) {
+                            rc.setFlag(outMsg);
+                        }
+                        end = true;
+                        turnRight(rc);
+                    }
+                    break;
+                case EAST:
+                    if (!rc.onTheMap(rc.getLocation().add(Direction.EAST))) {
+                        System.out.println("WALL!");
+                        MapLocation currentLocation = rc.getLocation();
+                        int dx = currentLocation.x - Data.originPoint.x;
+                        int dy = currentLocation.y - Data.originPoint.y;
+                        int outMsg = Communication.coordEncoder("WALL", dx, dy);
+                        if (rc.canSetFlag(outMsg)) {
+                            rc.setFlag(outMsg);
+                        }
+                        end = true;
+                        turnRight(rc);
+                    }
+                    break;
+                case SOUTH:
+                    if (!rc.onTheMap(rc.getLocation().add(Direction.SOUTH))) {
+                        System.out.println("WALL!");
+                        MapLocation currentLocation = rc.getLocation();
+                        int dx = currentLocation.x - Data.originPoint.x;
+                        int dy = currentLocation.y - Data.originPoint.y;
+                        int outMsg = Communication.coordEncoder("WALL", dx, dy);
+                        if (rc.canSetFlag(outMsg)) {
+                            rc.setFlag(outMsg);
+                        }
+                        end = true;
+                        turnRight(rc);
+                    }
+                    break;
+                case WEST:
+                    if (!rc.onTheMap(rc.getLocation().add(Direction.WEST))) {
+                        System.out.println("WALL!");
+                        MapLocation currentLocation = rc.getLocation();
+                        int dx = currentLocation.x - Data.originPoint.x;
+                        int dy = currentLocation.y - Data.originPoint.y;
+                        int outMsg = Communication.coordEncoder("WALL", dx, dy);
+                        if (rc.canSetFlag(outMsg)) {
+                            rc.setFlag(outMsg);
+                        }
+                        end = true;
+                        turnRight(rc);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        int sensorRadius = rc.getType().sensorRadiusSquared;
+        if (rc.canSenseRadiusSquared(sensorRadius)) {
+            for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, rc.getTeam().opponent())) {
+                if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
+                    MapLocation baseLocation = robot.getLocation();
+                    int dx = baseLocation.x - Data.originPoint.x;
+                    int dy = baseLocation.y - Data.originPoint.y;
+                    int outMsg = Communication.coordEncoder("ENEMY", dx, dy);
+                    System.out.println("Found Enemy Base:" + outMsg);
+                    if (rc.canSetFlag(outMsg)) {
+                        rc.setFlag(outMsg);
+                    }
+                    end = true;
+                }
+            }
+        }
+    }
+
+    public static void attackMode(RobotController rc) throws GameActionException {
+        Team enemy = rc.getTeam().opponent();
+        int actionRadius = rc.getType().actionRadiusSquared;
+
+        if (rc.canSenseRadiusSquared(actionRadius)) {
+            for (RobotInfo robot : rc.senseNearbyRobots(actionRadius, enemy)) {
+                if (robot.type.canBeExposed()) {
+                    // It's a slanderer... go get them!
+                    if (rc.canExpose(robot.location)) {
+                        // System.out.println("e x p o s e d");
+                        rc.expose(robot.location);
+                        return;
+                    }
+                }
+            }
+        }
+        if (role.length() == 7) {
+            System.out.println("I moved!");
+            int[] coords = Communication.coordDecoder(role);
+            MapLocation currentLocation = rc.getLocation();
+            coords[0] += currentLocation.x;
+            coords[1] += currentLocation.y;
+            System.out.println("ENEMY TARGET: " + coords[0] + "," + coords[1]);
+
+            MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
+            Direction targetDirection = currentLocation.directionTo(targetLocation);
+
+            if (rc.canMove(targetDirection)) {
+                rc.move(targetDirection);
+            }
         }
     }
 
