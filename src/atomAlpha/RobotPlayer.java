@@ -26,6 +26,9 @@ public strictfp class RobotPlayer {
             case MUCKRAKER:
                 Muckraker.init(rc);
                 Pathfinding.setStartLocation(rc);
+            case ENLIGHTENMENT_CENTER:
+                EnlightenmentCenter.init(rc);
+                break;
             default:
                 break;
         }

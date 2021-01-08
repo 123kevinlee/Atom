@@ -1,5 +1,7 @@
 package atomAlpha;
 
+import battlecode.common.RobotType;
+
 public class Communication {
     public static int coordEncoder(String type, int dx, int dy) {
         String outMsg = "";
@@ -53,5 +55,11 @@ public class Communication {
         coords[1] *= Integer.parseInt(msg.substring(5));
 
         return coords;
+    }
+
+    public static int roleEncoder(RobotType type, String field1, String field2) {
+        String out = "9";
+
+        return Integer.parseInt(out);
     }
 }
