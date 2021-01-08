@@ -37,21 +37,7 @@ public class EnlightenmentCenter {
 
     public static void run(RobotController rc) throws GameActionException {
         calculateInfluenceGain(rc);
-
-        int removeId = 0;
-        for (Integer id : farmerIds) {
-            if (!rc.canGetFlag(id)) { // farmer died
-                farmerIds.remove(id);
-            } else {
-                String flag = Integer.toString(rc.getFlag(id));
-                if (!flag.equals("0")) {
-                    removeId = id;
-                }
-            }
-        }
-        farmerIds.remove(removeId);
-
-        System.out.println(farmerIds.size());
+        calculateFarmers(rc);
 
         if (scoutingPhase) {
             scoutPhase(rc);
@@ -61,9 +47,6 @@ public class EnlightenmentCenter {
             listenForScoutMessages(rc);
         }
 
-        // System.out.println(mapBorders[0]);
-        // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
-        // MAKE SURE THAT THE CODE BELOW IS UPDATED when the world map is complete!
         if (firstFarmers == true) {
             // if(rc.canSetFlag(901)) {
             // rc.setFlag(901);
@@ -165,7 +148,7 @@ public class EnlightenmentCenter {
         } else if (enemyBases.size() > 0) {
 
         } else if (enemyBases.size() == 0 && possibleEnemyBases.size() > 0) {
-            // do something
+
         } else if (enemyBases.size() == 0 && possibleEnemyBases.size() == 0 && enemyCoords.size() > 0) {
 
         } else {
@@ -182,6 +165,21 @@ public class EnlightenmentCenter {
             lastInfluenceGain = rc.getInfluence() - lastInfluenceAmount;
             lastInfluenceAmount = rc.getInfluence();
         }
+    }
+
+    public static void calculateFarmers(RobotController rc) throws GameActionException {
+        int removeId = 0;
+        for (Integer id : farmerIds) {
+            if (!rc.canGetFlag(id)) { // farmer died
+                farmerIds.remove(id);
+            } else {
+                String flag = Integer.toString(rc.getFlag(id));
+                if (!flag.equals("0")) {
+                    removeId = id;
+                }
+            }
+        }
+        farmerIds.remove(removeId);
     }
 
     public static void calculateBid(RobotController rc) throws GameActionException {
