@@ -93,24 +93,26 @@ public class EnlightenmentCenter {
                                 case NORTH:
                                     if (mapBorders[0] == 0) {
                                         mapBorders[0] = currentLocation.y + coords[1];
+                                        System.out.println("y val north: " + mapBorders[1]);
                                     }
                                     break;
                                 case EAST:
                                     if (mapBorders[1] == 0) {
                                         mapBorders[1] = currentLocation.x + coords[0];
+                                        System.out.println("y val East: " + mapBorders[2]);
                                     }
                                     break;
                                 case SOUTH:
                                     if (mapBorders[2] == 0) {
                                         mapBorders[2] = currentLocation.y + coords[1];
-                                        System.out.println("y val : " + mapBorders[2]);
+                                        System.out.println("y val south: " + mapBorders[2]);
                                     }
 
                                     break;
                                 case WEST:
                                     if (mapBorders[3] == 0) {
                                         mapBorders[3] = currentLocation.x + coords[0];
-                                        System.out.println("x val : " + mapBorders[3]);
+                                        System.out.println("x val West: " + mapBorders[3]);
                                     }
                                     break;
                                 default:
@@ -245,7 +247,7 @@ public class EnlightenmentCenter {
             MapLocation Base = rc.getLocation();
             Direction safeDir = Direction.CENTER;
 
-            // stores a location within the mapBorders array
+            // stores a location within the mapBorders array, which will store the closest wall to the EC
             int arrayLocX = -1;
             int arrayLocY = -1;
 
@@ -290,16 +292,58 @@ public class EnlightenmentCenter {
                 }
             }
 
-            // System.out.println("array N/S :" + arrayLocY + ", array E/W : " + arrayLocX);
+            // //Obtaining the closest border value even if adjacent borders are unidentified
+            // if (Math.abs(Base.y - mapBorders[0]) == 0 || Math.abs(Base.y - mapBorders[2]) == 0) {
+            //     for (int i = 0; i < mapBorders.length; i += 2) {
+            //         if (Math.abs(Base.y - mapBorders[i]) > 0) {
+            //             arrayLocY = i;
+            //             // distanceY = Math.abs(Base.y - mapBorders[i]);
+            //         }
+            //     }
+            // } else { //if the border values are all defined, this code will find the true closest border
+            //     int minBorder = Math.abs(Base.y - mapBorders[0]);
+            //     arrayLocY = 0;
 
+            //     for (int i = 0; i < mapBorders.length; i += 2) {
+            //         if (Math.abs(Base.y - mapBorders[i]) < minBorder) {
+            //             arrayLocY = i;
+            //         }
+            //     }
+            // }
+
+            // // System.out.println(arrayLocY);
+
+            // // Obtaining the closest border value for x even if adjacent borders are unidentified
+            // if (Math.abs(Base.x - mapBorders[1]) == 0 || Math.abs(Base.x - mapBorders[3]) == 0) {
+            //     for (int i = 1; i < mapBorders.length; i += 2) {
+            //         if (Math.abs(Base.x - mapBorders[i]) > 0) {
+            //             arrayLocX = i;
+            //             // distanceX = Math.abs(Base.x - mapBorders[i]);
+            //         }
+            //     }
+            // } else { //if the border values are all defined, this code will find the true closest border
+            //     int minBorder = Math.abs(Base.x - mapBorders[1]);
+            //     arrayLocX = 1;
+
+            //     for (int i = 1; i < mapBorders.length; i += 2) {
+            //         if (Math.abs(Base.x - mapBorders[i]) < minBorder) {
+            //             arrayLocX = i;
+            //         }
+            //     }
+            // }
+
+            System.out.println("array N/S :" + arrayLocY + ", array E/W : " + arrayLocX);
+
+            // if (arrayLocY != -1 && arrayLocX != -1) {
+            //     cornerCoordY = mapBorders[arrayLocY];
+            //     cornerCoordX = mapBorders[arrayLocX];
+            // }
+
+            //If the location in the mapBorders array was actually obtained and extant
             if (arrayLocY != -1 && arrayLocX != -1) {
                 cornerCoordY = mapBorders[arrayLocY];
                 cornerCoordX = mapBorders[arrayLocX];
-            }
-
-            if (cornerCoordX != 0 && cornerCoordY != 0) {
-                // System.out.println("The closest corner is " + mapBorders[arrayLocY] + " , " +
-                // mapBorders[arrayLocX]);
+                System.out.println("The closest corner is " + mapBorders[arrayLocY] + " , " + mapBorders[arrayLocX]);
                 MapLocation safeCorner = new MapLocation(cornerCoordX, cornerCoordY);
                 safeDir = Base.directionTo(safeCorner);
 

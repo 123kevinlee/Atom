@@ -45,9 +45,10 @@ public class Politician {
             if (attackable.length != 0 && chaseCount != -1) {
                 System.out.println("TRACKING");
 
-                // The int below discerns which enemy to attack first in the RobotInfo array
+                // The int below discerns which enemy to attack first in the RobotInfo array (which is sorted from closest to farthest)
                 int priorityEnemy = 0;
 
+                //sort the robotinfo array to either track and attack the closest enemy, or the closest enemy ec
                 for (int i = 0; i < attackable.length; i++) {
                     if (attackable[i].getType() == RobotType.ENLIGHTENMENT_CENTER) {
                         priorityEnemy = i;
@@ -74,6 +75,7 @@ public class Politician {
                 }
             }
 
+            //this is the same for other units as well
             System.out.println("I moved!");
             int[] coords = Communication.coordDecoder(role); // coords of enemy base or whatever target
             MapLocation currentLocation = rc.getLocation();
@@ -95,7 +97,6 @@ public class Politician {
             rc.empower(9);
         }
         // System.out.println("I moved!");
-        // create a locking mechanism and chasing mechanism
     }
     public static void init(RobotController rc) throws GameActionException {
         if (rc.canSenseRadiusSquared(3)) {
