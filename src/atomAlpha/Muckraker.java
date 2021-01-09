@@ -46,7 +46,7 @@ public class Muckraker {
         Direction nextDir = Pathfinding.chooseBestNextStep(rc, scoutDirection);
 
         if (rc.canMove(nextDir)) {
-            System.out.println(scoutDirection);
+            // System.out.println(scoutDirection);
             rc.move(nextDir);
             MapLocation currentLocation = rc.getLocation();
             int dx = currentLocation.x - Data.originPoint.x;
@@ -61,7 +61,7 @@ public class Muckraker {
             switch (scoutDirection) {
                 case NORTH:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.NORTH))) {
-                        System.out.println("WALL!");
+                        // System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
                         int dx = currentLocation.x - Data.originPoint.x;
                         int dy = currentLocation.y - Data.originPoint.y;
@@ -71,12 +71,12 @@ public class Muckraker {
                         }
                         end = true;
                         turnRight(rc);
-                        System.out.println(scoutDirection + " " + currentLocation.toString());
+                        // System.out.println(scoutDirection + " " + currentLocation.toString());
                     }
                     break;
                 case EAST:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.EAST))) {
-                        System.out.println("WALL!");
+                        // System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
                         int dx = currentLocation.x - Data.originPoint.x;
                         int dy = currentLocation.y - Data.originPoint.y;
@@ -86,12 +86,12 @@ public class Muckraker {
                         }
                         end = true;
                         turnRight(rc);
-                        System.out.println(scoutDirection + " " + currentLocation.toString());
+                        // System.out.println(scoutDirection + " " + currentLocation.toString());
                     }
                     break;
                 case SOUTH:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.SOUTH))) {
-                        System.out.println("WALL!");
+                        // System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
                         int dx = currentLocation.x - Data.originPoint.x;
                         int dy = currentLocation.y - Data.originPoint.y;
@@ -101,12 +101,12 @@ public class Muckraker {
                         }
                         end = true;
                         turnRight(rc);
-                        System.out.println(scoutDirection + " " + currentLocation.toString());
+                        // System.out.println(scoutDirection + " " + currentLocation.toString());
                     }
                     break;
                 case WEST:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.WEST))) {
-                        System.out.println("WALL!");
+                        // System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
                         int dx = currentLocation.x - Data.originPoint.x;
                         int dy = currentLocation.y - Data.originPoint.y;
@@ -116,7 +116,7 @@ public class Muckraker {
                         }
                         end = true;
                         turnRight(rc);
-                        System.out.println(scoutDirection + " " + currentLocation.toString());
+                        // System.out.println(scoutDirection + " " + currentLocation.toString());
                     }
                     break;
                 default:
@@ -131,7 +131,7 @@ public class Muckraker {
                     int dx = baseLocation.x - Data.originPoint.x;
                     int dy = baseLocation.y - Data.originPoint.y;
                     int outMsg = Communication.coordEncoder("ENEMY", dx, dy);
-                    System.out.println("Found Enemy Base:" + outMsg);
+                    // System.out.println("Found Enemy Base:" + outMsg);
                     if (rc.canSetFlag(outMsg)) {
                         rc.setFlag(outMsg);
                     }
@@ -158,18 +158,19 @@ public class Muckraker {
             }
         }
         if (role.length() == 7) {
+            // System.out.println(role);
             // System.out.println("I moved!");
             int[] coords = Communication.coordDecoder(role);
             MapLocation currentLocation = rc.getLocation();
-            coords[0] += currentLocation.x;
-            coords[1] += currentLocation.y;
-            System.out.println("ENEMY TARGET: " + coords[0] + "," + coords[1]);
+            coords[0] += Data.originPoint.x;
+            coords[1] += Data.originPoint.y;
+            // System.out.println("ENEMY TARGET: " + coords[0] + "," + coords[1]);
 
             MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
-            Direction targetDirection = currentLocation.directionTo(targetLocation);
-
-            if (rc.canMove(targetDirection)) {
-                rc.move(targetDirection);
+            // Direction targetDirection = currentLocation.directionTo(targetLocation);
+            Direction nextDir = Pathfinding.basicBugToBase(rc, targetLocation);
+            if (rc.canMove(nextDir)) {
+                rc.move(nextDir);
             }
         }
     }
@@ -181,11 +182,15 @@ public class Muckraker {
                     if (rc.canGetFlag(robot.getID())) {
                         if (rc.canSetFlag(rc.getFlag(robot.getID()))) {
                             role = Integer.toString(rc.getFlag(robot.getID()));
-                            System.out.println(role);
+                            // System.out.println(role);
                             Data.originPoint = robot.getLocation();
                             Data.initRound = rc.getRoundNum();
                             if (role.equals("100")) {
                                 scoutDirection = rc.getLocation().directionTo(robot.getLocation()).opposite();
+                            } else {
+                                if (rc.canSetFlag(Integer.parseInt(role))) {
+                                    rc.setFlag(Integer.parseInt(role));
+                                }
                             }
                         }
                     }

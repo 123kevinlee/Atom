@@ -37,7 +37,7 @@ public class Slanderer {
             switch (scoutDirection) {
                 case NORTH:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.NORTH))) {
-                        System.out.println("WALL!");
+                        // System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
                         int dx = currentLocation.x - Data.originPoint.x;
                         int dy = currentLocation.y - Data.originPoint.y;
@@ -51,7 +51,7 @@ public class Slanderer {
                     break;
                 case EAST:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.EAST))) {
-                        System.out.println("WALL!");
+                        // System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
                         int dx = currentLocation.x - Data.originPoint.x;
                         int dy = currentLocation.y - Data.originPoint.y;
@@ -65,7 +65,7 @@ public class Slanderer {
                     break;
                 case SOUTH:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.SOUTH))) {
-                        System.out.println("WALL!");
+                        // System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
                         int dx = currentLocation.x - Data.originPoint.x;
                         int dy = currentLocation.y - Data.originPoint.y;
@@ -79,7 +79,7 @@ public class Slanderer {
                     break;
                 case WEST:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.WEST))) {
-                        System.out.println("WALL!");
+                        // System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
                         int dx = currentLocation.x - Data.originPoint.x;
                         int dy = currentLocation.y - Data.originPoint.y;
@@ -103,7 +103,7 @@ public class Slanderer {
                     int dx = baseLocation.x - Data.originPoint.x;
                     int dy = baseLocation.y - Data.originPoint.y;
                     int outMsg = Communication.coordEncoder("ENEMY", dx, dy);
-                    System.out.println("Found Enemy Base:" + outMsg);
+                    // System.out.println("Found Enemy Base:" + outMsg);
                     if (rc.canSetFlag(outMsg)) {
                         rc.setFlag(outMsg);
                     }
@@ -115,6 +115,7 @@ public class Slanderer {
 
     public static void farmMode(RobotController rc) throws GameActionException {
         // System.out.println("I moved!");
+<<<<<<< HEAD
         cornerRole = role;
 
         Team enemy = rc.getTeam().opponent();
@@ -177,6 +178,21 @@ public class Slanderer {
                     }
             }
         
+=======
+        int[] coords = Communication.coordDecoder(role); // coords of safe corner
+        coords[0] += Data.originPoint.x;
+        coords[1] += Data.originPoint.y;
+        //System.out.println("SAFE CORNER: " + coords[0] + "," + coords[1]);
+        MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
+        Direction targetDirection = Data.originPoint.directionTo(targetLocation);
+        if (Data.slandererConvertDirection == Direction.CENTER) {
+            Data.slandererConvertDirection = targetDirection.opposite();
+        }
+        //System.out.println(rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection)));
+        if (rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection))) {
+            rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
+        }
+>>>>>>> dev
     }
 
     public static void turnRight(RobotController rc) throws GameActionException {
@@ -200,6 +216,10 @@ public class Slanderer {
                             Data.initRound = rc.getRoundNum();
                             if (role.equals("100")) {
                                 scoutDirection = rc.getLocation().directionTo(robot.getLocation()).opposite();
+                            } else {
+                                if (rc.canSetFlag(Integer.parseInt(role))) {
+                                    rc.setFlag(Integer.parseInt(role));
+                                }
                             }
                         }
                     }
