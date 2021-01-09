@@ -167,10 +167,10 @@ public class Muckraker {
             // System.out.println("ENEMY TARGET: " + coords[0] + "," + coords[1]);
 
             MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
-            Direction targetDirection = currentLocation.directionTo(targetLocation);
-
-            if (rc.canMove(targetDirection)) {
-                rc.move(targetDirection);
+            // Direction targetDirection = currentLocation.directionTo(targetLocation);
+            Direction nextDir = Pathfinding.basicBugToBase(rc, targetLocation);
+            if (rc.canMove(nextDir)) {
+                rc.move(nextDir);
             }
         }
     }

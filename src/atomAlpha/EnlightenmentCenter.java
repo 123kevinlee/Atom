@@ -14,7 +14,7 @@ public class EnlightenmentCenter {
     public static int spawnOrderCounter = 0;
 
     public static boolean scoutingPhase = true;
-    public static boolean setGuard = false;
+    public static boolean setGuard = true;
     public static boolean rushPhase = true;
     public static boolean earlyDefensive = false;
     public static boolean firstFarmers = true;
