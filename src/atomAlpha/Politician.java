@@ -146,12 +146,12 @@ public class Politician {
 
             System.out.println("I moved!");
             int[] coords = Communication.coordDecoder(role); // coords of enemy base or whatever target
-            MapLocation currentLocation = rc.getLocation();
-            coords[0] += currentLocation.x;
-            coords[1] += currentLocation.y;
+            MapLocation origin = Data.originPoint;
+            coords[0] += origin.x;
+            coords[1] += origin.y;
             System.out.println("ENEMY TARGET: " + coords[0] + "," + coords[1]);
             MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
-            Direction targetDirection = currentLocation.directionTo(targetLocation);
+            Direction targetDirection = origin.directionTo(targetLocation);
             if (rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection))) {
                 rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
             }

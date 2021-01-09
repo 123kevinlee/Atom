@@ -102,7 +102,6 @@ public class Pathfinding {
             return Direction.CENTER;
             // hit wall -- add logic later
         }
-
     }
 
     public static void findDefenseLocation(RobotController rc, MapLocation baseLoc) throws GameActionException {

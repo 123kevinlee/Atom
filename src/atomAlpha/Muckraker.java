@@ -158,11 +158,12 @@ public class Muckraker {
             }
         }
         if (role.length() == 7) {
+            System.out.println(role);
             // System.out.println("I moved!");
             int[] coords = Communication.coordDecoder(role);
             MapLocation currentLocation = rc.getLocation();
-            coords[0] += currentLocation.x;
-            coords[1] += currentLocation.y;
+            coords[0] += Data.originPoint.x;
+            coords[1] += Data.originPoint.y;
             System.out.println("ENEMY TARGET: " + coords[0] + "," + coords[1]);
 
             MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
