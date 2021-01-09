@@ -51,15 +51,21 @@ public class EnlightenmentCenter {
             scoutPhase(rc);
         }
 
+        else if (setGuard == true) {
+            createDefensePhase(rc);
+        }
+
         else if (firstFarmers == true) {
             // if(rc.canSetFlag(901)) {
             // rc.setFlag(901);
             // }
 
             int farmerInfluence = 10;
-            /*
-             * if (farmerCount > 5) { farmerInfluence = rc.getInfluence() * (3 / 4); }
-             */
+
+            if (begFarmerLimit > 5) {
+                farmerInfluence = (int) (rc.getInfluence() / 2);
+            }
+
             MapLocation Base = rc.getLocation();
             Direction safeDir = Direction.CENTER;
 
@@ -189,9 +195,7 @@ public class EnlightenmentCenter {
         // }
 
         // }
-        else if (setGuard == true) {
-            createDefensePhase(rc);
-        } else if (enemyBases.size() > 0) {
+        else if (enemyBases.size() > 0) {
             switch (spawnOrder[spawnOrderCounter % 4]) {
                 case POLITICIAN:
                     Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
@@ -232,6 +236,45 @@ public class EnlightenmentCenter {
                     break;
             }
         } else if (enemyBases.size() == 0 && possibleEnemyBases.size() > 0) {
+            switch (spawnOrder[spawnOrderCounter % 4]) {
+                case POLITICIAN:
+                    Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
+                    int unitInfluence = rc.getInfluence() / 5;
+                    if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) { // technically don't
+                                                                                           // need this
+                        int dx = possibleEnemyBases.iterator().next().x - rc.getLocation().x;
+                        int dy = possibleEnemyBases.iterator().next().y - rc.getLocation().y;
+                        int flag = Communication.coordEncoder("ENEMY", dx, dy);
+                        if (rc.canSetFlag(flag)) {
+                            rc.setFlag(flag);
+                        }
+                        rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
+                        spawnOrderCounter++;
+                    }
+                    break;
+                case MUCKRAKER:
+                    spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
+                    unitInfluence = 1;
+                    if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
+                        int dx = possibleEnemyBases.iterator().next().x - rc.getLocation().x;
+                        int dy = possibleEnemyBases.iterator().next().y - rc.getLocation().y;
+                        int flag = Communication.coordEncoder("ENEMY", dx, dy);
+                        if (rc.canSetFlag(flag)) {
+                            rc.setFlag(flag);
+                        }
+                        rc.buildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence);
+                        spawnOrderCounter++;
+                    }
+                    break;
+                case SLANDERER:
+                    begFarmerLimit++;
+                    firstFarmers = true;
+                    // stuff here
+                    spawnOrderCounter++;
+                    break;
+                default:
+                    break;
+            }
 
         } else if (enemyBases.size() == 0 && possibleEnemyBases.size() == 0 && enemyCoords.size() > 0) {
 
@@ -277,7 +320,7 @@ public class EnlightenmentCenter {
         } else {
             if (rc.canBid(lastInfluenceGain / 4)) {
                 rc.bid(lastInfluenceGain / 4);
-                System.out.println("Bid:" + lastInfluenceGain / 4);
+                // System.out.println("Bid:" + lastInfluenceGain / 4);
             }
         }
     }
@@ -439,8 +482,8 @@ public class EnlightenmentCenter {
                                         default:
                                             break;
                                     }
-                                    // System.out.println("Possible Enemy Base:"
-                                    // + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
+                                    System.out.println("Possible Enemy Base:"
+                                            + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
                                 }
 
                                 // System.out.println(possibleEnemyBases.toString());
@@ -449,7 +492,7 @@ public class EnlightenmentCenter {
                     }
                 }
             } else {
-                // System.out.println(key + " DEAD");
+                System.out.println(key + " DEAD");
                 String lastMsg = scoutLastMessage.get(key);
                 if (lastMsg != null && lastMsg.length() != 0) {
                     int[] coords = Communication.coordDecoder(lastMsg);

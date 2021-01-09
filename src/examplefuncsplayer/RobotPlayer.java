@@ -90,7 +90,7 @@ public strictfp class RobotPlayer {
 
         }
         // System.out.println("I moved!");
-        System.out.println("COnviction: " + rc.getConviction());
+        //System.out.println("COnviction: " + rc.getConviction());
     }
 
     static void runMuckraker() throws GameActionException {
@@ -110,7 +110,7 @@ public strictfp class RobotPlayer {
 
         }
         // System.out.println("I moved!");
-        System.out.println("COnviction: " + rc.getConviction());
+        //System.out.println("COnviction: " + rc.getConviction());
     }
 
     /**

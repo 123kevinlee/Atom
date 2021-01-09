@@ -117,13 +117,13 @@ public class Slanderer {
         int[] coords = Communication.coordDecoder(role); // coords of safe corner
         coords[0] += Data.originPoint.x;
         coords[1] += Data.originPoint.y;
-        System.out.println("SAFE CORNER: " + coords[0] + "," + coords[1]);
+        //System.out.println("SAFE CORNER: " + coords[0] + "," + coords[1]);
         MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
         Direction targetDirection = Data.originPoint.directionTo(targetLocation);
         if (Data.slandererConvertDirection == Direction.CENTER) {
             Data.slandererConvertDirection = targetDirection.opposite();
         }
-        System.out.println(rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection)));
+        //System.out.println(rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection)));
         if (rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection))) {
             rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
         }

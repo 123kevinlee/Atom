@@ -138,7 +138,7 @@ public class Pathfinding {
 
     public static Direction basicBugToBase(RobotController rc, MapLocation target) throws GameActionException {
         Direction dir = rc.getLocation().directionTo(target);
-        System.out.println(dir);
+        // System.out.println(dir);
         if (dir == null) {
             return Direction.CENTER;
         }

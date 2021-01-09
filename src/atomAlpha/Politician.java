@@ -34,7 +34,7 @@ public class Politician {
                 rc.setFlag(1);
             }
             if (attackable.length != 0 && chaseCount != -1) {
-                System.out.println("TRACKING");
+                // System.out.println("TRACKING");
 
                 // The int below discerns which enemy to attack first in the RobotInfo array
                 int priorityEnemy = 0;
@@ -52,7 +52,7 @@ public class Politician {
                 tracked[0] += track.x;
                 tracked[1] += track.y;
 
-                System.out.println("ENEMY ROBOT: " + tracked[0] + "," + tracked[1]);
+                // System.out.println("ENEMY ROBOT: " + tracked[0] + "," + tracked[1]);
                 Direction toCloseEnemy = myLoc.directionTo(track);
 
                 if (myLoc.distanceSquaredTo(track) <= actionRadiusSquared && rc.canEmpower(actionRadiusSquared)) {
@@ -205,7 +205,7 @@ public class Politician {
             }
             // create a locking mechanism and chasing mechanism
             if (rc.canSenseRadiusSquared(9) && defensible.length > 0 && rc.canEmpower(9)) {
-                System.out.println("EMPOWER");
+                // System.out.println("EMPOWER");
                 rc.empower(9);
             }
         }
@@ -213,8 +213,6 @@ public class Politician {
         else if (role.length() != 7) {
             // sit around until get good role
         }
-        // System.out.println("I moved!");
-        // create a locking mechanism and chasing mechanism
     }
 
     public static void init(RobotController rc) throws GameActionException {
