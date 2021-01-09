@@ -4,6 +4,7 @@ import battlecode.common.*;
 
 public class Slanderer {
     public static Direction scoutDirection;
+    public static String cornerRole = "";
     public static boolean end = false;
     public static String role = "";
 
@@ -114,19 +115,68 @@ public class Slanderer {
 
     public static void farmMode(RobotController rc) throws GameActionException {
         // System.out.println("I moved!");
-        int[] coords = Communication.coordDecoder(role); // coords of safe corner
-        coords[0] += Data.originPoint.x;
-        coords[1] += Data.originPoint.y;
-        System.out.println("SAFE CORNER: " + coords[0] + "," + coords[1]);
-        MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
-        Direction targetDirection = Data.originPoint.directionTo(targetLocation);
-        if (Data.slandererConvertDirection == Direction.CENTER) {
-            Data.slandererConvertDirection = targetDirection.opposite();
-        }
-        System.out.println(rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection)));
-        if (rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection))) {
-            rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
-        }
+        cornerRole = role;
+
+        Team enemy = rc.getTeam().opponent();
+
+        //System.out.print("can sense radius 20" + rc.canSenseRadiusSquared(20));
+            RobotInfo[] fleeRaker = rc.senseNearbyRobots( 20, enemy);
+            int priorityEnemy = -1;
+
+            for (int i = 0; i < fleeRaker.length; i++) {
+                if (fleeRaker[i].getType() == RobotType.MUCKRAKER) {
+                    priorityEnemy = i;
+                    break;
+                }
+            }
+
+            if(priorityEnemy > -1){
+                //FLEE THE MUCKRAKER error as slanderers try to run into each other when moving against each other on a wall
+                MapLocation myLoc = rc.getLocation();
+                RobotInfo closeEnemy = fleeRaker[priorityEnemy];
+                MapLocation track = closeEnemy.getLocation();
+    
+                System.out.println("FLEEING MUCKRAKER");
+    
+                int[] tracked = new int[2];
+                tracked[0] += track.x;
+                tracked[1] += track.y;
+    
+                System.out.println("ENEMY MUCKRAKER: " + tracked[0] + "," + tracked[1]);
+    
+                Direction toEnemy = myLoc.directionTo(track);
+                Direction awayFromEnemy = toEnemy.opposite();
+    
+                System.out.println( "direction to run: " + awayFromEnemy);
+    
+                System.out.println("possible step is " + rc.canMove(Pathfinding.chooseBestNextStep(rc, awayFromEnemy)));
+
+                Pathfinding.setStartLocation(rc);
+
+                if (rc.canMove(Pathfinding.chooseBestNextStep(rc, awayFromEnemy))) {
+                    rc.move(Pathfinding.chooseBestNextStep(rc, awayFromEnemy));
+                }else if(rc.canMove(Pathfinding.chooseBestNextStep(rc, awayFromEnemy))) {
+                    rc.move(Pathfinding.chooseBestNextStep(rc, awayFromEnemy));
+                }
+    
+            }else {
+
+                System.out.println("the stored corner is in role: " + cornerRole);
+                int[] coords = Communication.coordDecoder(role); // coords of safe corner
+                coords[0] += Data.originPoint.x;
+                coords[1] += Data.originPoint.y;
+                System.out.println("SAFE CORNER: " + coords[0] + "," + coords[1]);
+                MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
+                Direction targetDirection = Data.originPoint.directionTo(targetLocation);
+                if (Data.slandererConvertDirection == Direction.CENTER) {
+                    Data.slandererConvertDirection = targetDirection.opposite();
+                }
+                    System.out.println(rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection)));
+                    if (rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection))) {
+                        rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
+                    }
+            }
+        
     }
 
     public static void turnRight(RobotController rc) throws GameActionException {
@@ -158,3 +208,4 @@ public class Slanderer {
         }
     }
 }
+
