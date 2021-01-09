@@ -194,9 +194,10 @@ public class EnlightenmentCenter {
         } else if (enemyBases.size() > 0) {
             switch (spawnOrder[spawnOrderCounter % 4]) {
                 case POLITICIAN:
-                    Direction spawnDir = rc.getLocation().directionTo(enemyBases.iterator().next());
+                    Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
                     int unitInfluence = rc.getInfluence() / 5;
-                    if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
+                    if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) { // technically don't
+                                                                                           // need this
                         int dx = enemyBases.iterator().next().x - rc.getLocation().x;
                         int dy = enemyBases.iterator().next().y - rc.getLocation().y;
                         int flag = Communication.coordEncoder("ENEMY", dx, dy);
@@ -208,7 +209,7 @@ public class EnlightenmentCenter {
                     }
                     break;
                 case MUCKRAKER:
-                    spawnDir = rc.getLocation().directionTo(enemyBases.iterator().next());
+                    spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
                     unitInfluence = 1;
                     if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
                         int dx = enemyBases.iterator().next().x - rc.getLocation().x;
@@ -222,8 +223,8 @@ public class EnlightenmentCenter {
                     }
                     break;
                 case SLANDERER:
-                    // begFarmerLimit++;
-                    // firstFarmers = true;
+                    begFarmerLimit++;
+                    firstFarmers = true;
                     // stuff here
                     spawnOrderCounter++;
                     break;
@@ -269,7 +270,16 @@ public class EnlightenmentCenter {
     }
 
     public static void calculateBid(RobotController rc) throws GameActionException {
-        // Do Later
+        if (rc.getRoundNum() < 1000) {
+            if (rc.canBid(3)) {
+                rc.bid(3);
+            }
+        } else {
+            if (rc.canBid(lastInfluenceGain / 4)) {
+                rc.bid(lastInfluenceGain / 4);
+                System.out.println("Bid:" + lastInfluenceGain / 4);
+            }
+        }
     }
 
     public static void scoutPhase(RobotController rc) throws GameActionException {
@@ -485,7 +495,8 @@ public class EnlightenmentCenter {
         if (removeId != null) {
             scoutIds.remove(removeId);
         }
-        System.out.println(mapBorders[0] + " " + mapBorders[1] + " " + mapBorders[2] + " " + mapBorders[3]);
+        // ln(mapBorders[0] + " " + mapBorders[1] + " " + mapBorders[2] + " " +
+        // mapBorders[3]);
     }
 
     public static void createDefensePhase(RobotController rc) throws GameActionException {

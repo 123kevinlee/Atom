@@ -57,7 +57,7 @@ public class Politician {
 
                 if (myLoc.distanceSquaredTo(track) <= actionRadiusSquared && rc.canEmpower(actionRadiusSquared)) {
                     rc.empower(actionRadiusSquared);
-                    System.out.println("Empowered");
+                    // System.out.println("Empowered");
 
                 } else if (rc.canMove(Pathfinding.chooseBestNextStep(rc, toCloseEnemy))) {
                     rc.move(Pathfinding.chooseBestNextStep(rc, toCloseEnemy));
@@ -66,13 +66,13 @@ public class Politician {
             }
 
             if (rc.canGetFlag(Data.baseId)) {
-                System.out.println("HERE0");
+                // System.out.println("HERE0");
                 String baseFlag = Integer.toString(rc.getFlag(Data.baseId));
                 if (baseFlag.charAt(0) == '3') {
-                    System.out.println("HERE1");
+                    // System.out.println("HERE1");
                     role = baseFlag;
                 } else if (rc.canSenseRadiusSquared(25)) {
-                    System.out.println("HERE2");
+                    // System.out.println("HERE2");
                     RobotInfo robots[] = rc.senseNearbyRobots(25, rc.getTeam());
                     for (RobotInfo robot : robots) {
                         if (rc.canGetFlag(robot.getID())) {
@@ -80,7 +80,7 @@ public class Politician {
                             if (baseFlag.charAt(0) == '3') {
                                 role = baseFlag;
                             } else {
-                                System.out.println("HERE3");
+                                // System.out.println("HERE3");
                                 if (Data.slandererConvertDirection != Direction.CENTER) {
                                     if (rc.canSenseRobot(Data.baseId)) {
                                         Data.slandererConvertDirection = Direction.CENTER;
@@ -144,7 +144,7 @@ public class Politician {
                 }
             }
 
-            System.out.println("I moved!");
+            // System.out.println("I moved!");
             int[] coords = Communication.coordDecoder(role); // coords of enemy base or whatever target
             MapLocation origin = Data.originPoint;
             coords[0] += origin.x;
@@ -201,6 +201,9 @@ public class Politician {
                             role = Integer.toString(rc.getFlag(Data.baseId));
                             Data.originPoint = robot.getLocation();
                             Data.initRound = rc.getRoundNum();
+                            if (rc.canSetFlag(Integer.parseInt(role))) {
+                                rc.setFlag(Integer.parseInt(role));
+                            }
                         }
                     }
                 }
