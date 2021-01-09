@@ -106,50 +106,6 @@ public class Politician {
         // System.out.println(role);
         else if (role.length() == 7) {
 
-<<<<<<< HEAD
-            /*
-             * create a locking mechanism and chasing mechanism marks the last known
-             * location of the closest enemy bot, no flags needed moves in the direction of
-             * this location, if within sensor radius, blows up if the enemy bot is already
-             * destroyed, the bot must resume trying to blow up the enlightment center.
-             */
-            if (attackable.length != 0 && chaseCount != -1) {
-                System.out.println("TRACKING");
-
-                // The int below discerns which enemy to attack first in the RobotInfo array (which is sorted from closest to farthest)
-                int priorityEnemy = 0;
-
-                //sort the robotinfo array to either track and attack the closest enemy, or the closest enemy ec
-                for (int i = 0; i < attackable.length; i++) {
-                    if (attackable[i].getType() == RobotType.ENLIGHTENMENT_CENTER) {
-                        priorityEnemy = i;
-                        break;
-                    }
-                }
-
-                RobotInfo closeEnemy = attackable[priorityEnemy];
-                MapLocation track = closeEnemy.getLocation();
-                int[] tracked = new int[2];
-                tracked[0] += track.x;
-                tracked[1] += track.y;
-
-                System.out.println("ENEMY ROBOT: " + tracked[0] + "," + tracked[1]);
-                Direction toCloseEnemy = myLoc.directionTo(track);
-
-                if (myLoc.distanceSquaredTo(track) <= actionRadiusSquared && rc.canEmpower(actionRadiusSquared)) {
-                    rc.empower(actionRadiusSquared);
-                    System.out.println("Empowered");
-
-                } else if (rc.canMove(Pathfinding.chooseBestNextStep(rc, toCloseEnemy))) {
-                    rc.move(Pathfinding.chooseBestNextStep(rc, toCloseEnemy));
-                    chaseCount++;
-                }
-            }
-
-            //this is the same for other units as well
-            System.out.println("I moved!");
-            int[] coords = Communication.coordDecoder(role); // coords of enemy base or whatever target
-=======
             // /*
             // * create a locking mechanism and chasing mechanism marks the last known
             // * location of the closest enemy bot, no flags needed moves in the direction
@@ -214,7 +170,6 @@ public class Politician {
             // System.out.println(role);
             // System.out.println("I moved!");
             int[] coords = Communication.coordDecoder(role);
->>>>>>> dev
             MapLocation currentLocation = rc.getLocation();
             coords[0] += Data.originPoint.x;
             coords[1] += Data.originPoint.y;
@@ -258,10 +213,7 @@ public class Politician {
         else if (role.length() != 7) {
             // sit around until get good role
         }
-<<<<<<< HEAD
         // System.out.println("I moved!");
-=======
->>>>>>> dev
     }
 
     public static void init(RobotController rc) throws GameActionException {
