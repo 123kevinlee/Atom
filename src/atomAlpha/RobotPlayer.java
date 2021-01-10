@@ -37,9 +37,11 @@ public strictfp class RobotPlayer {
             // Try/catch blocks stop unhandled exceptions, which cause your robot to freeze
             try {
                 switch (rc.getType()) {
+
                     case ENLIGHTENMENT_CENTER:
                         // runEnlightenmentCenter();
                         EnlightenmentCenter.run(rc);
+                        System.out.println("Influence:" + rc.getInfluence());
                         // System.out.println(Clock.getBytecodesLeft());
                         // System.out.println("Bytecode Left:" + Clock.getBytecodesLeft());
                         break;

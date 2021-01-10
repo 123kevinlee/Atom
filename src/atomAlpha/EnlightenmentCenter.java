@@ -9,8 +9,8 @@ public class EnlightenmentCenter {
     public static int lastInfluenceGain = 0;
     public static int lastVotes = 0;
 
-    public static RobotType[] spawnOrder = new RobotType[] { RobotType.POLITICIAN, RobotType.MUCKRAKER,
-            RobotType.POLITICIAN, RobotType.SLANDERER };
+    public static ArrayList<RobotType> spawnOrder = new ArrayList<RobotType>();
+
     public static int spawnOrderCounter = 0;
 
     public static boolean scoutingPhase = true;
@@ -42,10 +42,19 @@ public class EnlightenmentCenter {
     public static LinkedHashSet<MapLocation> enemyBases = new LinkedHashSet<MapLocation>();
     public static Map<Direction, MapLocation> enemyCoords = new TreeMap<Direction, MapLocation>();
     public static LinkedHashSet<MapLocation> possibleEnemyBases = new LinkedHashSet<MapLocation>();
+    public static LinkedHashMap<MapLocation, Integer> neutralBases = new LinkedHashMap<MapLocation, Integer>();
 
     public static void run(RobotController rc) throws GameActionException {
         calculateInfluenceGain(rc);
         calculateFarmers(rc);
+
+        System.out.println("ENEMIES:" + rc.senseNearbyRobots(2, rc.getTeam().opponent()).length);
+        if (rc.senseNearbyRobots(2, rc.getTeam().opponent()).length == 12) {
+            System.out.println("PANIC BID");
+            if (rc.canBid(rc.getInfluence() / 10)) {
+                rc.bid(rc.getInfluence() / 10);
+            }
+        }
 
         if (scoutingPhase) {
             scoutPhase(rc);
@@ -161,7 +170,7 @@ public class EnlightenmentCenter {
             // }
             // }
 
-            System.out.println("array N/S :" + arrayLocY + ", array E/W : " + arrayLocX);
+            // System.out.println("array N/S :" + arrayLocY + ", array E/W : " + arrayLocX);
 
             // if (arrayLocY != -1 && arrayLocX != -1) {
             // cornerCoordY = mapBorders[arrayLocY];
@@ -172,7 +181,8 @@ public class EnlightenmentCenter {
             if (arrayLocY != -1 && arrayLocX != -1) {
                 cornerCoordY = mapBorders[arrayLocY];
                 cornerCoordX = mapBorders[arrayLocX];
-                System.out.println("The closest corner is " + mapBorders[arrayLocY] + " , " + mapBorders[arrayLocX]);
+                // System.out.println("The closest corner is " + mapBorders[arrayLocY] + " , " +
+                // mapBorders[arrayLocX]);
                 MapLocation safeCorner = new MapLocation(cornerCoordX, cornerCoordY);
                 safeDir = Base.directionTo(safeCorner);
 
@@ -205,65 +215,100 @@ public class EnlightenmentCenter {
             }
         }
 
+        else if (false)
         // else if (muckrakerWall.containsValue(false) && rc.getRoundNum() -
-        // lastWallerSpawn > 10) {
-        // // add beacon
-        // // System.out.println(muckrakerWall.toString());
-        // int fillLocation = -1;
-        // Object[] keys = muckrakerWall.keySet().toArray();
-        // if (rc.canSenseRadiusSquared(40)) {
-        // for (int i = 0; i < keys.length; i++) {
-        // MapLocation key = (MapLocation) keys[i];
-        // // Boolean occupied = rc.isLocationOccupied(key);
-        // // muckrakerWall.put(key, occupied);
-        // if (muckrakerWall.get(key) == false) {
-        // fillLocation = i;
-        // }
-        // }
-        // if (fillLocation != -1) {
-        // Direction spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
-        // if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, 1)) {
-        // // System.out.println("Target:" + (MapLocation) keys[fillLocation]);
-        // int dx = ((MapLocation) keys[fillLocation]).x - rc.getLocation().x;
-        // int dy = ((MapLocation) keys[fillLocation]).y - rc.getLocation().y;
-        // int flag = Communication.coordEncoder("WALL", dx, dy);
-        // if (rc.canSetFlag(flag)) { // wall defender
-        // rc.setFlag(flag);
-        // }
-        // rc.buildRobot(RobotType.MUCKRAKER, spawnDir, 1);
+        // lastWallerSpawn > 10)
+        {
+            // // add beacon
+            // // System.out.println(muckrakerWall.toString());
+            // int fillLocation = -1;
+            // Object[] keys = muckrakerWall.keySet().toArray();
+            // if (rc.canSenseRadiusSquared(40)) {
+            // for (int i = 0; i < keys.length; i++) {
+            // MapLocation key = (MapLocation) keys[i];
+            // // Boolean occupied = rc.isLocationOccupied(key);
+            // // muckrakerWall.put(key, occupied);
+            // if (muckrakerWall.get(key) == false) {
+            // fillLocation = i;
+            // }
+            // }
+            // if (fillLocation != -1) {
+            // Direction spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
+            // if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, 1)) {
+            // // System.out.println("Target:" + (MapLocation) keys[fillLocation]);
+            // int dx = ((MapLocation) keys[fillLocation]).x - rc.getLocation().x;
+            // int dy = ((MapLocation) keys[fillLocation]).y - rc.getLocation().y;
+            // int flag = Communication.coordEncoder("WALL", dx, dy);
+            // if (rc.canSetFlag(flag)) { // wall defender
+            // rc.setFlag(flag);
+            // }
+            // rc.buildRobot(RobotType.MUCKRAKER, spawnDir, 1);
 
-        // muckrakerWall.put((MapLocation) (keys[fillLocation]), true);
-        // // make waller wait
-        // spawned++;
-        // if (spawned % 8 == 0) {
-        // lastWallerSpawn = rc.getRoundNum();
-        // }
+            // muckrakerWall.put((MapLocation) (keys[fillLocation]), true);
+            // // make waller wait
+            // spawned++;
+            // if (spawned % 8 == 0) {
+            // lastWallerSpawn = rc.getRoundNum();
+            // }
 
-        // }
-        // }
-        // }
+            // }
+            // }
+            // }
 
-        // }
-        else if (enemyBases.size() > 0) {
-            switch (spawnOrder[spawnOrderCounter % 4]) {
+        } else if (enemyBases.size() > 0) {
+            // if (neutralBases.size() > 0) {
+            // spawnOrder.add(RobotType.POLITICIAN);
+            // }
+            switch (spawnOrder.get(spawnOrderCounter % spawnOrder.size())) {
                 case POLITICIAN:
                     Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
-                    int unitInfluence = rc.getInfluence() / 5;
-                    if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) { // technically don't
-                                                                                           // need this
-                        int dx = enemyBases.iterator().next().x - rc.getLocation().x;
-                        int dy = enemyBases.iterator().next().y - rc.getLocation().y;
-                        int flag = Communication.coordEncoder("ENEMY", dx, dy);
-                        if (rc.canSetFlag(flag)) {
-                            rc.setFlag(flag);
+                    int currentInfluence = rc.getInfluence();
+                    if (currentInfluence > 11) {
+                        int unitInfluence = rc.getInfluence() / 5;
+                        if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) { // technically don't
+                                                                                               // need this
+                            int dx = enemyBases.iterator().next().x - rc.getLocation().x;
+                            int dy = enemyBases.iterator().next().y - rc.getLocation().y;
+                            int flag = Communication.coordEncoder("ENEMY", dx, dy);
+                            if (spawnOrder.size() > 4 && spawnOrder.size() % 5 == 4) {
+                                Object[] keys = neutralBases.keySet().toArray();
+                                MapLocation baseLocation = (MapLocation) keys[0];
+                                dx = baseLocation.x - rc.getLocation().x;
+                                dy = baseLocation.y - rc.getLocation().y;
+                                flag = Communication.coordEncoder("ENEMY", dx, dy);
+                                if (unitInfluence - neutralBases.get(keys[0]) > 0) {
+                                    unitInfluence = neutralBases.get(keys[0]);
+                                }
+                                int remaining = neutralBases.get(keys[0]) - unitInfluence;
+                                if (remaining == 0) {
+                                    spawnOrder.remove(spawnOrder.size() - 1);
+                                }
+                                neutralBases.put((MapLocation) keys[0], remaining);
+                            }
+                            if (rc.canSetFlag(flag)) {
+                                rc.setFlag(flag);
+                            }
+                            rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
+                            spawnOrderCounter++;
                         }
-                        rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
-                        spawnOrderCounter++;
+                    } else {
+                        spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
+                        int unitInfluence = 1;
+                        if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
+                            int dx = enemyBases.iterator().next().x - rc.getLocation().x;
+                            int dy = enemyBases.iterator().next().y - rc.getLocation().y;
+                            int flag = Communication.coordEncoder("ENEMY", dx, dy);
+                            if (rc.canSetFlag(flag)) {
+                                rc.setFlag(flag);
+                            }
+                            rc.buildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence);
+                            spawnOrderCounter++;
+                        }
                     }
                     break;
                 case MUCKRAKER:
                     spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
-                    unitInfluence = 1;
+                    int unitInfluence = 1;
                     if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
                         int dx = enemyBases.iterator().next().x - rc.getLocation().x;
                         int dy = enemyBases.iterator().next().y - rc.getLocation().y;
@@ -285,25 +330,59 @@ public class EnlightenmentCenter {
                     break;
             }
         } else if (enemyBases.size() == 0 && possibleEnemyBases.size() > 0) {
-            switch (spawnOrder[spawnOrderCounter % 4]) {
+            // if (neutralBases.size() > 0) {
+            // spawnOrder.add(RobotType.POLITICIAN);
+            // }
+            switch (spawnOrder.get(spawnOrderCounter % spawnOrder.size())) {
                 case POLITICIAN:
                     Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
-                    int unitInfluence = rc.getInfluence() / 5;
-                    if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) { // technically don't
-                                                                                           // need this
-                        int dx = possibleEnemyBases.iterator().next().x - rc.getLocation().x;
-                        int dy = possibleEnemyBases.iterator().next().y - rc.getLocation().y;
-                        int flag = Communication.coordEncoder("ENEMY", dx, dy);
-                        if (rc.canSetFlag(flag)) {
-                            rc.setFlag(flag);
+                    int currentInfluence = rc.getInfluence();
+                    if (currentInfluence > 11) {
+                        int unitInfluence = rc.getInfluence() / 5;
+                        if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) { // technically don't
+                                                                                               // need this
+                            int dx = enemyBases.iterator().next().x - rc.getLocation().x;
+                            int dy = enemyBases.iterator().next().y - rc.getLocation().y;
+                            int flag = Communication.coordEncoder("ENEMY", dx, dy);
+                            if (spawnOrder.size() > 4 && spawnOrder.size() % 5 == 4) {
+                                Object[] keys = neutralBases.keySet().toArray();
+                                MapLocation baseLocation = (MapLocation) keys[0];
+                                dx = baseLocation.x - rc.getLocation().x;
+                                dy = baseLocation.y - rc.getLocation().y;
+                                flag = Communication.coordEncoder("ENEMY", dx, dy);
+                                if (unitInfluence - neutralBases.get(keys[0]) > 0) {
+                                    unitInfluence = neutralBases.get(keys[0]);
+                                }
+                                int remaining = neutralBases.get(keys[0]) - unitInfluence;
+                                if (remaining == 0) {
+                                    spawnOrder.remove(spawnOrder.size() - 1);
+                                }
+                                neutralBases.put((MapLocation) keys[0], remaining);
+                            }
+                            if (rc.canSetFlag(flag)) {
+                                rc.setFlag(flag);
+                            }
+                            rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
+                            spawnOrderCounter++;
                         }
-                        rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
-                        spawnOrderCounter++;
+                    } else {
+                        spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
+                        int unitInfluence = 1;
+                        if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
+                            int dx = enemyBases.iterator().next().x - rc.getLocation().x;
+                            int dy = enemyBases.iterator().next().y - rc.getLocation().y;
+                            int flag = Communication.coordEncoder("ENEMY", dx, dy);
+                            if (rc.canSetFlag(flag)) {
+                                rc.setFlag(flag);
+                            }
+                            rc.buildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence);
+                            spawnOrderCounter++;
+                        }
                     }
                     break;
                 case MUCKRAKER:
                     spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
-                    unitInfluence = 1;
+                    int unitInfluence = 1;
                     if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
                         int dx = possibleEnemyBases.iterator().next().x - rc.getLocation().x;
                         int dy = possibleEnemyBases.iterator().next().y - rc.getLocation().y;
@@ -326,8 +405,14 @@ public class EnlightenmentCenter {
             }
 
         } else if (enemyBases.size() == 0 && possibleEnemyBases.size() == 0 && enemyCoords.size() > 0) {
+            // if (neutralBases.size() > 0) {
+            // spawnOrder.add(RobotType.POLITICIAN);
+            // }
 
         } else {
+            // if (neutralBases.size() > 0) {
+            // spawnOrder.add(RobotType.POLITICIAN);
+            // }
             // when there's practically no info
             // more defensive and if there are enemy unit coords -- light search attacks?
         }
@@ -362,13 +447,14 @@ public class EnlightenmentCenter {
     }
 
     public static void calculateBid(RobotController rc) throws GameActionException {
-        if (rc.getRoundNum() < 1000) {
+        if (rc.getRoundNum() > 150 && rc.getRoundNum() < 1000) {
             if (rc.canBid(3)) {
                 rc.bid(3);
+                // System.out.println(3);
             }
         } else {
-            if (rc.canBid(lastInfluenceGain / 4)) {
-                rc.bid(lastInfluenceGain / 4);
+            if (rc.canBid(lastInfluenceGain / 5)) {
+                rc.bid(lastInfluenceGain / 5);
                 // System.out.println("Bid:" + lastInfluenceGain / 4);
             }
         }
@@ -423,6 +509,12 @@ public class EnlightenmentCenter {
 
                         enemyBases.add(new MapLocation(coords[0], coords[1]));
                         // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
+                    } else if (msg.charAt(0) == '6') {
+                        MapLocation currentLocation = rc.getLocation();
+                        coords[0] += currentLocation.x;
+                        coords[1] += currentLocation.y;
+                        // System.out.println("Neutral BASE: " + coords[0] + "," + coords[1]
+                        neutralBases.put(new MapLocation(coords[0], coords[1]), 501);
                     } else if (msg.charAt(0) == '3') {
                         scoutLastMessage.put((int) key, msg);
                     }
@@ -480,7 +572,7 @@ public class EnlightenmentCenter {
                             }
                         }
                         if (zeroCount == 1 && !mapComplete) {
-                            // System.out.println("Calculating World Map...");
+                            // .println("Calculating World Map...");
                             int missingIndex = 0;
                             for (int i = 0; i < mapBorders.length; i++) {
                                 if (mapBorders[i] == 0) {
@@ -531,8 +623,8 @@ public class EnlightenmentCenter {
                                         default:
                                             break;
                                     }
-                                    System.out.println("Possible Enemy Base:"
-                                            + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
+                                    // System.out.println("Possible Enemy Base:"
+                                    // + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
                                 }
 
                                 // System.out.println(possibleEnemyBases.toString());
@@ -541,7 +633,7 @@ public class EnlightenmentCenter {
                     }
                 }
             } else {
-                System.out.println(key + " DEAD");
+                // System.out.println(key + " DEAD");
                 String lastMsg = scoutLastMessage.get(key);
                 if (lastMsg != null && lastMsg.length() != 0) {
                     int[] coords = Communication.coordDecoder(lastMsg);
@@ -592,7 +684,7 @@ public class EnlightenmentCenter {
     }
 
     public static void createDefensePhase(RobotController rc) throws GameActionException {
-        int influence = 10;
+        int influence = 12;
         int dirIndex = guardCount % 4;
         if (rc.canSetFlag(111)
                 && rc.canBuildRobot(RobotType.POLITICIAN, Data.directions[dirIndex * 2 + 1], influence)) {
@@ -650,5 +742,9 @@ public class EnlightenmentCenter {
         muckrakerWall.put(origin.translate(-3, 3), false);
         muckrakerWall.put(origin.translate(-2, 3), false);
         muckrakerWall.put(origin.translate(-1, 3), false);
+
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.SLANDERER);
     }
 }

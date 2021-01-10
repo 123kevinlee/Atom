@@ -69,7 +69,7 @@ public class Muckraker {
                         if (rc.canSetFlag(outMsg)) {
                             rc.setFlag(outMsg);
                         }
-                        end = true;
+                        // end = true;
                         turnRight(rc);
                         // System.out.println(scoutDirection + " " + currentLocation.toString());
                     }
@@ -84,7 +84,7 @@ public class Muckraker {
                         if (rc.canSetFlag(outMsg)) {
                             rc.setFlag(outMsg);
                         }
-                        end = true;
+                        // end = true;
                         turnRight(rc);
                         // System.out.println(scoutDirection + " " + currentLocation.toString());
                     }
@@ -99,7 +99,7 @@ public class Muckraker {
                         if (rc.canSetFlag(outMsg)) {
                             rc.setFlag(outMsg);
                         }
-                        end = true;
+                        // end = true;
                         turnRight(rc);
                         // System.out.println(scoutDirection + " " + currentLocation.toString());
                     }
@@ -114,7 +114,7 @@ public class Muckraker {
                         if (rc.canSetFlag(outMsg)) {
                             rc.setFlag(outMsg);
                         }
-                        end = true;
+                        // end = true;
                         turnRight(rc);
                         // System.out.println(scoutDirection + " " + currentLocation.toString());
                     }
@@ -125,17 +125,29 @@ public class Muckraker {
         }
         int sensorRadius = rc.getType().sensorRadiusSquared;
         if (rc.canSenseRadiusSquared(sensorRadius)) {
-            for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, rc.getTeam().opponent())) {
-                if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
+            for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius)) {
+                System.out.println(robot.toString());
+                if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER && robot.getTeam() == rc.getTeam().opponent()) {
                     MapLocation baseLocation = robot.getLocation();
                     int dx = baseLocation.x - Data.originPoint.x;
                     int dy = baseLocation.y - Data.originPoint.y;
                     int outMsg = Communication.coordEncoder("ENEMY", dx, dy);
+                    System.out.println("Found Enemy Base:" + outMsg);
+                    if (rc.canSetFlag(outMsg)) {
+                        rc.setFlag(outMsg);
+                    }
+                    // end = true;
+                } else if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER && robot.getTeam() == Team.NEUTRAL) {
+                    System.out.println("NUETRAL");
+                    MapLocation baseLocation = robot.getLocation();
+                    int dx = baseLocation.x - Data.originPoint.x;
+                    int dy = baseLocation.y - Data.originPoint.y;
+                    int outMsg = Communication.coordEncoder("NEUTRAL", dx, dy);
                     // System.out.println("Found Enemy Base:" + outMsg);
                     if (rc.canSetFlag(outMsg)) {
                         rc.setFlag(outMsg);
                     }
-                    end = true;
+                    // end = true;
                 }
             }
         }
@@ -161,7 +173,6 @@ public class Muckraker {
             // System.out.println(role);
             // System.out.println("I moved!");
             int[] coords = Communication.coordDecoder(role);
-            MapLocation currentLocation = rc.getLocation();
             coords[0] += Data.originPoint.x;
             coords[1] += Data.originPoint.y;
             // System.out.println("ENEMY TARGET: " + coords[0] + "," + coords[1]);

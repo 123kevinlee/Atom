@@ -20,6 +20,16 @@ public class Politician {
         RobotInfo[] defensible = rc.senseNearbyRobots(defenseRadius, enemy);
         RobotInfo[] attackable = rc.senseNearbyRobots(sensorRadiusSquared, enemy);
         // if (attackable.length != 0 && rc.canEmpower(desiredActionRadius)) {
+        // RobotInfo[] attackable = rc.senseNearbyRobots(25, enemy);
+        // // System.out.println(attackable.length);
+
+        // if (attackable.length > 0) {
+        // if (rc.canEmpower(9)) {
+        // rc.empower(9);
+        // }
+        // }
+
+        // if (attackable.length != 0 && rc.canEmpower(actionRadius)) {
         // // System.out.println("empowering...");
         // rc.empower(desiredActionRadius);
         // // System.out.println("empowered");
@@ -87,12 +97,12 @@ public class Politician {
                     }
                 }
 
-                if(ecException != true){
+                if (ecException != true) {
                     for (int i = 0; i < attackable.length; i++) {
-                        if((rc.getInfluence() - attackable[i].getInfluence()) >= 11){
+                        if ((rc.getInfluence() - attackable[i].getInfluence()) >= 11) {
                             priorityEnemy = i;
                             break;
-                        } else{
+                        } else {
                             priorityEnemy = -1;
                         }
                     }
@@ -101,8 +111,8 @@ public class Politician {
 
                 System.out.println(priorityEnemy);
 
-                if(priorityEnemy != -1){
-                    //System.out.println("TRACKING");
+                if (priorityEnemy != -1) {
+                    // System.out.println("TRACKING");
 
                     RobotInfo closeEnemy = attackable[priorityEnemy];
 
@@ -113,8 +123,8 @@ public class Politician {
                     tracked[0] += track.x;
                     tracked[1] += track.y;
 
-                    //System.out.println("ENEMY ROBOT: " + tracked[0] + "," + tracked[1]);
-                    
+                    // System.out.println("ENEMY ROBOT: " + tracked[0] + "," + tracked[1]);
+
                     Direction toCloseEnemy = myLoc.directionTo(track);
 
                     if (myLoc.distanceSquaredTo(track) <= desiredActionRadius && rc.canEmpower(desiredActionRadius)) {
@@ -128,10 +138,10 @@ public class Politician {
             }
 
             // if (rc.canSenseRadiusSquared(desiredActionRadius)) {
-            //     RobotInfo[] robot = rc.senseNearbyRobots(desiredActionRadius, enemy);
-            //     if (robot.length > 0 && rc.canEmpower(desiredActionRadius)) {
-            //         rc.empower(desiredActionRadius);
-            //     }
+            // RobotInfo[] robot = rc.senseNearbyRobots(desiredActionRadius, enemy);
+            // if (robot.length > 0 && rc.canEmpower(desiredActionRadius)) {
+            // rc.empower(desiredActionRadius);
+            // }
             // }
 
             // System.out.println(role);
