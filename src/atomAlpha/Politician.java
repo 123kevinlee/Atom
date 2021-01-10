@@ -18,7 +18,7 @@ public class Politician {
         Team enemy = rc.getTeam().opponent();
 
         RobotInfo[] defensible = rc.senseNearbyRobots(defenseRadius, enemy);
-        RobotInfo[] attackable = rc.senseNearbyRobots(sensorRadiusSquared, enemy);
+
         // if (attackable.length != 0 && rc.canEmpower(desiredActionRadius)) {
         // RobotInfo[] attackable = rc.senseNearbyRobots(25, enemy);
         // // System.out.println(attackable.length);
@@ -82,57 +82,59 @@ public class Politician {
         }
         // System.out.println(role);
         else if (role.length() == 7) {
+            if(rc.canSenseRadiusSquared(sensorRadiusSquared)){
+                RobotInfo[] attackable = rc.senseNearbyRobots(sensorRadiusSquared, enemy);
+                if (attackable.length != 0) {
+                    // The int below discerns which enemy to attack first in the RobotInfo array
 
-            if (attackable.length != 0) {
-                // The int below discerns which enemy to attack first in the RobotInfo array
+                    int priorityEnemy = 0;
 
-                int priorityEnemy = 0;
-
-                for (int i = 0; i < attackable.length; i++) {
-                    if (attackable[i].getType() == RobotType.ENLIGHTENMENT_CENTER) {
-                        ecException = true;
-                        priorityEnemy = i;
-                        desiredActionRadius = 1;
-                        break;
-                    }
-                }
-
-                if (ecException != true) {
                     for (int i = 0; i < attackable.length; i++) {
-                        if ((rc.getInfluence() - attackable[i].getInfluence()) >= 11) {
+                        if (attackable[i].getType() == RobotType.ENLIGHTENMENT_CENTER) {
+                            ecException = true;
                             priorityEnemy = i;
+                            desiredActionRadius = 1;
                             break;
-                        } else {
-                            priorityEnemy = -1;
                         }
                     }
 
-                }
+                    if (ecException != true) {
+                        for (int i = 0; i < attackable.length; i++) {
+                            if ((rc.getInfluence() - attackable[i].getInfluence()) >= 11) {
+                                priorityEnemy = i;
+                                break;
+                            } else {
+                                priorityEnemy = -1;
+                            }
+                        }
 
-                System.out.println(priorityEnemy);
+                    }
 
-                if (priorityEnemy != -1) {
-                    // System.out.println("TRACKING");
+                    System.out.println(priorityEnemy);
 
-                    RobotInfo closeEnemy = attackable[priorityEnemy];
+                    if (priorityEnemy != -1) {
+                        // System.out.println("TRACKING");
 
-                    MapLocation myLoc = rc.getLocation();
-                    MapLocation track = closeEnemy.getLocation();
-                    int[] tracked = new int[2];
+                        RobotInfo closeEnemy = attackable[priorityEnemy];
 
-                    tracked[0] += track.x;
-                    tracked[1] += track.y;
+                        MapLocation myLoc = rc.getLocation();
+                        MapLocation track = closeEnemy.getLocation();
+                        int[] tracked = new int[2];
 
-                    // System.out.println("ENEMY ROBOT: " + tracked[0] + "," + tracked[1]);
+                        tracked[0] += track.x;
+                        tracked[1] += track.y;
 
-                    Direction toCloseEnemy = myLoc.directionTo(track);
+                        // System.out.println("ENEMY ROBOT: " + tracked[0] + "," + tracked[1]);
 
-                    if (myLoc.distanceSquaredTo(track) <= desiredActionRadius && rc.canEmpower(desiredActionRadius)) {
-                        rc.empower(desiredActionRadius);
-                        // System.out.println("Empowered");
+                        Direction toCloseEnemy = myLoc.directionTo(track);
 
-                    } else if (rc.canMove(Pathfinding.basicBugToBase(rc, track))) {
-                        rc.move(Pathfinding.basicBugToBase(rc, track));
+                        if (myLoc.distanceSquaredTo(track) <= desiredActionRadius && rc.canEmpower(desiredActionRadius)) {
+                            rc.empower(desiredActionRadius);
+                            // System.out.println("Empowered");
+
+                        } else if (rc.canMove(Pathfinding.basicBugToBase(rc, track))) {
+                            rc.move(Pathfinding.basicBugToBase(rc, track));
+                        }
                     }
                 }
             }
