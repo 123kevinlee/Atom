@@ -614,21 +614,21 @@ public class EnlightenmentCenter {
     }
 
     //spawns 4 politicans in 4 corners around the ec
-    public static void createDefensePhase(RobotController rc) throws GameActionException {
-        int influence = 12;
-        int dirIndex = guardCount % 4;
-        if (rc.canSetFlag(111)
-                && rc.canBuildRobot(RobotType.POLITICIAN, Data.directions[dirIndex * 2 + 1], influence)) {
-            rc.setFlag(111); // defender politician
-            rc.buildRobot(RobotType.POLITICIAN, Data.directions[dirIndex * 2 + 1], influence);
-            guardCount++;
-        }
+    // public static void createDefensePhase(RobotController rc) throws GameActionException {
+    //     int influence = 12;
+    //     int dirIndex = guardCount % 4;
+    //     if (rc.canSetFlag(111)
+    //             && rc.canBuildRobot(RobotType.POLITICIAN, Data.directions[dirIndex * 2 + 1], influence)) {
+    //         rc.setFlag(111); // defender politician
+    //         rc.buildRobot(RobotType.POLITICIAN, Data.directions[dirIndex * 2 + 1], influence);
+    //         guardCount++;
+    //     }
 
-        if (guardCount > 3) {
-            setGuard = false;
-            guardsFull = true;
-        }
-    }
+    //     if (guardCount > 3) {
+    //         setGuard = false;
+    //         guardsFull = true;
+    //     }
+    // }
 
     public static void scatterPoliticians(RobotController rc) throws GameActionException {
         Direction spawn = openSpawnLocation(rc, RobotType.POLITICIAN);

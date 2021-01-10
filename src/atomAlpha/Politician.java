@@ -7,6 +7,7 @@ public class Politician {
     public static MapLocation originPoint;
 
     public static void run(RobotController rc) throws GameActionException {
+
         boolean ecException = false;
 
         int sensorRadiusSquared = 25;
@@ -311,7 +312,7 @@ public class Politician {
                 }
                 Direction nextDir = Pathfinding.basicBugToBase(rc, target);
                 if (rc.canMove(nextDir)) {
-                    // System.out.println("Rand Dir:" + randDirection);
+                    //System.out.println("Next Dir:" + nextDir);
                     rc.move(nextDir);
                 } else {
                     for (int i = 0; i < 8; i++) {
