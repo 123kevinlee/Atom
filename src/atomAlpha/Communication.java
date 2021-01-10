@@ -10,7 +10,7 @@ public class Communication {
                 outMsg += "2";
                 break;
             case "LIKELY": // ec in
-                outMsg += "3";
+                outMsg += "3"; // also conversion
                 break;
             case "WALL": // ec in
                 outMsg += "4";
