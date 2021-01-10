@@ -1,4 +1,4 @@
-package atomAlpha;
+package atomAlphaV1;
 
 import battlecode.common.*;
 
@@ -7,7 +7,6 @@ public class Politician {
     public static MapLocation originPoint;
 
     public static void run(RobotController rc) throws GameActionException {
-
         boolean ecException = false;
 
         int sensorRadiusSquared = 25;
@@ -20,24 +19,26 @@ public class Politician {
 
         RobotInfo[] defensible = rc.senseNearbyRobots(defenseRadius, enemy);
         RobotInfo[] attackable = rc.senseNearbyRobots(sensorRadiusSquared, enemy);
+        // if (attackable.length != 0 && rc.canEmpower(desiredActionRadius)) {
+        // RobotInfo[] attackable = rc.senseNearbyRobots(25, enemy);
+        // // System.out.println(attackable.length);
 
-        for (RobotInfo robot : attackable) {
-            if (robot.getTeam() == Team.NEUTRAL || (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
-                    && robot.getTeam() == rc.getTeam().opponent())) {
-                if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 9)) {
-                    if (rc.canEmpower(9)) {
-                        rc.empower(9);
-                    } else {
-                        Direction nextDir = Pathfinding.basicBugToBase(rc, robot.getLocation());
-                        if (rc.canMove(nextDir)) {
-                            rc.move(nextDir);
-                        }
-                    }
-                }
-            }
-        }
+        // if (attackable.length > 0) {
+        // if (rc.canEmpower(9)) {
+        // rc.empower(9);
+        // }
+        // }
 
-        if (role.equals("") || role.equals("1")) { // this means it justconverted from slanderer
+        // if (attackable.length != 0 && rc.canEmpower(actionRadius)) {
+        // // System.out.println("empowering...");
+        // rc.empower(desiredActionRadius);
+        // // System.out.println("empowered");
+        // return;
+        // }
+
+        // System.out.println(role);
+
+        if (role.equals("")) { // this means it justconverted from slanderer
             if (rc.canSetFlag(1)) {
                 rc.setFlag(1);
             }
@@ -45,33 +46,26 @@ public class Politician {
             if (rc.canGetFlag(Data.baseId)) {
                 // System.out.println("HERE0");
                 String baseFlag = Integer.toString(rc.getFlag(Data.baseId));
-                if (baseFlag.charAt(0) == '2' && baseFlag.length() == 7) {
+                if (baseFlag.charAt(0) == '3') {
                     // System.out.println("HERE1");
                     role = baseFlag;
-                    if (rc.canSetFlag(Integer.parseInt(baseFlag))) {
-                        rc.setFlag(Integer.parseInt(baseFlag));
-                    }
                 } else if (rc.canSenseRadiusSquared(25)) {
                     // System.out.println("HERE2");
                     RobotInfo robots[] = rc.senseNearbyRobots(25, rc.getTeam());
                     for (RobotInfo robot : robots) {
                         if (rc.canGetFlag(robot.getID())) {
                             baseFlag = Integer.toString(rc.getFlag(robot.getID()));
-                            if (baseFlag.charAt(0) == '2' || baseFlag.charAt(0) == '3' & baseFlag.length() == 7) {
+                            if (baseFlag.charAt(0) == '3') {
                                 role = baseFlag;
-                                if (rc.canSetFlag(Integer.parseInt(baseFlag))) {
-                                    rc.setFlag(Integer.parseInt(baseFlag));
-                                }
                             } else {
+                                // System.out.println("HERE3");
                                 if (Data.slandererConvertDirection != Direction.CENTER) {
                                     if (rc.canSenseRobot(Data.baseId)) {
-                                        RobotInfo base = rc.senseRobot(Data.baseId);
-                                        Data.slandererConvertDirection = rc.getLocation()
-                                                .directionTo(base.getLocation());
-                                        Direction nextDir = Pathfinding.basicBugToBase(rc, base.getLocation());
-                                        if (rc.canMove(nextDir)) {
-                                            rc.move(nextDir);
-                                        }
+                                        Data.slandererConvertDirection = Direction.CENTER;
+                                    }
+                                    if (rc.canMove(
+                                            Pathfinding.chooseBestNextStep(rc, Data.slandererConvertDirection))) {
+                                        rc.move(Pathfinding.chooseBestNextStep(rc, Data.slandererConvertDirection));
                                     }
                                 } else {
                                     Direction randomDirection = Data.directions[(int) (Math.random()
@@ -89,7 +83,6 @@ public class Politician {
         // System.out.println(role);
         else if (role.length() == 7) {
             if (rc.canSenseRadiusSquared(25)) {
-
                 RobotInfo[] robots = rc.senseNearbyRobots(25);
                 // System.out.println(robots.toString());
                 for (RobotInfo robot : robots) {
@@ -278,48 +271,12 @@ public class Politician {
                 // System.out.println("EMPOWER");
                 rc.empower(9);
             }
-        } else if (role.substring(0, 3).equals("112")) {
-            //only sense action radius
-            if (rc.canSenseRadiusSquared(9)) {
-                RobotInfo[] robots = rc.senseNearbyRobots(9, rc.getTeam().opponent());
-                for (RobotInfo robot : robots) {
-                    if (robot.getType().equals(RobotType.MUCKRAKER) && rc.getInfluence() > robot.getInfluence() + 10) {
-                        if (rc.canEmpower(rc.getLocation().distanceSquaredTo(robot.getLocation()))) {
-                            rc.empower(rc.getLocation().distanceSquaredTo(robot.getLocation()));
-                        }
-                    }
-                }
-            }
-
-            if (rc.getLocation().distanceSquaredTo(Data.originPoint) > 26) {
-                Direction dirBack = rc.getLocation().directionTo(Data.originPoint);
-                if (rc.canMove(dirBack)) {
-                    rc.move(dirBack);
-                }
-            } else {
-
-                Direction[] directions = new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH,
-                        Direction.WEST };
-                Direction scatterDir = directions[Integer.parseInt(Character.toString((role.charAt(3))))];
-                //System.out.println(scatterDir);
-                int boundary = 22;
-                MapLocation target = Data.originPoint;
-                for (int i = 0; i < boundary; i++) {
-                    target = target.add(scatterDir);
-                }
-                Direction nextDir = Pathfinding.basicBugToBase(rc, target);
-                if (rc.canMove(nextDir)) {
-                    //System.out.println("Next Dir:" + nextDir);
-                    rc.move(nextDir);
-                } else {
-                    for (int i = 0; i < 8; i++) {
-                        if (rc.canMove(Data.directions[i])) {
-                            rc.move(Data.directions[i]);
-                        }
-                    }
-                }
-            }
         }
+
+        else if (role.length() != 7) {
+            // sit around until get good role
+        }
+        // System.out.println("I moved!");
     }
 
     public static void init(RobotController rc) throws GameActionException {
