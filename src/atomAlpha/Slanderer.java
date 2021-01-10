@@ -172,9 +172,9 @@ public class Slanderer {
             if (Data.slandererConvertDirection == Direction.CENTER) {
                 Data.slandererConvertDirection = targetDirection.opposite();
             }
-            System.out.println(rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection)));
-            if (rc.canMove(Pathfinding.chooseBestNextStep(rc, targetDirection))) {
-                rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
+            System.out.println(rc.canMove(Pathfinding.basicBugToBase(rc, targetLocation)));
+            if (rc.canMove(Pathfinding.basicBugToBase(rc, targetLocation))) {
+                rc.move(Pathfinding.basicBugToBase(rc, targetLocation));
             }
         }
 
