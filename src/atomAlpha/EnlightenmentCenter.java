@@ -86,19 +86,23 @@ public class EnlightenmentCenter {
             int cornerCoordX = 0;
             int cornerCoordY = 0;
 
+            int bases0X = Math.abs(Base.x);
+            int bases0Y = Math.abs(Base.y);
+
             if (mapBorders[0] == 0 || mapBorders[2] == 0) {
                 for (int i = 0; i < mapBorders.length; i += 2) {
-                    if (mapBorders[i] != 0) {
+                    if (Math.abs(Base.y - mapBorders[i]) != bases0Y) {
                         arrayLocY = i;
                         // distanceY = Math.abs(Base.y - mapBorders[i]);
                     }
                 }
-            } else {
-                int minBorder = Math.abs(mapBorders[0]);
+            } else { // if the border values are all defined, this code will find the true
+                // closest border
+                int minBorder = Math.abs(Base.y - mapBorders[0]);
                 arrayLocY = 0;
 
                 for (int i = 0; i < mapBorders.length; i += 2) {
-                    if (Math.abs(mapBorders[i]) < minBorder) {
+                    if (Math.abs(Base.y - mapBorders[i]) < minBorder) {
                         arrayLocY = i;
                     }
                 }
@@ -106,19 +110,25 @@ public class EnlightenmentCenter {
 
             // System.out.println(arrayLocY);
 
+            // Obtaining the closest border value for x even if adjacent borders are
+            // unidentified
+
+            // System.out.println(arrayLocY);
+
             if (mapBorders[1] == 0 || mapBorders[3] == 0) {
                 for (int i = 1; i < mapBorders.length; i += 2) {
-                    if (mapBorders[i] != 0) {
+                    if (Math.abs(Base.x - mapBorders[i]) != bases0X) {
                         arrayLocX = i;
                         // distanceX = Math.abs(Base.x - mapBorders[i]);
                     }
                 }
-            } else {
-                int minBorder = Math.abs(mapBorders[1]);
+            } else { // if the border values are all defined, this code will find the true
+                // closest border
+                int minBorder = Math.abs(Base.x - mapBorders[1]);
                 arrayLocX = 1;
 
                 for (int i = 1; i < mapBorders.length; i += 2) {
-                    if (Math.abs(mapBorders[i]) < minBorder) {
+                    if (Math.abs(Base.x - mapBorders[i]) < minBorder) {
                         arrayLocX = i;
                     }
                 }
@@ -186,11 +196,15 @@ public class EnlightenmentCenter {
                 MapLocation safeCorner = new MapLocation(cornerCoordX, cornerCoordY);
                 safeDir = Base.directionTo(safeCorner);
 
+                System.out.println(safeCorner.toString());
+
                 // ("The safe direction is: " + safeDir);
 
                 MapLocation currentLocation = rc.getLocation();
                 int dx = safeCorner.x - currentLocation.x;
                 int dy = safeCorner.y - currentLocation.y;
+                // System.out.println(dx);
+                // System.out.println(dy);
 
                 if (scoutCount > 3 && farmerCount <= begFarmerLimit && safeDir != Direction.CENTER
                         && rc.canBuildRobot(RobotType.SLANDERER, safeDir, farmerInfluence)) {
