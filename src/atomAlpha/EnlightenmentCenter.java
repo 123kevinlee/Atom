@@ -48,9 +48,10 @@ public class EnlightenmentCenter {
         calculateInfluenceGain(rc);
         calculateFarmers(rc);
 
-        System.out.println("ENEMIES:" + rc.senseNearbyRobots(2, rc.getTeam().opponent()).length);
+        // System.out.println("ENEMIES:" + rc.senseNearbyRobots(2,
+        // rc.getTeam().opponent()).length);
         if (rc.senseNearbyRobots(2, rc.getTeam().opponent()).length == 12) {
-            System.out.println("PANIC BID");
+            // System.out.println("PANIC BID");
             if (rc.canBid(rc.getInfluence() / 10)) {
                 rc.bid(rc.getInfluence() / 10);
             }
@@ -196,7 +197,7 @@ public class EnlightenmentCenter {
                 MapLocation safeCorner = new MapLocation(cornerCoordX, cornerCoordY);
                 safeDir = Base.directionTo(safeCorner);
 
-                System.out.println(safeCorner.toString());
+                // System.out.println(safeCorner.toString());
 
                 // ("The safe direction is: " + safeDir);
 

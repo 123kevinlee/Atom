@@ -126,19 +126,19 @@ public class Muckraker {
         int sensorRadius = rc.getType().sensorRadiusSquared;
         if (rc.canSenseRadiusSquared(sensorRadius)) {
             for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius)) {
-                System.out.println(robot.toString());
+                // System.out.println(robot.toString());
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER && robot.getTeam() == rc.getTeam().opponent()) {
                     MapLocation baseLocation = robot.getLocation();
                     int dx = baseLocation.x - Data.originPoint.x;
                     int dy = baseLocation.y - Data.originPoint.y;
                     int outMsg = Communication.coordEncoder("ENEMY", dx, dy);
-                    System.out.println("Found Enemy Base:" + outMsg);
+                    // System.out.println("Found Enemy Base:" + outMsg);
                     if (rc.canSetFlag(outMsg)) {
                         rc.setFlag(outMsg);
                     }
                     // end = true;
                 } else if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER && robot.getTeam() == Team.NEUTRAL) {
-                    System.out.println("NUETRAL");
+                    // System.out.println("NUETRAL");
                     MapLocation baseLocation = robot.getLocation();
                     int dx = baseLocation.x - Data.originPoint.x;
                     int dy = baseLocation.y - Data.originPoint.y;
@@ -179,6 +179,14 @@ public class Muckraker {
                         if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
                         }
+                        // System.out.println("NEW TARGET");
+                        // MapLocation newTarget = robot.getLocation();
+                        // int dx = newTarget.x - Data.originPoint.x;
+                        // int dy = newTarget.y - Data.originPoint.y;
+                        // int newFlag = Communication.coordEncoder("ENEMY", dx, dy);
+                        // if (rc.canSetFlag(newFlag)) {
+                        // rc.setFlag(newFlag);
+                        // }
                     }
                     if (robot.getTeam() == rc.getTeam()) {
                         if (rc.canGetFlag(robot.getID())) {
@@ -191,6 +199,16 @@ public class Muckraker {
                                     }
                                 }
                             }
+                            // if (flag.charAt(0) == '2') {
+                            // String ending = Integer.toString(rc.getFlag(rc.getID())).substring(1);
+                            // if (!flag.substring(1).equals(ending)) {
+                            // role = flag;
+                            // if (rc.canSetFlag(Integer.parseInt(flag))) {
+                            // rc.setFlag(Integer.parseInt(flag));
+                            // System.out.println("SEEEE");
+                            // }
+                            // }
+                            // }
                         }
                     }
                 }
@@ -207,7 +225,7 @@ public class Muckraker {
                 RobotInfo robot = rc.senseRobotAtLocation(targetLocation);
                 if (robot != null && robot.getTeam() == rc.getTeam()
                         && robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
-                    System.out.println("MISSING OR CONVERTED");
+                    // System.out.println("MISSING OR CONVERTED");
                     String convertMsg = "3" + role.substring(1);
                     if (rc.canSetFlag(Integer.parseInt(convertMsg))) {
                         rc.setFlag(Integer.parseInt(convertMsg));

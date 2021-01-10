@@ -70,8 +70,8 @@ public class Politician {
                                 } else {
                                     Direction randomDirection = Data.directions[(int) (Math.random()
                                             * Data.directions.length)];
-                                    if (rc.canMove(Pathfinding.chooseBestNextStep(rc, randomDirection))) {
-                                        rc.move(Pathfinding.chooseBestNextStep(rc, randomDirection));
+                                    if (rc.canMove(randomDirection)) {
+                                        rc.move(randomDirection);
                                     }
                                 }
                             }
@@ -82,12 +82,25 @@ public class Politician {
         }
         // System.out.println(role);
         else if (role.length() == 7) {
-            System.out.println("HERE");
             if (rc.canSenseRadiusSquared(25)) {
-                System.out.println("HERE1");
                 RobotInfo[] robots = rc.senseNearbyRobots(25);
-                System.out.println(robots.toString());
+                // System.out.println(robots.toString());
                 for (RobotInfo robot : robots) {
+                    if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
+                            && robot.getTeam() == rc.getTeam().opponent()) {
+                        Direction nextDir = Pathfinding.basicBugToBase(rc, robot.getLocation());
+                        if (rc.canMove(nextDir)) {
+                            rc.move(nextDir);
+                        }
+                        // System.out.println("NEW TARGET");
+                        // MapLocation newTarget = robot.getLocation();
+                        // int dx = newTarget.x - Data.originPoint.x;
+                        // int dy = newTarget.y - Data.originPoint.y;
+                        // int newFlag = Communication.coordEncoder("ENEMY", dx, dy);
+                        // if (rc.canSetFlag(newFlag)) {
+                        // rc.setFlag(newFlag);
+                        // }
+                    }
                     if (robot.getTeam() == rc.getTeam()) {
                         if (rc.canGetFlag(robot.getID())) {
                             String flag = Integer.toString(rc.getFlag(robot.getID()));
@@ -99,6 +112,16 @@ public class Politician {
                                     }
                                 }
                             }
+                            // if (flag.charAt(0) == '2') {
+                            // String ending = Integer.toString(rc.getFlag(rc.getID())).substring(1);
+                            // if (!flag.substring(1).equals(ending)) {
+                            // role = flag;
+                            // if (rc.canSetFlag(Integer.parseInt(flag))) {
+                            // rc.setFlag(Integer.parseInt(flag));
+                            // System.out.println("SEEEE");
+                            // }
+                            // }
+                            // }
                         }
                     }
                     if (robot.getTeam() == Team.NEUTRAL || (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
@@ -142,7 +165,7 @@ public class Politician {
 
                 }
 
-                System.out.println(priorityEnemy);
+                // System.out.println(priorityEnemy);
 
                 if (priorityEnemy != -1) {
                     // System.out.println("TRACKING");
@@ -186,7 +209,7 @@ public class Politician {
                     Direction[] directions = Data.directions;
                     Direction randDirection = directions[(int) (Math.random() * directions.length)];
                     if (rc.canMove(randDirection)) {
-                        System.out.println("Rand Dir:" + randDirection);
+                        // System.out.println("Rand Dir:" + randDirection);
                         rc.move(randDirection);
                     } else {
                         for (int i = 0; i < 8; i++) {
@@ -208,8 +231,8 @@ public class Politician {
                 RobotInfo robot = rc.senseRobotAtLocation(targetLocation);
                 if (robot != null && robot.getTeam() == rc.getTeam()
                         && robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
-                    System.out.println(robot.getTeam());
-                    System.out.println("MISSING OR CONVERTED");
+                    // System.out.println(robot.getTeam());
+                    // System.out.println("MISSING OR CONVERTED");
                     String convertMsg = "3" + role.substring(1);
                     if (rc.canSetFlag(Integer.parseInt(convertMsg))) {
                         rc.setFlag(Integer.parseInt(convertMsg));

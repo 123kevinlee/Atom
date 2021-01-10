@@ -41,7 +41,7 @@ public strictfp class RobotPlayer {
                     case ENLIGHTENMENT_CENTER:
                         // runEnlightenmentCenter();
                         EnlightenmentCenter.run(rc);
-                        System.out.println("Influence:" + rc.getInfluence());
+                        // System.out.println("Influence:" + rc.getInfluence());
                         // System.out.println(Clock.getBytecodesLeft());
                         // System.out.println("Bytecode Left:" + Clock.getBytecodesLeft());
                         break;
