@@ -341,8 +341,8 @@ public class EnlightenmentCenter {
                         int unitInfluence = rc.getInfluence() / 5;
                         if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) { // technically don't
                                                                                                // need this
-                            int dx = enemyBases.iterator().next().x - rc.getLocation().x;
-                            int dy = enemyBases.iterator().next().y - rc.getLocation().y;
+                            int dx = possibleEnemyBases.iterator().next().x - rc.getLocation().x;
+                            int dy = possibleEnemyBases.iterator().next().y - rc.getLocation().y;
                             int flag = Communication.coordEncoder("ENEMY", dx, dy);
                             if (spawnOrder.size() > 4 && spawnOrder.size() % 5 == 4) {
                                 Object[] keys = neutralBases.keySet().toArray();
@@ -369,8 +369,8 @@ public class EnlightenmentCenter {
                         spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
                         int unitInfluence = 1;
                         if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
-                            int dx = enemyBases.iterator().next().x - rc.getLocation().x;
-                            int dy = enemyBases.iterator().next().y - rc.getLocation().y;
+                            int dx = possibleEnemyBases.iterator().next().x - rc.getLocation().x;
+                            int dy = possibleEnemyBases.iterator().next().y - rc.getLocation().y;
                             int flag = Communication.coordEncoder("ENEMY", dx, dy);
                             if (rc.canSetFlag(flag)) {
                                 rc.setFlag(flag);
