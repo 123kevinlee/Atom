@@ -35,6 +35,7 @@ public class EnlightenmentCenter {
     public static LinkedHashMap<MapLocation, Boolean> muckrakerWall = new LinkedHashMap<MapLocation, Boolean>();
     public static int lastWallerSpawn = 0;
     public static int spawned = 0;
+    public static int scatterPoliCounter = 0;
 
     public static Set<Integer> farmerIds = new HashSet<Integer>();
     public static int[] mapBorders = new int[4]; // 0=NORTH 1=EAST 2=SOUTH 3=WEST
@@ -74,9 +75,9 @@ public class EnlightenmentCenter {
             scoutPhase(rc);
         }
 
-        else if (setGuard == true) {
-            createDefensePhase(rc);
-        }
+        // else if (setGuard == true) {
+        //     createDefensePhase(rc);
+        // }
 
         else if (firstFarmers == true && mapInitX > 0 && mapInitY > 0) {
             int farmerInfluence = 10;
@@ -197,7 +198,7 @@ public class EnlightenmentCenter {
                 case POLITICIAN:
                     Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
                     int currentInfluence = rc.getInfluence();
-                    if (currentInfluence > 11) {
+                    if (rc.getInfluence() / 5 > 11) {
                         int unitInfluence = rc.getInfluence() / 5;
                         if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) { // technically don't
                                                                                                // need this
@@ -338,10 +339,13 @@ public class EnlightenmentCenter {
                     break;
             }
 
-        } else if (enemyBases.size() == 0 && possibleEnemyBases.size() == 0 && enemyCoords.size() > 0) {
-            //do later
-        } else {
-            //do later
+        }
+        // else if (enemyBases.size() == 0 && possibleEnemyBases.size() == 0 && enemyCoords.size() > 0) {
+        //     //do later
+        // } 
+        else {
+            scoutLimit += 4;
+            scoutingPhase = true;
         }
         if (scoutIds.size() > 0) {
             listenForScoutMessages(rc);
@@ -628,9 +632,11 @@ public class EnlightenmentCenter {
 
     public static void scatterPoliticians(RobotController rc) throws GameActionException {
         Direction spawn = openSpawnLocation(rc, RobotType.POLITICIAN);
+        String msg = "112" + Integer.toString(scatterPoliCounter % 4);
         if (rc.canBuildRobot(RobotType.POLITICIAN, spawn, 12)) {
-            if (rc.canSetFlag(112)) {
-                rc.setFlag(112);
+            if (rc.canSetFlag(Integer.parseInt(msg))) {
+                rc.setFlag(Integer.parseInt(msg));
+                scatterPoliCounter++;
             }
             rc.buildRobot(RobotType.POLITICIAN, spawn, 12);
         }

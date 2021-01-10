@@ -5,7 +5,6 @@ import battlecode.common.*;
 public class Politician {
     public static String role = "";
     public static MapLocation originPoint;
-    public static Direction randScatterDirection = Direction.CENTER;
 
     public static void run(RobotController rc) throws GameActionException {
         boolean ecException = false;
@@ -281,12 +280,12 @@ public class Politician {
                 // System.out.println("EMPOWER");
                 rc.empower(9);
             }
-        } else if (role.equals("112")) {
+        } else if (role.substring(0, 3).equals("112")) {
             //only sense action radius
             if (rc.canSenseRadiusSquared(9)) {
                 RobotInfo[] robots = rc.senseNearbyRobots(9, rc.getTeam().opponent());
                 for (RobotInfo robot : robots) {
-                    if (robot.getType().equals(RobotType.MUCKRAKER) && rc.getInfluence() > robot.getInfluence() + 11) {
+                    if (robot.getType().equals(RobotType.MUCKRAKER) && rc.getInfluence() > robot.getInfluence() + 10) {
                         if (rc.canEmpower(rc.getLocation().distanceSquaredTo(robot.getLocation()))) {
                             rc.empower(rc.getLocation().distanceSquaredTo(robot.getLocation()));
                         }
@@ -294,24 +293,30 @@ public class Politician {
                 }
             }
 
-            if (rc.getLocation().distanceSquaredTo(Data.originPoint) > 12) {
+            if (rc.getLocation().distanceSquaredTo(Data.originPoint) > 22) {
                 Direction dirBack = rc.getLocation().directionTo(Data.originPoint);
                 if (rc.canMove(dirBack)) {
                     rc.move(dirBack);
                 }
             } else {
-                //System.out.println(randScatterDirection);
-                Direction[] directions = Data.directions;
-                if (randScatterDirection.equals(Direction.CENTER)) {
-                    randScatterDirection = directions[(int) (Math.random() * directions.length)];
+
+                Direction[] directions = new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH,
+                        Direction.WEST };
+                Direction scatterDir = directions[Integer.parseInt(Character.toString((role.charAt(3))))];
+                System.out.println(scatterDir);
+                int boundary = 22;
+                MapLocation target = Data.originPoint;
+                for (int i = 0; i < boundary; i++) {
+                    target = target.add(scatterDir);
                 }
-                if (rc.canMove(randScatterDirection)) {
+                Direction nextDir = Pathfinding.basicBugToBase(rc, target);
+                if (rc.canMove(nextDir)) {
                     // System.out.println("Rand Dir:" + randDirection);
-                    rc.move(randScatterDirection);
+                    rc.move(nextDir);
                 } else {
                     for (int i = 0; i < 8; i++) {
-                        if (rc.canMove(directions[i])) {
-                            rc.move(directions[i]);
+                        if (rc.canMove(Data.directions[i])) {
+                            rc.move(Data.directions[i]);
                         }
                     }
                 }
