@@ -5,6 +5,7 @@ import battlecode.common.*;
 public class Politician {
     public static String role = "";
     public static MapLocation originPoint;
+    public static Direction randScatterDirection = Direction.CENTER;
 
     public static void run(RobotController rc) throws GameActionException {
         boolean ecException = false;
@@ -19,6 +20,7 @@ public class Politician {
 
         RobotInfo[] defensible = rc.senseNearbyRobots(defenseRadius, enemy);
         RobotInfo[] attackable = rc.senseNearbyRobots(sensorRadiusSquared, enemy);
+
         // if (attackable.length != 0 && rc.canEmpower(desiredActionRadius)) {
         // RobotInfo[] attackable = rc.senseNearbyRobots(25, enemy);
         // // System.out.println(attackable.length);
@@ -46,26 +48,33 @@ public class Politician {
             if (rc.canGetFlag(Data.baseId)) {
                 // System.out.println("HERE0");
                 String baseFlag = Integer.toString(rc.getFlag(Data.baseId));
-                if (baseFlag.charAt(0) == '3') {
+                if (baseFlag.charAt(0) == '2' && baseFlag.length() == 7) {
                     // System.out.println("HERE1");
                     role = baseFlag;
+                    if (rc.canSetFlag(Integer.parseInt(baseFlag))) {
+                        rc.setFlag(Integer.parseInt(baseFlag));
+                    }
                 } else if (rc.canSenseRadiusSquared(25)) {
                     // System.out.println("HERE2");
                     RobotInfo robots[] = rc.senseNearbyRobots(25, rc.getTeam());
                     for (RobotInfo robot : robots) {
                         if (rc.canGetFlag(robot.getID())) {
                             baseFlag = Integer.toString(rc.getFlag(robot.getID()));
-                            if (baseFlag.charAt(0) == '3') {
+                            if (baseFlag.charAt(0) == '2' || baseFlag.charAt(0) == '3' & baseFlag.length() == 7) {
                                 role = baseFlag;
+                                if (rc.canSetFlag(Integer.parseInt(baseFlag))) {
+                                    rc.setFlag(Integer.parseInt(baseFlag));
+                                }
                             } else {
-                                // System.out.println("HERE3");
                                 if (Data.slandererConvertDirection != Direction.CENTER) {
                                     if (rc.canSenseRobot(Data.baseId)) {
-                                        Data.slandererConvertDirection = Direction.CENTER;
-                                    }
-                                    if (rc.canMove(
-                                            Pathfinding.chooseBestNextStep(rc, Data.slandererConvertDirection))) {
-                                        rc.move(Pathfinding.chooseBestNextStep(rc, Data.slandererConvertDirection));
+                                        RobotInfo base = rc.senseRobot(Data.baseId);
+                                        Data.slandererConvertDirection = rc.getLocation()
+                                                .directionTo(base.getLocation());
+                                        Direction nextDir = Pathfinding.basicBugToBase(rc, base.getLocation());
+                                        if (rc.canMove(nextDir)) {
+                                            rc.move(nextDir);
+                                        }
                                     }
                                 } else {
                                     Direction randomDirection = Data.directions[(int) (Math.random()
@@ -272,12 +281,42 @@ public class Politician {
                 // System.out.println("EMPOWER");
                 rc.empower(9);
             }
-        }
+        } else if (role.equals("112")) {
+            //only sense action radius
+            if (rc.canSenseRadiusSquared(9)) {
+                RobotInfo[] robots = rc.senseNearbyRobots(9, rc.getTeam().opponent());
+                for (RobotInfo robot : robots) {
+                    if (robot.getType().equals(RobotType.MUCKRAKER) && rc.getInfluence() > robot.getInfluence() + 11) {
+                        if (rc.canEmpower(rc.getLocation().distanceSquaredTo(robot.getLocation()))) {
+                            rc.empower(rc.getLocation().distanceSquaredTo(robot.getLocation()));
+                        }
+                    }
+                }
+            }
 
-        else if (role.length() != 7) {
-            // sit around until get good role
+            if (rc.getLocation().distanceSquaredTo(Data.originPoint) > 12) {
+                Direction dirBack = rc.getLocation().directionTo(Data.originPoint);
+                if (rc.canMove(dirBack)) {
+                    rc.move(dirBack);
+                }
+            } else {
+                //System.out.println(randScatterDirection);
+                Direction[] directions = Data.directions;
+                if (randScatterDirection.equals(Direction.CENTER)) {
+                    randScatterDirection = directions[(int) (Math.random() * directions.length)];
+                }
+                if (rc.canMove(randScatterDirection)) {
+                    // System.out.println("Rand Dir:" + randDirection);
+                    rc.move(randScatterDirection);
+                } else {
+                    for (int i = 0; i < 8; i++) {
+                        if (rc.canMove(directions[i])) {
+                            rc.move(directions[i]);
+                        }
+                    }
+                }
+            }
         }
-        // System.out.println("I moved!");
     }
 
     public static void init(RobotController rc) throws GameActionException {

@@ -159,7 +159,7 @@ public class Muckraker {
 
         if (rc.canSenseRadiusSquared(actionRadius)) {
             for (RobotInfo robot : rc.senseNearbyRobots(actionRadius)) {
-                if (robot.type.canBeExposed() && robot.getTeam() == rc.getTeam().opponent()) {
+                if (robot.type.canBeExposed() && robot.getTeam().equals(enemy)) {
                     // It's a slanderer... go get them!
                     if (rc.canExpose(robot.location)) {
                         // System.out.println("e x p o s e d");
