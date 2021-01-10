@@ -432,7 +432,7 @@ public class EnlightenmentCenter {
         for (Object key : keys) {
             if (rc.canGetFlag((int) key)) {
                 int flag = rc.getFlag((int) key);
-                if (flag != 0) {
+                if (flag != 0 && Integer.toString(flag).length() == 7) {
                     // System.out.println("id: " + key + " msg:" + flag);
                     String msg = Integer.toString(flag);
                     int[] coords = Communication.coordDecoder(msg);
@@ -727,6 +727,8 @@ public class EnlightenmentCenter {
 
         spawnOrder.add(RobotType.MUCKRAKER);
         spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.MUCKRAKER);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.MUCKRAKER);

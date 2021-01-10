@@ -293,7 +293,7 @@ public class Politician {
                 }
             }
 
-            if (rc.getLocation().distanceSquaredTo(Data.originPoint) > 22) {
+            if (rc.getLocation().distanceSquaredTo(Data.originPoint) > 26) {
                 Direction dirBack = rc.getLocation().directionTo(Data.originPoint);
                 if (rc.canMove(dirBack)) {
                     rc.move(dirBack);
@@ -303,7 +303,7 @@ public class Politician {
                 Direction[] directions = new Direction[] { Direction.NORTH, Direction.EAST, Direction.SOUTH,
                         Direction.WEST };
                 Direction scatterDir = directions[Integer.parseInt(Character.toString((role.charAt(3))))];
-                System.out.println(scatterDir);
+                //System.out.println(scatterDir);
                 int boundary = 22;
                 MapLocation target = Data.originPoint;
                 for (int i = 0; i < boundary; i++) {
