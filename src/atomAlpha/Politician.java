@@ -17,6 +17,7 @@ public class Politician {
 
         Team enemy = rc.getTeam().opponent();
 
+        RobotInfo[] attackable = rc.senseNearbyRobots(sensorRadiusSquared, enemy);
         RobotInfo[] defensible = rc.senseNearbyRobots(defenseRadius, enemy);
 
         // if (attackable.length != 0 && rc.canEmpower(desiredActionRadius)) {
@@ -121,14 +122,14 @@ public class Politician {
 
                 int priorityEnemy = 0;
 
-                for (int i = 0; i < attackable.length; i++) {
-                    if (attackable[i].getType() == RobotType.ENLIGHTENMENT_CENTER) {
-                        ecException = true;
-                        priorityEnemy = i;
-                        desiredActionRadius = 1;
-                        break;
+                    for (int i = 0; i < attackable.length; i++) {
+                        if (attackable[i].getType() == RobotType.ENLIGHTENMENT_CENTER) {
+                            ecException = true;
+                            priorityEnemy = i;
+                            desiredActionRadius = 1;
+                            break;
+                        }
                     }
-                }
 
                     for (int i = 0; i < attackable.length; i++) {
                         if (attackable[i].getType() == RobotType.ENLIGHTENMENT_CENTER) {
@@ -177,7 +178,7 @@ public class Politician {
                             rc.move(Pathfinding.basicBugToBase(rc, track));
                         }
                     }
-                }
+                
             }
 
             // if (rc.canSenseRadiusSquared(desiredActionRadius)) {
