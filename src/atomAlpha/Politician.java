@@ -19,7 +19,15 @@ public class Politician {
         Team enemy = rc.getTeam().opponent();
 
         RobotInfo[] defensible = rc.senseNearbyRobots(defenseRadius, enemy);
-        RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemy);
+        RobotInfo[] attackable = rc.senseNearbyRobots(25, enemy);
+        // System.out.println(attackable.length);
+
+        if (attackable.length > 0) {
+            if (rc.canEmpower(9)) {
+                rc.empower(9);
+            }
+        }
+
         // if (attackable.length != 0 && rc.canEmpower(actionRadius)) {
         // // System.out.println("empowering...");
         // rc.empower(actionRadius);
@@ -160,12 +168,15 @@ public class Politician {
             // rc.move(Pathfinding.chooseBestNextStep(rc, targetDirection));
             // }
             // reverted
-            if (rc.canSenseRadiusSquared(actionRadius)) {
-                RobotInfo[] robot = rc.senseNearbyRobots(actionRadius, enemy);
-                if (robot.length > 0 && rc.canEmpower(actionRadius)) {
-                    rc.empower(actionRadius);
-                }
-            }
+            // if (rc.canSenseRadiusSquared(actionRadius)) {
+            // RobotInfo[] robot = rc.senseNearbyRobots(actionRadius, enemy);
+            // if (robot.length > 0 && rc.canEmpower(actionRadius)) {
+            // rc.empower(actionRadius);
+            // }
+            // RobotInfo[] allies = rc.senseNearbyRobots(actionRadius,rc.getTeam()){
+
+            // }
+            // }
 
             // System.out.println(role);
             // System.out.println("I moved!");

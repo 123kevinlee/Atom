@@ -6,17 +6,20 @@ public class Communication {
     public static int coordEncoder(String type, int dx, int dy) {
         String outMsg = "";
         switch (type) {
-            case "ENEMY":
+            case "ENEMY": // ec in and out
                 outMsg += "2";
                 break;
-            case "LIKELY":
+            case "LIKELY": // ec in
                 outMsg += "3";
                 break;
-            case "WALL":
+            case "WALL": // ec in
                 outMsg += "4";
                 break;
-            case "CORNER":
+            case "CORNER": // ec out
                 outMsg += "5";
+                break;
+            case "NEUTRAL": // ec out
+                outMsg += "6";
                 break;
         }
         Boolean xNeg = dx < 0;
