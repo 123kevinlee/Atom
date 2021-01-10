@@ -45,15 +45,28 @@ public class EnlightenmentCenter {
     public static LinkedHashMap<MapLocation, Integer> neutralBases = new LinkedHashMap<MapLocation, Integer>();
 
     public static void run(RobotController rc) throws GameActionException {
-        calculateInfluenceGain(rc);
-        calculateFarmers(rc);
+        calculateInfluenceGain(rc); // calculates the influence gain between last round and this round
+        calculateFarmers(rc); // calculates the amount of farmers in the field
 
-        // System.out.println("ENEMIES:" + rc.senseNearbyRobots(2,
-        // rc.getTeam().opponent()).length);
+        // Panic Bid: logic to uses remaining influence to bid when surrounded by enemies
         if (rc.senseNearbyRobots(2, rc.getTeam().opponent()).length == 12) {
-            // System.out.println("PANIC BID");
             if (rc.canBid(rc.getInfluence() / 10)) {
                 rc.bid(rc.getInfluence() / 10);
+            }
+        }
+
+        //checks if scouts have returned any information: 
+        //allows for things to happen in the time after scouts and guards have been spawned
+        //but no map information has been gathered
+        int mapInitX = 0;
+        int mapInitY = 0;
+        for (int i = 0; i < mapBorders.length; i++) {
+            if (mapBorders[i] != 0) {
+                if (i % 2 == 0) {
+                    mapInitY++;
+                } else {
+                    mapInitX++;
+                }
             }
         }
 
@@ -65,11 +78,7 @@ public class EnlightenmentCenter {
             createDefensePhase(rc);
         }
 
-        else if (firstFarmers == true) {
-            // if(rc.canSetFlag(901)) {
-            // rc.setFlag(901);
-            // }
-
+        else if (firstFarmers == true && mapInitX > 0 && mapInitY > 0) {
             int farmerInfluence = 10;
 
             if (begFarmerLimit > 5) {
@@ -79,8 +88,7 @@ public class EnlightenmentCenter {
             MapLocation Base = rc.getLocation();
             Direction safeDir = Direction.CENTER;
 
-            // stores a location within the mapBorders array, which will store the closest
-            // wall to the EC
+            // stores a location within the mapBorders array, which will store the closest wall to the EC
             int arrayLocX = -1;
             int arrayLocY = -1;
 
@@ -134,59 +142,6 @@ public class EnlightenmentCenter {
                     }
                 }
             }
-
-            // //Obtaining the closest border value even if adjacent borders are
-            // unidentified
-            // if (Math.abs(Base.y - mapBorders[0]) == 0 || Math.abs(Base.y - mapBorders[2])
-            // == 0) {
-            // for (int i = 0; i < mapBorders.length; i += 2) {
-            // if (Math.abs(Base.y - mapBorders[i]) > 0) {
-            // arrayLocY = i;
-            // // distanceY = Math.abs(Base.y - mapBorders[i]);
-            // }
-            // }
-            // } else { //if the border values are all defined, this code will find the true
-            // closest border
-            // int minBorder = Math.abs(Base.y - mapBorders[0]);
-            // arrayLocY = 0;
-
-            // for (int i = 0; i < mapBorders.length; i += 2) {
-            // if (Math.abs(Base.y - mapBorders[i]) < minBorder) {
-            // arrayLocY = i;
-            // }
-            // }
-            // }
-
-            // // System.out.println(arrayLocY);
-
-            // // Obtaining the closest border value for x even if adjacent borders are
-            // unidentified
-            // if (Math.abs(Base.x - mapBorders[1]) == 0 || Math.abs(Base.x - mapBorders[3])
-            // == 0) {
-            // for (int i = 1; i < mapBorders.length; i += 2) {
-            // if (Math.abs(Base.x - mapBorders[i]) > 0) {
-            // arrayLocX = i;
-            // // distanceX = Math.abs(Base.x - mapBorders[i]);
-            // }
-            // }
-            // } else { //if the border values are all defined, this code will find the true
-            // closest border
-            // int minBorder = Math.abs(Base.x - mapBorders[1]);
-            // arrayLocX = 1;
-
-            // for (int i = 1; i < mapBorders.length; i += 2) {
-            // if (Math.abs(Base.x - mapBorders[i]) < minBorder) {
-            // arrayLocX = i;
-            // }
-            // }
-            // }
-
-            // System.out.println("array N/S :" + arrayLocY + ", array E/W : " + arrayLocX);
-
-            // if (arrayLocY != -1 && arrayLocX != -1) {
-            // cornerCoordY = mapBorders[arrayLocY];
-            // cornerCoordX = mapBorders[arrayLocX];
-            // }
 
             // If the location in the mapBorders array was actually obtained and extant
             if (arrayLocY != -1 && arrayLocX != -1) {
@@ -352,8 +307,8 @@ public class EnlightenmentCenter {
                 case POLITICIAN:
                     Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
                     int currentInfluence = rc.getInfluence();
-                    if (currentInfluence > 11) {
-                        int unitInfluence = rc.getInfluence() / 5;
+                    if (currentInfluence / 5 > 11) {
+                        int unitInfluence = currentInfluence / 5;
                         if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) { // technically don't
                                                                                                // need this
                             int dx = possibleEnemyBases.iterator().next().x - rc.getLocation().x;
@@ -420,16 +375,9 @@ public class EnlightenmentCenter {
             }
 
         } else if (enemyBases.size() == 0 && possibleEnemyBases.size() == 0 && enemyCoords.size() > 0) {
-            // if (neutralBases.size() > 0) {
-            // spawnOrder.add(RobotType.POLITICIAN);
-            // }
-
+            //do later
         } else {
-            // if (neutralBases.size() > 0) {
-            // spawnOrder.add(RobotType.POLITICIAN);
-            // }
-            // when there's practically no info
-            // more defensive and if there are enemy unit coords -- light search attacks?
+            //do later
         }
         if (scoutIds.size() > 0) {
             listenForScoutMessages(rc);
@@ -437,6 +385,7 @@ public class EnlightenmentCenter {
         calculateBid(rc);
     }
 
+    // calculates the influence gain between last round and this round
     public static void calculateInfluenceGain(RobotController rc) {
         if (rc.getRoundNum() - Data.initRound == 0) {
             lastInfluenceAmount = rc.getInfluence();
@@ -446,10 +395,11 @@ public class EnlightenmentCenter {
         }
     }
 
+    // calculates the number of farmers in the field
     public static void calculateFarmers(RobotController rc) throws GameActionException {
         int removeId = 0;
         for (Integer id : farmerIds) {
-            if (!rc.canGetFlag(id)) { // farmer died
+            if (!rc.canGetFlag(id)) { // means farmer died
                 removeId = id;
             } else {
                 String flag = Integer.toString(rc.getFlag(id));
@@ -461,11 +411,13 @@ public class EnlightenmentCenter {
         farmerIds.remove(removeId);
     }
 
+    //logic for bidding:
+    //currently bids 3 between rounds 150 and 1000
+    //after round 1000, the ec will bid 1/5 of its influence gain
     public static void calculateBid(RobotController rc) throws GameActionException {
         if (rc.getRoundNum() > 150 && rc.getRoundNum() < 1000) {
             if (rc.canBid(3)) {
                 rc.bid(3);
-                // System.out.println(3);
             }
         } else {
             if (rc.canBid(lastInfluenceGain / 5)) {
@@ -475,6 +427,7 @@ public class EnlightenmentCenter {
         }
     }
 
+    //sends 4 muckrackers as scouts in the 4 cardinal directions
     public static void scoutPhase(RobotController rc) throws GameActionException {
         int dirIndex = scoutCount % 4;
         int influence = 1;
@@ -503,6 +456,7 @@ public class EnlightenmentCenter {
         }
     }
 
+    //logic for scout communication
     public static void listenForScoutMessages(RobotController rc) throws GameActionException {
         Object removeId = null;
         Object[] keys = scoutIds.keySet().toArray();
@@ -512,10 +466,10 @@ public class EnlightenmentCenter {
                 int flag = rc.getFlag((int) key);
                 if (flag != 0) {
                     // System.out.println("id: " + key + " msg:" + flag);
-
                     String msg = Integer.toString(flag);
                     int[] coords = Communication.coordDecoder(msg);
 
+                    //recieved enemy base coords
                     if (msg.charAt(0) == '2') {
                         MapLocation currentLocation = rc.getLocation();
                         coords[0] += currentLocation.x;
@@ -523,44 +477,42 @@ public class EnlightenmentCenter {
                         // System.out.println("ENEMY BASE: " + coords[0] + "," + coords[1]);
 
                         enemyBases.add(new MapLocation(coords[0], coords[1]));
-                        // System.out.println(enemyBases.get(0)[0] + " " + enemyBases.get(0)[1]);
-                    } else if (msg.charAt(0) == '6') {
+                    }
+                    //recieved neutral base coords
+                    else if (msg.charAt(0) == '6') {
                         MapLocation currentLocation = rc.getLocation();
                         coords[0] += currentLocation.x;
                         coords[1] += currentLocation.y;
-                        // System.out.println("Neutral BASE: " + coords[0] + "," + coords[1]
+                        // System.out.println("NEUTRAL BASE: " + coords[0] + "," + coords[1]
                         neutralBases.put(new MapLocation(coords[0], coords[1]), 501);
-                    } else if (msg.charAt(0) == '3') {
+                    }
+                    //recieved beacon from scout
+                    else if (msg.charAt(0) == '3') {
                         scoutLastMessage.put((int) key, msg);
                     }
+                    //recieved wall coords
+                    //wall coord will only be added if it has not been discovered before
 
+                    //scouts that hit the wall and change direction screw up the initial array of scouts and their direction
+                    //after they hit a wall, only messages listened to will be for exact coords
                     else if (msg.charAt(0) == '4' && !waller.contains(key)) {
-                        // System.out.println("ScoutID:" + key + "ScoutDirection:" + scoutIds.get(key) +
-                        // "WALL: "
-                        // + coords[0] + "," + coords[1]);
-
                         MapLocation currentLocation = rc.getLocation();
-
                         switch (scoutIds.get(key)) {
                             case NORTH:
                                 if (mapBorders[0] == 0) {
                                     mapBorders[0] = currentLocation.y + coords[1];
-                                    // scoutIds.put((int) key, Direction.EAST);
                                     waller.add((int) key);
                                 }
                                 break;
                             case EAST:
                                 if (mapBorders[1] == 0) {
                                     mapBorders[1] = currentLocation.x + coords[0];
-                                    // scoutIds.put((int) key, Direction.SOUTH);
                                     waller.add((int) key);
                                 }
                                 break;
                             case SOUTH:
                                 if (mapBorders[2] == 0) {
                                     mapBorders[2] = currentLocation.y + coords[1];
-                                    // System.out.println("y val : " + mapBorders[2]);
-                                    // scoutIds.put((int) key, Direction.WEST);
                                     waller.add((int) key);
                                 }
 
@@ -577,9 +529,7 @@ public class EnlightenmentCenter {
                                 break;
                         }
 
-                        // System.out.println("Waller:" + waller.toString());
-
-                        // method to find last border using the other 3 border values
+                        // if the ec has 3 wall coords, it can and will find the fourth
                         int zeroCount = 0;
                         for (int i = 0; i < mapBorders.length; i++) {
                             if (mapBorders[i] == 0) {
@@ -587,21 +537,21 @@ public class EnlightenmentCenter {
                             }
                         }
                         if (zeroCount == 1 && !mapComplete) {
-                            // .println("Calculating World Map...");
+                            // System.out.println("Calculating World Map...");
                             int missingIndex = 0;
                             for (int i = 0; i < mapBorders.length; i++) {
                                 if (mapBorders[i] == 0) {
                                     missingIndex = i;
                                 }
                             }
-                            if (missingIndex % 2 == 0) { // North Or South
+                            if (missingIndex % 2 == 0) { // North or South
                                 int width = Math.abs(mapBorders[1] - mapBorders[3]);
                                 if (missingIndex == 0) {
                                     mapBorders[missingIndex] = mapBorders[2] + width;
                                 } else if (missingIndex == 2) {
                                     mapBorders[missingIndex] = mapBorders[0] - width;
                                 }
-                            } else {
+                            } else { //East or West
                                 int height = Math.abs(mapBorders[0] - mapBorders[2]);
                                 if (missingIndex == 1) {
                                     mapBorders[missingIndex] = mapBorders[3] + height;
@@ -609,8 +559,9 @@ public class EnlightenmentCenter {
                                     mapBorders[missingIndex] = mapBorders[1] - height;
                                 }
                             }
-                            mapComplete = true;
+                            mapComplete = true; //this variable is used later to determine if enemy coords can be used to calculate possible enemy base locations
 
+                            //after the map is complete, the ec will check if there are any previously stored enemy coords that can be used to calculate possible enemy base locations
                             if (enemyCoords.size() > 0) {
                                 Object[] baseKeys = enemyCoords.keySet().toArray();
                                 currentLocation = rc.getLocation();
@@ -638,17 +589,16 @@ public class EnlightenmentCenter {
                                         default:
                                             break;
                                     }
-                                    // System.out.println("Possible Enemy Base:"
-                                    // + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
+                                    // System.out.println("Possible Enemy Base:" + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
                                 }
-
-                                // System.out.println(possibleEnemyBases.toString());
                             }
                         }
                     }
                 }
             } else {
-                // System.out.println(key + " DEAD");
+                //if ec could not get flag of scout, it means the scout has died
+                //ec will get the scout's last known location and try to determine where the enemy ec is using it's direction and map coordinates 
+                //(possible because of guaranteed map symmetry)
                 String lastMsg = scoutLastMessage.get(key);
                 if (lastMsg != null && lastMsg.length() != 0) {
                     int[] coords = Communication.coordDecoder(lastMsg);
@@ -677,8 +627,7 @@ public class EnlightenmentCenter {
                                 break;
                         }
                         // System.out.println(possibleEnemyBases.toString());
-                        // System.out.println("Possible Enemy Base:"
-                        // + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
+                        // System.out.println("Possible Enemy Base:" + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
                     } else {
                         if (!waller.contains(key)) {
                             MapLocation baseLocation = rc.getLocation();
@@ -694,10 +643,9 @@ public class EnlightenmentCenter {
         if (removeId != null) {
             scoutIds.remove(removeId);
         }
-        // ln(mapBorders[0] + " " + mapBorders[1] + " " + mapBorders[2] + " " +
-        // mapBorders[3]);
     }
 
+    //spawns 4 politicans in 4 corners around the ec
     public static void createDefensePhase(RobotController rc) throws GameActionException {
         int influence = 12;
         int dirIndex = guardCount % 4;
@@ -718,6 +666,7 @@ public class EnlightenmentCenter {
 
     }
 
+    //returns an open spawn location around the ec
     public static Direction openSpawnLocation(RobotController rc, RobotType type) throws GameActionException {
         for (int i = 0; i < Data.directions.length; i++) {
             if (rc.canBuildRobot(type, Data.directions[i], 1)) {
@@ -760,6 +709,7 @@ public class EnlightenmentCenter {
 
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.SLANDERER);
     }
 }

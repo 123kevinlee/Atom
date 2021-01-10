@@ -83,6 +83,7 @@ public class Politician {
         // System.out.println(role);
         else if (role.length() == 7) {
             if (rc.canSenseRadiusSquared(25)) {
+
                 RobotInfo[] robots = rc.senseNearbyRobots(25);
                 // System.out.println(robots.toString());
                 for (RobotInfo robot : robots) {
