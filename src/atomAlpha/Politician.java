@@ -23,7 +23,7 @@ public class Politician {
 
         for (RobotInfo robot : attackable) {
             if (robot.getTeam().equals(Team.NEUTRAL) || (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
-                    && robot.getTeam() == rc.getTeam().opponent())) {
+                    && robot.getTeam().equals(rc.getTeam().opponent()))) {
                 if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 9)) {
                     if (rc.canEmpower(9)) {
                         rc.empower(9);
