@@ -118,47 +118,90 @@ public class Slanderer {
         cornerRole = role;
 
         Team enemy = rc.getTeam().opponent();
+        Team home = rc.getTeam();
+
+        boolean muckrakerThreat = false;
+        boolean getAwayEC = false;
 
         // System.out.print("can sense radius 20" + rc.canSenseRadiusSquared(20));
         RobotInfo[] fleeRaker = rc.senseNearbyRobots(20, enemy);
+        RobotInfo[] awayEC = rc.senseNearbyRobots(15, home);
         int priorityEnemy = -1;
 
         for (int i = 0; i < fleeRaker.length; i++) {
             if (fleeRaker[i].getType() == RobotType.MUCKRAKER) {
                 priorityEnemy = i;
+                muckrakerThreat = true;
                 break;
             }
         }
 
+        if (muckrakerThreat == false) {
+            for (int i = 0; i < awayEC.length; i++) {
+                if (awayEC[i].getType() == RobotType.ENLIGHTENMENT_CENTER) {
+                    priorityEnemy = i;
+                    getAwayEC = true;
+                    break;
+                }
+            }
+        }
+
         if (priorityEnemy > -1) {
-            // FLEE THE MUCKRAKER error as slanderers try to run into each other when moving
-            // against each other on a wall
             MapLocation myLoc = rc.getLocation();
-            RobotInfo closeEnemy = fleeRaker[priorityEnemy];
-            MapLocation track = closeEnemy.getLocation();
+            MapLocation destination = myLoc;
 
-            // System.out.println("FLEEING MUCKRAKER");
+            if (muckrakerThreat) {
+                // FLEE THE MUCKRAKER
 
-            int[] tracked = new int[2];
-            tracked[0] += track.x;
-            tracked[1] += track.y;
+                RobotInfo closeObject = fleeRaker[priorityEnemy];
+                MapLocation track = closeObject.getLocation();
 
-            // System.out.println("ENEMY MUCKRAKER: " + tracked[0] + "," + tracked[1]);
+                // System.out.println("FLEEING MUCKRAKER");
 
-            Direction toEnemy = myLoc.directionTo(track);
-            Direction awayFromEnemy = toEnemy.opposite();
+                // int[] tracked = new int[2];
+                // tracked[0] += track.x;
+                // tracked[1] += track.y;
 
-            // System.out.println("direction to run: " + awayFromEnemy);
+                // System.out.println("ENEMY MUCKRAKER: " + tracked[0] + "," + tracked[1]);
 
-            // System.out.println("possible step is " +
-            // rc.canMove(Pathfinding.chooseBestNextStep(rc, awayFromEnemy)));
+                Direction toObject = myLoc.directionTo(track);
+                Direction away = toObject.opposite();
 
-            Pathfinding.setStartLocation(rc);
+                for (int i = 0; i < 2; i++) {
+                    destination = destination.add(away);
+                }
 
-            if (rc.canMove(Pathfinding.chooseBestNextStep(rc, awayFromEnemy))) {
-                rc.move(Pathfinding.chooseBestNextStep(rc, awayFromEnemy));
-            } else if (rc.canMove(Pathfinding.chooseBestNextStep(rc, awayFromEnemy))) {
-                rc.move(Pathfinding.chooseBestNextStep(rc, awayFromEnemy));
+                // System.out.println("direction to run: " + away);
+
+            } else if (getAwayEC) {
+                // Move away from ec at the opposite and rotated 45 direction
+
+                RobotInfo closeObject = awayEC[priorityEnemy];
+                MapLocation track = closeObject.getLocation();
+
+                System.out.println("MOVING AWAY FROM HOME BASE");
+
+                // int[] tracked = new int[2];
+                // tracked[0] += track.x;
+                // tracked[1] += track.y;
+
+                // System.out.println("Home Base: " + tracked[0] + "," + tracked[1]);
+
+                Direction toObject = myLoc.directionTo(track);
+                Direction awayObject = toObject.opposite();
+                Direction away = awayObject.rotateRight();
+
+                System.out.print("to base: " + toObject + " Away from base: " + awayObject + " w rotation: " + away);
+
+                for (int i = 0; i < 2; i++) {
+                    destination = destination.add(away);
+                }
+            }
+
+            System.out.print(destination.x + ", " + destination.y);
+
+            if (rc.canMove(Pathfinding.basicBugToBase(rc, destination))) {
+                rc.move(Pathfinding.basicBugToBase(rc, destination));
             }
 
         } else {
@@ -173,8 +216,7 @@ public class Slanderer {
             if (Data.slandererConvertDirection == Direction.CENTER) {
                 Data.slandererConvertDirection = targetDirection.opposite();
             }
-            // System.out.println(rc.canMove(Pathfinding.basicBugToBase(rc,
-            // targetLocation)));
+            System.out.println(rc.canMove(Pathfinding.basicBugToBase(rc, targetLocation)));
             if (rc.canMove(Pathfinding.basicBugToBase(rc, targetLocation))) {
                 rc.move(Pathfinding.basicBugToBase(rc, targetLocation));
             }
