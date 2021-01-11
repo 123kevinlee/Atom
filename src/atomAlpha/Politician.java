@@ -22,7 +22,7 @@ public class Politician {
         RobotInfo[] attackable = rc.senseNearbyRobots(sensorRadiusSquared, enemy);
 
         for (RobotInfo robot : attackable) {
-            if (robot.getTeam() == Team.NEUTRAL || (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
+            if (robot.getTeam().equals(Team.NEUTRAL) || (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
                     && robot.getTeam() == rc.getTeam().opponent())) {
                 if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 9)) {
                     if (rc.canEmpower(9)) {
