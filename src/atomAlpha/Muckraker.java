@@ -208,7 +208,8 @@ public class Muckraker {
                                 }
                             }
                             //if a ally's flag has diff target coords and this unit has already converted its target, it will switch targets
-                            if (allyFlag.charAt(0) == '2' && thisFlag.charAt(0) == '3') {
+                            //if (allyFlag.charAt(0) == '2' && thisFlag.charAt(0) == '3') {
+                            if (allyFlag.charAt(0) == '2') {
                                 String ending = Integer.toString(rc.getFlag(rc.getID())).substring(1);
                                 if (!allyFlag.substring(1).equals(ending)) {
                                     if (rc.canSetFlag(Integer.parseInt(allyFlag))) {

@@ -88,7 +88,7 @@ public class EnlightenmentCenter {
         //     //do later
         // } 
         else {
-            hasNoInfo(rc);
+            //hasNoInfo(rc);
         }
         if (scoutIds.size() > 0) {
             listenForScoutMessages(rc);
