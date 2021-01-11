@@ -136,7 +136,7 @@ public class Slanderer {
             }
         }
 
-        if(muckrakerThreat == false){
+        if (muckrakerThreat == false) {
             for (int i = 0; i < awayEC.length; i++) {
                 if (awayEC[i].getType() == RobotType.ENLIGHTENMENT_CENTER) {
                     priorityEnemy = i;
@@ -150,7 +150,7 @@ public class Slanderer {
             MapLocation myLoc = rc.getLocation();
             MapLocation destination = myLoc;
 
-            if(muckrakerThreat){
+            if (muckrakerThreat) {
                 // FLEE THE MUCKRAKER
 
                 RobotInfo closeObject = fleeRaker[priorityEnemy];
@@ -167,13 +167,13 @@ public class Slanderer {
                 Direction toObject = myLoc.directionTo(track);
                 Direction away = toObject.opposite();
 
-                for (int i = 0; i < 2; i++){
-                destination = destination.add(away);
+                for (int i = 0; i < 2; i++) {
+                    destination = destination.add(away);
                 }
 
                 // System.out.println("direction to run: " + away);
 
-            } else if(getAwayEC){
+            } else if (getAwayEC) {
                 // Move away from ec at the opposite and rotated 45 direction
 
                 RobotInfo closeObject = awayEC[priorityEnemy];
@@ -193,7 +193,7 @@ public class Slanderer {
 
                 System.out.print("to base: " + toObject + " Away from base: " + awayObject + " w rotation: " + away);
 
-                for (int i = 0; i < 2; i++){
+                for (int i = 0; i < 2; i++) {
                     destination = destination.add(away);
                 }
             }
@@ -216,8 +216,7 @@ public class Slanderer {
             if (Data.slandererConvertDirection == Direction.CENTER) {
                 Data.slandererConvertDirection = targetDirection.opposite();
             }
-            // System.out.println(rc.canMove(Pathfinding.basicBugToBase(rc,
-            // targetLocation)));
+            System.out.println(rc.canMove(Pathfinding.basicBugToBase(rc, targetLocation)));
             if (rc.canMove(Pathfinding.basicBugToBase(rc, targetLocation))) {
                 rc.move(Pathfinding.basicBugToBase(rc, targetLocation));
             }
