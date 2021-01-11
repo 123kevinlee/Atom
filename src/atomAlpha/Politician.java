@@ -21,8 +21,8 @@ public class Politician {
         RobotInfo[] defensible = rc.senseNearbyRobots(defenseRadius, enemy);
         RobotInfo[] attackable = rc.senseNearbyRobots(sensorRadiusSquared, enemy);
 
-        for (RobotInfo robot : attackable) {
-            if (robot.getTeam().equals(Team.NEUTRAL) || (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
+        for (RobotInfo robot : rc.senseNearbyRobots(25)) {
+            if (robot.getTeam().equals(Team.NEUTRAL) || (robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)
                     && robot.getTeam().equals(rc.getTeam().opponent()))) {
                 if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 9)) {
                     if (rc.canEmpower(9)) {
@@ -70,8 +70,8 @@ public class Politician {
                 RobotInfo[] robots = rc.senseNearbyRobots(25);
                 // System.out.println(robots.toString());
                 for (RobotInfo robot : robots) {
-                    if (robot.getTeam() == Team.NEUTRAL || (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
-                            && robot.getTeam() == rc.getTeam().opponent())) {
+                    if (robot.getTeam().equals(Team.NEUTRAL) || (robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)
+                            && robot.getTeam().equals(rc.getTeam().opponent()))) {
                         Direction nextDir = Pathfinding.basicBugToBase(rc, robot.getLocation());
                         if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
@@ -88,7 +88,7 @@ public class Politician {
                             }
                         }
                     }
-                    if (robot.getTeam() == rc.getTeam()) {
+                    if (robot.getTeam().equals(rc.getTeam())) {
                         if (rc.canGetFlag(robot.getID())) {
                             String allyFlag = Integer.toString(rc.getFlag(robot.getID()));
                             String thisFlag = Integer.toString(rc.getFlag(rc.getID()));
@@ -191,8 +191,8 @@ public class Politician {
             MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
             if (rc.canSenseLocation(targetLocation)) {
                 RobotInfo robot = rc.senseRobotAtLocation(targetLocation);
-                if (robot != null && robot.getTeam() == rc.getTeam()
-                        && robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
+                if (robot != null && robot.getTeam().equals(rc.getTeam())
+                        && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
                     // System.out.println(robot.getTeam());
                     // System.out.println("MISSING OR CONVERTED");
                     String convertMsg = "3" + role.substring(1);
@@ -224,7 +224,7 @@ public class Politician {
         if (rc.canSenseRadiusSquared(9)) {
             RobotInfo[] robots = rc.senseNearbyRobots(9, rc.getTeam().opponent());
             for (RobotInfo robot : robots) {
-                if (robot.getType().equals(RobotType.MUCKRAKER) && rc.getInfluence() > robot.getInfluence() + 10) {
+                if (robot.getType().equals(RobotType.MUCKRAKER)) {
                     if (rc.canEmpower(rc.getLocation().distanceSquaredTo(robot.getLocation()))) {
                         rc.empower(rc.getLocation().distanceSquaredTo(robot.getLocation()));
                     }
@@ -273,42 +273,46 @@ public class Politician {
     }
 
     public static void isConvertedSlanderer(RobotController rc) throws GameActionException {
-        //for now, slanderer -> politician will join the defense
-        if (!Data.originPoint.equals(new MapLocation(0, 0))) {
-            int scatterDir = (int) (Math.random() * 3);
-            String msg = "112" + Integer.toString(scatterDir);
-            role = msg;
-        }
-        /* if (rc.canGetFlag(Data.baseId)) {
-            String baseFlag = Integer.toString(rc.getFlag(Data.baseId));
-            if (baseFlag.charAt(0) == '2' && baseFlag.length() == 7) {
-                if (rc.canSetFlag(Integer.parseInt(baseFlag))) {
-                    rc.setFlag(Integer.parseInt(baseFlag));
-                    role = baseFlag;
-                }
+        int determinant = (int) (Math.random() * 3);
+        if (determinant == 2) {
+            //slanderer -> politician will join the defense
+            if (!Data.originPoint.equals(new MapLocation(0, 0))) {
+                int scatterDir = (int) (Math.random() * 4);
+                String msg = "112" + Integer.toString(scatterDir);
+                role = msg;
             }
-            //if unit could not get attacking orders from home ec, it will try nearby allied units
-            else if (rc.canSenseRadiusSquared(25)) {
-                RobotInfo robots[] = rc.senseNearbyRobots(25, rc.getTeam());
-                for (RobotInfo robot : robots) {
-                    if (rc.canGetFlag(robot.getID())) {
-                        String allyFlag = Integer.toString(rc.getFlag(robot.getID()));
-                        if (allyFlag.charAt(0) == '2' && allyFlag.length() == 7) {
-                            if (rc.canSetFlag(Integer.parseInt(allyFlag))) {
-                                rc.setFlag(Integer.parseInt(allyFlag));
-                                role = allyFlag;
-                            }
-                        } else {
-                            if (rc.canSenseRobot(Data.baseId)) {
-                                int scatterDir = (int) (Math.random() * 3);
-                                String msg = "112" + Integer.toString(scatterDir);
-                                role = msg;
+        } else {
+            if (rc.canGetFlag(Data.baseId)) {
+                String baseFlag = Integer.toString(rc.getFlag(Data.baseId));
+                if (baseFlag.charAt(0) == '2' && baseFlag.length() == 7) {
+                    if (rc.canSetFlag(Integer.parseInt(baseFlag))) {
+                        rc.setFlag(Integer.parseInt(baseFlag));
+                        role = baseFlag;
+                    }
+                }
+                //if unit could not get attacking orders from home ec, it will try nearby allied units
+                else if (rc.canSenseRadiusSquared(25)) {
+                    RobotInfo robots[] = rc.senseNearbyRobots(25, rc.getTeam());
+                    for (RobotInfo robot : robots) {
+                        if (rc.canGetFlag(robot.getID())) {
+                            String allyFlag = Integer.toString(rc.getFlag(robot.getID()));
+                            if (allyFlag.charAt(0) == '2' && allyFlag.length() == 7) {
+                                if (rc.canSetFlag(Integer.parseInt(allyFlag))) {
+                                    rc.setFlag(Integer.parseInt(allyFlag));
+                                    role = allyFlag;
+                                }
+                            } else {
+                                if (rc.canSenseRobot(Data.baseId)) {
+                                    int scatterDir = (int) (Math.random() * 4);
+                                    String msg = "112" + Integer.toString(scatterDir);
+                                    role = msg;
+                                }
                             }
                         }
                     }
                 }
             }
-        } */
+        }
     }
 
     public static void isConvertedEnemy(RobotController rc) throws GameActionException {
