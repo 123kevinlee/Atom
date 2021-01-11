@@ -76,10 +76,8 @@ public class EnlightenmentCenter {
 
         if (scoutingPhase) {
             scoutPhase(rc);
-            hasEnemyBaseCoords(rc);
         } else if (firstFarmers == true && mapInitX > 0 && mapInitY > 0) {
             spawnFarmers(rc);
-            hasEnemyBaseCoords(rc);
         }
         //Time between scouts finding map coords and farmers being sent out
         else if ((mapInitX == 0 || mapInitY == 0)) {
@@ -88,7 +86,7 @@ public class EnlightenmentCenter {
                 amntNearFarmers++;
             } */
             scatterPoliticians(rc);
-            hasEnemyBaseCoords(rc);
+            //hasEnemyBaseCoords(rc);
             //buildWall(rc);
         }
         /*   else if (scatterDefenderCount[0] == 0 || scatterDefenderCount[1] == 0 || scatterDefenderCount[2] == 0
