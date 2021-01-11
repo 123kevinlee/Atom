@@ -21,6 +21,9 @@ public class Communication {
             case "NEUTRAL": // ec out
                 outMsg += "6";
                 break;
+            case "CONVERSION": // ec out
+                outMsg += "7";
+                break;
         }
         Boolean xNeg = dx < 0;
         Boolean yNeg = dy < 0;
