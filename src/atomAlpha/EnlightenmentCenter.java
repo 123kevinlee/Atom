@@ -161,11 +161,7 @@ public class EnlightenmentCenter {
     //currently bids 3 between rounds 150 and 1000
     //after round 1000, the ec will bid 1/5 of its influence gain
     public static void calculateBid(RobotController rc) throws GameActionException {
-<<<<<<< HEAD
-        if (rc.getRoundNum() < 1000) {
-=======
         if (rc.getRoundNum() > 500 && rc.getRoundNum() < 1000) {
->>>>>>> dev
             if (rc.canBid(3)) {
                 rc.bid(3);
             }
