@@ -27,7 +27,7 @@ public strictfp class RobotPlayer {
                 Muckraker.init(rc);
                 Pathfinding.setStartLocation(rc);
             case ENLIGHTENMENT_CENTER:
-                //System.out.println("ATOM V1.1: Good Luck!");
+                System.out.println("ATOM V1.2: Good Luck!");
                 EnlightenmentCenter.init(rc);
                 break;
             default:
