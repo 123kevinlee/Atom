@@ -1,4 +1,4 @@
-package atomAlpha;
+package atomAlphaV12;
 
 import battlecode.common.*;
 

@@ -1,4 +1,4 @@
-package atomAlpha;
+package atomAlphaV1;
 
 import battlecode.common.RobotType;
 
@@ -20,9 +20,6 @@ public class Communication {
                 break;
             case "NEUTRAL": // ec out
                 outMsg += "6";
-                break;
-            case "CONVERSION": // ec out
-                outMsg += "7";
                 break;
         }
         Boolean xNeg = dx < 0;
