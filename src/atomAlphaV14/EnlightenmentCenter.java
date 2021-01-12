@@ -1,4 +1,4 @@
-package atomAlpha;
+package atomAlphaV14;
 
 import battlecode.common.*;
 import java.util.*;
@@ -51,14 +51,13 @@ public class EnlightenmentCenter {
         calculateInfluenceGain(rc); // calculates the influence gain between last round and this round
         calculateFarmers(rc); // calculates the amount of farmers in the field
         calculateDangers(rc); //calculates the amount of scatter defenders around the base
-        calculateBid(rc); //calculates the amount to bid
 
         // Panic Bid: logic to uses remaining influence to bid when surrounded by enemies
-        // if (rc.senseNearbyRobots(2, rc.getTeam().opponent()).length == 12) {
-        //     if (rc.canBid(rc.getInfluence() / 10)) {
-        //         rc.bid(rc.getInfluence() / 10);
-        //     }
-        // }
+        if (rc.senseNearbyRobots(2, rc.getTeam().opponent()).length == 12) {
+            if (rc.canBid(rc.getInfluence() / 10)) {
+                rc.bid(rc.getInfluence() / 10);
+            }
+        }
 
         if (scoutIds.size() > 0) {
             listenForScoutMessages(rc);
@@ -82,11 +81,11 @@ public class EnlightenmentCenter {
         //System.out.println(mapInitX + "," + mapInitY);
 
         if (amntNearFarmers < nearFarmerLimit * 2) {
-            //System.out.println("Near farmers");
+            System.out.println("Near farmers");
             spawnNearFarmer(rc);
             amntNearFarmers++;
         } else if (scoutingPhase) {
-            //System.out.println("SCOUT");
+            System.out.println("SCOUT");
             scoutPhase(rc);
         } else if (firstFarmers == true && mapInitX > 0 && mapInitY > 0) {
             spawnFarmers(rc);
@@ -94,7 +93,7 @@ public class EnlightenmentCenter {
         }
         //Time between scouts finding map coords and farmers being sent out
         else if ((mapInitX == 0 || mapInitY == 0)) {
-            //System.out.println("Scatter Here");
+            System.out.println("Scatter Here");
             /* if (amntNearFarmers < nearFarmerLimit * 2) {
                 spawnNearFarmer(rc);
                 amntNearFarmers++;
@@ -105,20 +104,22 @@ public class EnlightenmentCenter {
         }
 
         if (enemyBases.size() > 0) {
-            //System.out.println("SPAWN ORDER HERE");
+            System.out.println("SPAWN ORDER HERE");
             hasEnemyBaseCoords(rc);
         } else if (enemyBases.size() == 0 && possibleEnemyBases.size() > 0) {
-            //System.out.println("POSSIBLE");
+            System.out.println("POSSIBLE");
             hasPossibleEnemyBaseCoords(rc);
         }
         // else if (enemyBases.size() == 0 && possibleEnemyBases.size() == 0 && enemyCoords.size() > 0) {
         //     //do later
         // } 
         else {
-            //System.out.println("OTHER");
+            System.out.println("OTHER");
             //hasNoInfo(rc);
         }
-        //System.out.println("Bases:" + enemyBases.size());
+
+        calculateBid(rc);
+        System.out.println("Bases:" + enemyBases.size());
     }
 
     // calculates the influence gain between last round and this round
@@ -166,29 +167,14 @@ public class EnlightenmentCenter {
     //currently bids 3 between rounds 150 and 1000
     //after round 1000, the ec will bid 1/5 of its influence gain
     public static void calculateBid(RobotController rc) throws GameActionException {
-        int round = rc.getRoundNum();
-        boolean wonLastRound = false;
-        //System.out.println(rc.getTeamVotes());
-        if (rc.getTeamVotes() > lastVotes) {
-            lastVotes++;
-            wonLastRound = true;
-        }
-        System.out.println("Won Last Round:" + wonLastRound);
-        if (round > 300 && round < 750) {
+        if (rc.getRoundNum() > 500 && rc.getRoundNum() < 1000) {
             if (rc.canBid(3)) {
                 rc.bid(3);
-                System.out.println("Bid default");
             }
-        } else if (round >= 750) {
-            if (wonLastRound == false) {
-                if (rc.canBid((int) (lastInfluenceGain * (3 / 4)))) {
-                    rc.bid((int) (lastInfluenceGain * (3 / 4)));
-                    System.out.println("Bid:" + (int) (lastInfluenceGain * (3 / 4)));
-                }
-            }
-            if (rc.canBid(lastInfluenceGain / 3)) {
-                rc.bid(lastInfluenceGain / 3);
-                System.out.println("Bid:" + lastInfluenceGain / 3);
+        } else {
+            if (rc.canBid(lastInfluenceGain / 5)) {
+                rc.bid(lastInfluenceGain / 5);
+                // System.out.println("Bid:" + lastInfluenceGain / 4);
             }
         }
     }

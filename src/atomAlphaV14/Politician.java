@@ -1,4 +1,4 @@
-package atomAlpha;
+package atomAlphaV14;
 
 import battlecode.common.*;
 
@@ -214,7 +214,7 @@ public class Politician {
         // }
 
         //scatter defender logic
-        else if (role.length() == 4 && role.substring(0, 3).equals("112")) {
+        else if (role.substring(0, 3).equals("112")) {
             scatterDefenderLogic(rc);
         }
     }

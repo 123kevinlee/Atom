@@ -1,4 +1,4 @@
-package atomAlpha;
+package atomAlphaV14;
 
 import battlecode.common.*;
 
@@ -46,7 +46,7 @@ public class Muckraker {
         //Direction nextDir = Pathfinding.basicBugToBase(rc, rc.getLocation().add(scoutDirection).add(scoutDirection));
 
         if (rc.canMove(nextDir)) {
-            //System.out.println(scoutDirection);
+            System.out.println(scoutDirection);
             rc.move(nextDir);
             MapLocation currentLocation = rc.getLocation();
             int dx = currentLocation.x - Data.originPoint.x;
