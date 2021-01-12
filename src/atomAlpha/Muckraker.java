@@ -43,9 +43,10 @@ public class Muckraker {
         // System.out.println(scoutDirection);
 
         Direction nextDir = Pathfinding.chooseBestNextStep(rc, scoutDirection);
+        //Direction nextDir = Pathfinding.basicBugToBase(rc, rc.getLocation().add(scoutDirection).add(scoutDirection));
 
         if (rc.canMove(nextDir)) {
-            // System.out.println(scoutDirection);
+            System.out.println(scoutDirection);
             rc.move(nextDir);
             MapLocation currentLocation = rc.getLocation();
             int dx = currentLocation.x - Data.originPoint.x;
@@ -58,6 +59,7 @@ public class Muckraker {
             }
         } else {
             //if scout can't move, it means it hit a wall
+            //System.out.println(scoutDirection);
             switch (scoutDirection) {
                 case NORTH:
                     if (!rc.onTheMap(rc.getLocation().add(Direction.NORTH))) {

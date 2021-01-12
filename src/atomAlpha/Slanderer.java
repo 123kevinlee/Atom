@@ -230,11 +230,24 @@ public class Slanderer {
         //only sense action radius
         Direction scatterDir = Data.directions[(int) (Math.random() * 8)];
         //System.out.println(scatterDir);
-        int boundary = 8;
+        int boundary = 4;
         MapLocation target = Data.originPoint;
         for (int i = 0; i < boundary; i++) {
             target = target.add(scatterDir);
         }
+        if (rc.canSenseRadiusSquared(20)) {
+            RobotInfo[] robots = rc.senseNearbyRobots(20, rc.getTeam().opponent());
+            for (RobotInfo robot : robots) {
+                if (robot.getType().equals(RobotType.MUCKRAKER)) {
+                    Direction nextDir = Pathfinding.basicBugToBase(rc,
+                            rc.getLocation().add(rc.getLocation().directionTo(robot.getLocation()).opposite()));
+                    if (rc.canMove(nextDir)) {
+                        rc.move(nextDir);
+                    }
+                }
+            }
+        }
+
         Direction nextDir = Pathfinding.basicBugToBase(rc, target);
         if (rc.canMove(nextDir)) {
             rc.move(nextDir);

@@ -15,7 +15,7 @@ public class EnlightenmentCenter {
     public static boolean scoutingPhase = true;
     public static boolean setGuard = true;
     public static boolean guardsFull = false;
-    public static boolean firstFarmers = true;
+    public static boolean firstFarmers = false;
 
     public static int scoutCount = 0;
     public static int scoutLimit = 4;
@@ -27,11 +27,11 @@ public class EnlightenmentCenter {
 
     public static int guardCount = 0;
     public static int[] scatterDefenderCount = new int[4]; // 0=NORTH 1=EAST 2=SOUTH 3=WEST
-    public static int farmerLimit = 5;
+    public static int farmerLimit = 0;
     public static int farmerCount = 0;
     public static Set<Integer> farmerIds = new HashSet<Integer>();
     public static int amntNearFarmers = 0;
-    public static int nearFarmerLimit = 4;
+    public static int nearFarmerLimit = 1;
 
     public static LinkedHashMap<MapLocation, Boolean> muckrakerWall = new LinkedHashMap<MapLocation, Boolean>();
     public static int lastWallerSpawn = 0;
@@ -59,6 +59,10 @@ public class EnlightenmentCenter {
             }
         }
 
+        if (scoutIds.size() > 0) {
+            listenForScoutMessages(rc);
+        }
+
         //checks if scouts have returned any information: 
         //allows for things to happen in the time after scouts and guards have been spawned
         //but no map information has been gathered
@@ -74,13 +78,22 @@ public class EnlightenmentCenter {
             }
         }
 
-        if (scoutingPhase) {
+        //System.out.println(mapInitX + "," + mapInitY);
+
+        if (amntNearFarmers < nearFarmerLimit * 2) {
+            System.out.println("Near farmers");
+            spawnNearFarmer(rc);
+            amntNearFarmers++;
+        } else if (scoutingPhase) {
+            System.out.println("SCOUT");
             scoutPhase(rc);
         } else if (firstFarmers == true && mapInitX > 0 && mapInitY > 0) {
             spawnFarmers(rc);
+
         }
         //Time between scouts finding map coords and farmers being sent out
         else if ((mapInitX == 0 || mapInitY == 0)) {
+            System.out.println("Scatter Here");
             /* if (amntNearFarmers < nearFarmerLimit * 2) {
                 spawnNearFarmer(rc);
                 amntNearFarmers++;
@@ -89,31 +102,24 @@ public class EnlightenmentCenter {
             //hasEnemyBaseCoords(rc);
             //buildWall(rc);
         }
-        /*   else if (scatterDefenderCount[0] == 0 || scatterDefenderCount[1] == 0 || scatterDefenderCount[2] == 0
-                || scatterDefenderCount[3] == 0) {
-            int position = 0;
-            for (int i = 0; i < 4; i++) {
-                if (scatterDefenderCount[i] == 0) {
-                    position = i;
-                }
-            }
-            scatterPoliticians(rc, position);
-        }  */
-        else if (enemyBases.size() > 0) {
+
+        if (enemyBases.size() > 0) {
+            System.out.println("SPAWN ORDER HERE");
             hasEnemyBaseCoords(rc);
         } else if (enemyBases.size() == 0 && possibleEnemyBases.size() > 0) {
+            System.out.println("POSSIBLE");
             hasPossibleEnemyBaseCoords(rc);
         }
         // else if (enemyBases.size() == 0 && possibleEnemyBases.size() == 0 && enemyCoords.size() > 0) {
         //     //do later
         // } 
         else {
+            System.out.println("OTHER");
             //hasNoInfo(rc);
         }
-        if (scoutIds.size() > 0) {
-            listenForScoutMessages(rc);
-        }
+
         calculateBid(rc);
+        System.out.println("Bases:" + enemyBases.size());
     }
 
     // calculates the influence gain between last round and this round
@@ -203,21 +209,19 @@ public class EnlightenmentCenter {
     }
 
     public static void spawnNearFarmer(RobotController rc) throws GameActionException {
-        if (rc.canBuildRobot(RobotType.SLANDERER, openSpawnLocation(rc, RobotType.SLANDERER), rc.getInfluence() / 4)) {
+        if (rc.canBuildRobot(RobotType.SLANDERER, openSpawnLocation(rc, RobotType.SLANDERER), rc.getInfluence())) {
             if (rc.canSetFlag(102)) {
                 rc.setFlag(102);
             }
-            rc.buildRobot(RobotType.SLANDERER, openSpawnLocation(rc, RobotType.SLANDERER), rc.getInfluence() / 4);
+            rc.buildRobot(RobotType.SLANDERER, openSpawnLocation(rc, RobotType.SLANDERER), rc.getInfluence());
         }
     }
 
     //logic for spawning farmers
     public static void spawnFarmers(RobotController rc) throws GameActionException {
-        int farmerInfluence = 10;
+        //int farmerInfluence = 10;
 
-        if (farmerLimit > 5) {
-            farmerInfluence = Math.min((int) (rc.getInfluence() / 5), 949);
-        }
+        int farmerInfluence = Math.min((int) (rc.getInfluence() / 2), 949);
 
         MapLocation Base = rc.getLocation();
         Direction safeDir = Direction.CENTER;
@@ -518,12 +522,12 @@ public class EnlightenmentCenter {
     public static void scatterPoliticians(RobotController rc) throws GameActionException {
         Direction spawn = openSpawnLocation(rc, RobotType.POLITICIAN);
         String msg = "112" + Integer.toString(scatterPoliCounter % 4);
-        if (rc.canBuildRobot(RobotType.POLITICIAN, spawn, 12)) {
+        if (rc.canBuildRobot(RobotType.POLITICIAN, spawn, 20) && rc.getInfluence() > 120) {
             if (rc.canSetFlag(Integer.parseInt(msg))) {
                 rc.setFlag(Integer.parseInt(msg));
                 scatterPoliCounter++;
             }
-            rc.buildRobot(RobotType.POLITICIAN, spawn, 12);
+            rc.buildRobot(RobotType.POLITICIAN, spawn, 20);
         }
     }
 
@@ -586,8 +590,17 @@ public class EnlightenmentCenter {
             case POLITICIAN:
                 Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
                 int currentInfluence = rc.getInfluence();
-                if (currentInfluence / 10 > 11) {
-                    int unitInfluence = currentInfluence / 10;
+                if (currentInfluence / 2 > 11) {
+                    int unitInfluence = Math.max(11, lastInfluenceGain + (int) (rc.getInfluence() / 20));
+                    if (rc.getRoundNum() > 500) {
+                        unitInfluence = Math.max(11, lastInfluenceGain + (int) (rc.getInfluence() / 20));
+                    }
+                    if (rc.getRoundNum() > 1000) {
+                        unitInfluence = Math.max(11, lastInfluenceGain + (int) (rc.getInfluence() / 20));
+                    }
+                    if (rc.getRoundNum() > 2000) {
+                        unitInfluence = Math.max(11, lastInfluenceGain + (int) (rc.getInfluence() / 20));
+                    }
                     if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
                         int dx = enemyBases.iterator().next().x - rc.getLocation().x;
                         int dy = enemyBases.iterator().next().y - rc.getLocation().y;
@@ -661,8 +674,8 @@ public class EnlightenmentCenter {
             case POLITICIAN:
                 Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
                 int currentInfluence = rc.getInfluence();
-                if (currentInfluence / 10 > 11) {
-                    int unitInfluence = currentInfluence / 10;
+                if (currentInfluence / 2 > 11) {
+                    int unitInfluence = Math.max(11, 25);
                     if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
                         int dx = possibleEnemyBases.iterator().next().x - rc.getLocation().x;
                         int dy = possibleEnemyBases.iterator().next().y - rc.getLocation().y;
@@ -777,14 +790,16 @@ public class EnlightenmentCenter {
         // muckrakerWall.put(origin.translate(-3, 3), false);
         // muckrakerWall.put(origin.translate(-2, 3), false);
         // muckrakerWall.put(origin.translate(-1, 3), false);
+        spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.MUCKRAKER);
         spawnOrder.add(RobotType.SLANDERER);
-        spawnOrder.add(RobotType.MUCKRAKER);
-        spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.MUCKRAKER);
-        spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.MUCKRAKER);
-        spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.POLITICIAN);
         //spawnOrder.add(RobotType.POLITICIAN);
 
     }
