@@ -180,7 +180,7 @@ public class Muckraker {
                 }
             }
         }
-        if (role.length() == 7) {
+        if (role.length() == 7 && role.charAt(0) == '2') {
             if (rc.canSenseRadiusSquared(30)) {
                 RobotInfo[] robots = rc.senseNearbyRobots(30);
                 for (RobotInfo robot : robots) {

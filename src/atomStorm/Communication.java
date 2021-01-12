@@ -15,7 +15,7 @@ public class Communication {
             case "WALL": // ec in
                 outMsg += "4";
                 break;
-            case "CORNER": // ec out
+            case "SAFE": // ec out
                 outMsg += "5";
                 break;
             case "NEUTRAL": // ec out

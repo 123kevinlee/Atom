@@ -3,14 +3,29 @@ package atomStorm;
 import battlecode.common.*;
 
 public class Slanderer {
-    public static Direction scoutDirection;
+    public static Direction safeDirection;
     public static String cornerRole = "";
     public static boolean end = false;
     public static String role = "";
 
     public static void run(RobotController rc) throws GameActionException {
+        String baseFlag = Integer.toString(rc.getFlag(Data.baseId));
+        if (rc.canGetFlag(Data.baseId) && baseFlag.length() == 4) {
+            if (baseFlag.substring(0, 3).equals("112")) {
+                Direction[] directionsS = { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
+                safeDirection = directionsS[Integer.parseInt(Character.toString((baseFlag.charAt(3))))].opposite();
+            }
+        }
         urgentMoves(rc);
-        if (role.length() == 7) {
+        if (safeDirection != null) {
+            MapLocation safeTarget = Data.originPoint.add(safeDirection).add(safeDirection).add(safeDirection)
+                    .add(safeDirection).add(safeDirection).add(safeDirection);
+            safeDirection = Pathfinding.basicBugToBase(rc, safeTarget);
+            if (rc.canMove(safeDirection)) {
+                rc.move(safeDirection);
+            }
+        }
+        if (role.length() == 7 && role.charAt(0) == '5') {
             relocate(rc);
         } else if (role.equals("102")) {
             nearFarm(rc);
@@ -27,7 +42,8 @@ public class Slanderer {
         int priorityEnemy = -1;
 
         for (int i = 0; i < fleeRaker.length; i++) {
-            if (fleeRaker[i].getType().equals(RobotType.MUCKRAKER)) {
+            if (fleeRaker[i].getType().equals(RobotType.MUCKRAKER)
+                    && fleeRaker[i].getType().equals(RobotType.POLITICIAN)) {
                 priorityEnemy = i;
                 muckrakerThreat = true;
                 break;

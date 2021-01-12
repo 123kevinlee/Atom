@@ -13,6 +13,7 @@ public class Data {
             Direction.SOUTHEAST, Direction.SOUTH, Direction.SOUTHWEST, Direction.WEST, Direction.NORTHWEST, };
 
     public static int slandererBoundary = 40;
+    public static int politicianDefenderBoundary = 60;
     public static int politicianBoundary = 125;
     public static int muckrakerBoundary = 140;
 }
