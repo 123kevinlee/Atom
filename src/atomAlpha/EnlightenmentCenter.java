@@ -32,6 +32,8 @@ public class EnlightenmentCenter {
     public static Set<Integer> farmerIds = new HashSet<Integer>();
     public static int amntNearFarmers = 0;
     public static int nearFarmerLimit = 1;
+    public static int[] optimalFarmingInfluence = new int[] { 21, 41, 63, 85, 107, 130, 154, 178, 203, 229, 255, 282,
+            310, 341, 369, 400, 431, 463, 497, 533, 569, 605, 644, 683, 724, 767, 810, 855, 903, 949 };
 
     public static LinkedHashMap<MapLocation, Boolean> muckrakerWall = new LinkedHashMap<MapLocation, Boolean>();
     public static int lastWallerSpawn = 0;
@@ -181,14 +183,25 @@ public class EnlightenmentCenter {
             }
         } else if (round >= 750) {
             if (wonLastRound == false) {
-                if (rc.canBid((int) (lastInfluenceGain * (3 / 4)))) {
-                    rc.bid((int) (lastInfluenceGain * (3 / 4)));
-                    System.out.println("Bid:" + (int) (lastInfluenceGain * (3 / 4)));
+                if (rc.canBid((int) (lastInfluenceGain))) {
+                    rc.bid((int) (lastInfluenceGain));
+                    System.out.println("Bid:" + (int) (lastInfluenceGain));
                 }
             }
             if (rc.canBid(lastInfluenceGain / 3)) {
                 rc.bid(lastInfluenceGain / 3);
                 System.out.println("Bid:" + lastInfluenceGain / 3);
+            } else if (round >= 2000) {
+                if (wonLastRound == false) {
+                    if (rc.canBid((int) (lastInfluenceGain + 50))) {
+                        rc.bid((int) (lastInfluenceGain + 50));
+                        System.out.println("Bid:" + (int) (lastInfluenceGain + 50));
+                    }
+                }
+                if (rc.canBid(lastInfluenceGain / 3)) {
+                    rc.bid(lastInfluenceGain / 3);
+                    System.out.println("Bid:" + lastInfluenceGain / 3);
+                }
             }
         }
     }
@@ -658,6 +671,14 @@ public class EnlightenmentCenter {
             case MUCKRAKER:
                 spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
                 int unitInfluence = 1;
+                // int ecInfluence = rc.getInfluence();
+                // int unitInfluence = 21;
+
+                // for (int i = 0; i < optimalFarmingInfluence.length; i++) {
+                //     if (optimalFarmingInfluence[i] * 2 < ecInfluence) {
+                //         unitInfluence = optimalFarmingInfluence[i];
+                //     }
+                // }
                 if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
                     int dx = enemyBases.iterator().next().x - rc.getLocation().x;
                     int dy = enemyBases.iterator().next().y - rc.getLocation().y;
@@ -733,6 +754,14 @@ public class EnlightenmentCenter {
             case MUCKRAKER:
                 spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
                 int unitInfluence = 1;
+                // int ecInfluence = rc.getInfluence();
+                // int unitInfluence = 21;
+
+                // for (int i = 0; i < optimalFarmingInfluence.length; i++) {
+                //     if (optimalFarmingInfluence[i] * 2 < ecInfluence) {
+                //         unitInfluence = optimalFarmingInfluence[i];
+                //     }
+                // }
                 if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
                     int dx = possibleEnemyBases.iterator().next().x - rc.getLocation().x;
                     int dy = possibleEnemyBases.iterator().next().y - rc.getLocation().y;
