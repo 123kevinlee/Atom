@@ -230,7 +230,7 @@ public class Slanderer {
         //only sense action radius
         Direction scatterDir = Data.directions[(int) (Math.random() * 8)];
         //System.out.println(scatterDir);
-        int boundary = 4;
+        int boundary = 16;
         MapLocation target = Data.originPoint;
         for (int i = 0; i < boundary; i++) {
             target = target.add(scatterDir);
