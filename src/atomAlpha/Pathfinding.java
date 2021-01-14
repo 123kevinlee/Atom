@@ -189,4 +189,29 @@ public class Pathfinding {
     public static void setStartLocation(RobotController rc) throws GameActionException {
         variableLoc = rc.getLocation();
     }
+
+    public static int[] getDistance(int[] ref, int[] target) {
+        int[] temp = new int[2];
+
+        if (target[0] >= ref[0] && target[0] < ref[0] + 64) {
+            temp[0] = target[0] - ref[0];
+        } else if (target[0] > ref[0] && target[0] > ref[0] + 64) {
+            temp[0] = ref[0] - (127 - target[0]);
+        } else if (target[0] < ref[0] && target[0] > ref[0] - 64) {
+            temp[0] = target[0] - ref[0];
+        } else if (target[0] < ref[0] && target[0] < ref[0] - 64) {
+            temp[0] = (127 - ref[0]) + target[0];
+        }
+
+        if (target[1] >= ref[1] && target[1] < ref[1] + 64) {
+            temp[1] = target[1] - ref[1];
+        } else if (target[1] > ref[1] && target[1] > ref[1] + 64) {
+            temp[1] = ref[1] - (127 - target[1]);
+        } else if (target[1] < ref[1] && target[1] > ref[1] - 64) {
+            temp[1] = target[1] - ref[1];
+        } else if (target[1] < ref[1] && target[1] < ref[1] - 64) {
+            temp[1] = (127 - ref[1]) + target[1];
+        }
+        return temp;
+    }
 }

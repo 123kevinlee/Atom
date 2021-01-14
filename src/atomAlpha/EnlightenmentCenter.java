@@ -345,16 +345,15 @@ public class EnlightenmentCenter {
 
             // System.out.println(safeCorner.toString());
             // ("The safe direction is: " + safeDir);
-            MapLocation currentLocation = rc.getLocation();
-            int dx = safeCorner.x - currentLocation.x;
-            int dy = safeCorner.y - currentLocation.y;
-            // System.out.println(dx);
-            // System.out.println(dy);
+
+            int relx = safeCorner.x % 128;
+            int rely = safeCorner.y % 128;
+            int outMsg = Communication.relCoordEncoder("CORNER", relx, rely);
 
             if (scoutCount > 3 && farmerCount <= farmerLimit && safeDir != Direction.CENTER
                     && rc.canBuildRobot(RobotType.SLANDERER, safeDir, farmerInfluence)) {
-                if (rc.canSetFlag(Communication.coordEncoder("CORNER", dx, dy))) {
-                    rc.setFlag(Communication.coordEncoder("CORNER", dx, dy));
+                if (rc.canSetFlag(outMsg)) {
+                    rc.setFlag(outMsg);
                 }
 
                 rc.buildRobot(RobotType.SLANDERER, safeDir, farmerInfluence);
@@ -383,24 +382,20 @@ public class EnlightenmentCenter {
                 if (flag != 0 && Integer.toString(flag).length() == 7) {
                     // System.out.println("id: " + key + " msg:" + flag);
                     String msg = Integer.toString(flag);
-                    int[] coords = Communication.coordDecoder(msg);
+                    int[] coords = Communication.relCoordDecoder(msg);
 
                     //recieved enemy base coords
                     if (msg.charAt(0) == '2') {
-                        MapLocation currentLocation = rc.getLocation();
-                        coords[0] += currentLocation.x;
-                        coords[1] += currentLocation.y;
-                        // System.out.println("ENEMY BASE: " + coords[0] + "," + coords[1]);
-
-                        enemyBases.add(new MapLocation(coords[0], coords[1]));
+                        int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+                        MapLocation enemyBase = Data.originPoint.translate(distance[0], distance[1]);
+                        enemyBases.add(enemyBase);
                     }
                     //recieved neutral base coords
                     else if (msg.charAt(0) == '6') {
-                        MapLocation currentLocation = rc.getLocation();
-                        coords[0] += currentLocation.x;
-                        coords[1] += currentLocation.y;
-                        // System.out.println("NEUTRAL BASE: " + coords[0] + "," + coords[1]
-                        neutralBases.put(new MapLocation(coords[0], coords[1]), 501);
+                        int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+                        MapLocation neutralBase = Data.originPoint.translate(distance[0], distance[1]);
+                        neutralBases.put(neutralBase, 501);
+                        //System.out.println("NEUTRAL BASES:" + neutralBases.toString());
                     }
                     //recieved beacon from scout
                     else if (msg.charAt(0) == '3') {
@@ -412,32 +407,30 @@ public class EnlightenmentCenter {
                     //scouts that hit the wall and change direction screw up the initial array of scouts and their direction
                     //after they hit a wall, only messages listened to will be for exact coords
                     else if (msg.charAt(0) == '4' && !waller.contains(key)) {
-                        MapLocation currentLocation = rc.getLocation();
+                        int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+                        MapLocation wall = Data.originPoint.translate(distance[0], distance[1]);
                         switch (scoutIds.get(key)) {
                             case NORTH:
                                 if (mapBorders[0] == 0) {
-                                    mapBorders[0] = currentLocation.y + coords[1];
+                                    mapBorders[0] = wall.y;
                                     waller.add((int) key);
                                 }
                                 break;
                             case EAST:
                                 if (mapBorders[1] == 0) {
-                                    mapBorders[1] = currentLocation.x + coords[0];
+                                    mapBorders[1] = wall.x;
                                     waller.add((int) key);
                                 }
                                 break;
                             case SOUTH:
                                 if (mapBorders[2] == 0) {
-                                    mapBorders[2] = currentLocation.y + coords[1];
+                                    mapBorders[2] = wall.y;
                                     waller.add((int) key);
                                 }
-
                                 break;
                             case WEST:
                                 if (mapBorders[3] == 0) {
-                                    mapBorders[3] = currentLocation.x + coords[0];
-                                    // System.out.println("x val : " + mapBorders[3]);
-                                    // scoutIds.put((int) key, Direction.NORTH);
+                                    mapBorders[3] = wall.x;
                                     waller.add((int) key);
                                 }
                                 break;
@@ -480,7 +473,7 @@ public class EnlightenmentCenter {
                             //after the map is complete, the ec will check if there are any previously stored enemy coords that can be used to calculate possible enemy base locations
                             if (enemyCoords.size() > 0) {
                                 Object[] baseKeys = enemyCoords.keySet().toArray();
-                                currentLocation = rc.getLocation();
+                                MapLocation currentLocation = rc.getLocation();
                                 for (Object bKey : baseKeys) {
                                     switch ((Direction) bKey) {
                                         case NORTH:
@@ -517,7 +510,9 @@ public class EnlightenmentCenter {
                 //(possible because of guaranteed map symmetry)
                 String lastMsg = scoutLastMessage.get(key);
                 if (lastMsg != null && lastMsg.length() != 0) {
-                    int[] coords = Communication.coordDecoder(lastMsg);
+                    int[] coords = Communication.relCoordDecoder(lastMsg);
+                    int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+                    MapLocation enemyPosition = Data.originPoint.translate(distance[0], distance[1]);
                     if (mapComplete && !waller.contains(key)) {
                         Direction dir = scoutIds.get(key);
                         MapLocation currentLocation = rc.getLocation();
@@ -546,9 +541,7 @@ public class EnlightenmentCenter {
                         // System.out.println("Possible Enemy Base:" + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
                     } else {
                         if (!waller.contains(key)) {
-                            MapLocation baseLocation = rc.getLocation();
-                            enemyCoords.put(scoutIds.get(key),
-                                    new MapLocation(coords[0] + baseLocation.x, coords[1] + baseLocation.y));
+                            enemyCoords.put(scoutIds.get(key), new MapLocation(enemyPosition.x, enemyPosition.y));
                         }
                         // System.out.println("Enemy Coord:" + enemyCoords.get(baseKeys[0]).toString());
                     }
@@ -602,43 +595,43 @@ public class EnlightenmentCenter {
         }
     }
 
-    public static void buildWall(RobotController rc) throws GameActionException {
-        if (muckrakerWall.containsValue(false) && rc.getRoundNum() - lastWallerSpawn > 10) {
-            // add beacon
-            // System.out.println(muckrakerWall.toString());
-            int fillLocation = -1;
-            Object[] keys = muckrakerWall.keySet().toArray();
-            if (rc.canSenseRadiusSquared(40)) {
-                for (int i = 0; i < keys.length; i++) {
-                    MapLocation key = (MapLocation) keys[i];
-                    // Boolean occupied = rc.isLocationOccupied(key);
-                    // muckrakerWall.put(key, occupied);
-                    if (muckrakerWall.get(key) == false) {
-                        fillLocation = i;
-                    }
-                }
-            }
-            if (fillLocation != -1) {
-                Direction spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
-                if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, 1)) {
-                    // System.out.println("Target:" + (MapLocation) keys[fillLocation]);
-                    int dx = ((MapLocation) keys[fillLocation]).x - rc.getLocation().x;
-                    int dy = ((MapLocation) keys[fillLocation]).y - rc.getLocation().y;
-                    int flag = Communication.coordEncoder("WALL", dx, dy);
-                    if (rc.canSetFlag(flag)) { // wall defender
-                        rc.setFlag(flag);
-                    }
-                    rc.buildRobot(RobotType.MUCKRAKER, spawnDir, 1);
-                    muckrakerWall.put((MapLocation) (keys[fillLocation]), true);
-                    // make waller wait
-                    muckrakerWallspawned++;
-                    if (muckrakerWallspawned % 8 == 0) {
-                        lastWallerSpawn = rc.getRoundNum();
-                    }
-                }
-            }
-        }
-    }
+    // public static void buildWall(RobotController rc) throws GameActionException {
+    //     if (muckrakerWall.containsValue(false) && rc.getRoundNum() - lastWallerSpawn > 10) {
+    //         // add beacon
+    //         // System.out.println(muckrakerWall.toString());
+    //         int fillLocation = -1;
+    //         Object[] keys = muckrakerWall.keySet().toArray();
+    //         if (rc.canSenseRadiusSquared(40)) {
+    //             for (int i = 0; i < keys.length; i++) {
+    //                 MapLocation key = (MapLocation) keys[i];
+    //                 // Boolean occupied = rc.isLocationOccupied(key);
+    //                 // muckrakerWall.put(key, occupied);
+    //                 if (muckrakerWall.get(key) == false) {
+    //                     fillLocation = i;
+    //                 }
+    //             }
+    //         }
+    //         if (fillLocation != -1) {
+    //             Direction spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
+    //             if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, 1)) {
+    //                 // System.out.println("Target:" + (MapLocation) keys[fillLocation]);
+    //                 int dx = ((MapLocation) keys[fillLocation]).x - rc.getLocation().x;
+    //                 int dy = ((MapLocation) keys[fillLocation]).y - rc.getLocation().y;
+    //                 int flag = Communication.coordEncoder("WALL", dx, dy);
+    //                 if (rc.canSetFlag(flag)) { // wall defender
+    //                     rc.setFlag(flag);
+    //                 }
+    //                 rc.buildRobot(RobotType.MUCKRAKER, spawnDir, 1);
+    //                 muckrakerWall.put((MapLocation) (keys[fillLocation]), true);
+    //                 // make waller wait
+    //                 muckrakerWallspawned++;
+    //                 if (muckrakerWallspawned % 8 == 0) {
+    //                     lastWallerSpawn = rc.getRoundNum();
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     //logic for attacking if the ec has definite enemy ec coords
     public static void hasEnemyBaseCoords(RobotController rc) throws GameActionException {
@@ -672,9 +665,10 @@ public class EnlightenmentCenter {
                     //         rc.buildRobot(RobotType.POLITICIAN, spawn, unitInfluence);
                     //     }
                     if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
-                        int dx = enemyBases.iterator().next().x - rc.getLocation().x;
-                        int dy = enemyBases.iterator().next().y - rc.getLocation().y;
-                        int flag = Communication.coordEncoder("ENEMY", dx, dy);
+                        MapLocation targetLocation = enemyBases.iterator().next();
+                        int relx = targetLocation.x % 128;
+                        int rely = targetLocation.y % 128;
+                        int flag = Communication.relCoordEncoder("ENEMY", relx, rely);
                         /* if (spawnOrder.size() > 4 && spawnOrder.size() % 5 == 4) {
                         Object[] keys = neutralBases.keySet().toArray();
                         MapLocation baseLocation = (MapLocation) keys[0];
@@ -700,9 +694,10 @@ public class EnlightenmentCenter {
                     spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
                     int unitInfluence = 1;
                     if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
-                        int dx = enemyBases.iterator().next().x - rc.getLocation().x;
-                        int dy = enemyBases.iterator().next().y - rc.getLocation().y;
-                        int flag = Communication.coordEncoder("ENEMY", dx, dy);
+                        MapLocation targetLocation = enemyBases.iterator().next();
+                        int relx = targetLocation.x % 128;
+                        int rely = targetLocation.y % 128;
+                        int flag = Communication.relCoordEncoder("ENEMY", relx, rely);
                         if (rc.canSetFlag(flag)) {
                             rc.setFlag(flag);
                         }
@@ -723,9 +718,10 @@ public class EnlightenmentCenter {
                 //     }
                 // }
                 if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
-                    int dx = enemyBases.iterator().next().x - rc.getLocation().x;
-                    int dy = enemyBases.iterator().next().y - rc.getLocation().y;
-                    int flag = Communication.coordEncoder("ENEMY", dx, dy);
+                    MapLocation targetLocation = enemyBases.iterator().next();
+                    int relx = targetLocation.x % 128;
+                    int rely = targetLocation.y % 128;
+                    int flag = Communication.relCoordEncoder("ENEMY", relx, rely);
                     if (rc.canSetFlag(flag)) {
                         rc.setFlag(flag);
                     }
@@ -779,9 +775,10 @@ public class EnlightenmentCenter {
                     //     rc.buildRobot(RobotType.POLITICIAN, spawn, unitInfluence);
                     // }
                     if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
-                        int dx = possibleEnemyBases.iterator().next().x - rc.getLocation().x;
-                        int dy = possibleEnemyBases.iterator().next().y - rc.getLocation().y;
-                        int flag = Communication.coordEncoder("ENEMY", dx, dy);
+                        MapLocation targetLocation = possibleEnemyBases.iterator().next();
+                        int relx = targetLocation.x % 128;
+                        int rely = targetLocation.y % 128;
+                        int flag = Communication.relCoordEncoder("ENEMY", relx, rely);
                         /* if (spawnOrder.size() > 4 && spawnOrder.size() % 5 == 4) { 
                             Object[] keys = neutralBases.keySet().toArray();
                             MapLocation baseLocation = (MapLocation) keys[0];
@@ -807,9 +804,10 @@ public class EnlightenmentCenter {
                     spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
                     int unitInfluence = 1;
                     if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
-                        int dx = possibleEnemyBases.iterator().next().x - rc.getLocation().x;
-                        int dy = possibleEnemyBases.iterator().next().y - rc.getLocation().y;
-                        int flag = Communication.coordEncoder("ENEMY", dx, dy);
+                        MapLocation targetLocation = possibleEnemyBases.iterator().next();
+                        int relx = targetLocation.x % 128;
+                        int rely = targetLocation.y % 128;
+                        int flag = Communication.relCoordEncoder("ENEMY", relx, rely);
                         if (rc.canSetFlag(flag)) {
                             rc.setFlag(flag);
                         }
@@ -830,9 +828,10 @@ public class EnlightenmentCenter {
                 //     }
                 // }
                 if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
-                    int dx = possibleEnemyBases.iterator().next().x - rc.getLocation().x;
-                    int dy = possibleEnemyBases.iterator().next().y - rc.getLocation().y;
-                    int flag = Communication.coordEncoder("ENEMY", dx, dy);
+                    MapLocation targetLocation = possibleEnemyBases.iterator().next();
+                    int relx = targetLocation.x % 128;
+                    int rely = targetLocation.y % 128;
+                    int flag = Communication.relCoordEncoder("ENEMY", relx, rely);
                     if (rc.canSetFlag(flag)) {
                         rc.setFlag(flag);
                     }
@@ -873,6 +872,8 @@ public class EnlightenmentCenter {
 
     public static void init(RobotController rc) throws GameActionException {
         Data.originPoint = rc.getLocation();
+        Data.relOriginPoint[0] = Data.originPoint.x % 128;
+        Data.relOriginPoint[1] = Data.originPoint.y % 128;
         Data.initRound = rc.getRoundNum();
 
         //MapLocation origin = Data.originPoint;

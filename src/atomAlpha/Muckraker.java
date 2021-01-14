@@ -49,9 +49,9 @@ public class Muckraker {
             //System.out.println(scoutDirection);
             rc.move(nextDir);
             MapLocation currentLocation = rc.getLocation();
-            int dx = currentLocation.x - Data.originPoint.x;
-            int dy = currentLocation.y - Data.originPoint.y;
-            int outMsg = Communication.coordEncoder("LIKELY", dx, dy);
+            int relx = currentLocation.x % 128;
+            int rely = currentLocation.y % 128;
+            int outMsg = Communication.relCoordEncoder("LIKELY", relx, rely);
             if (!end) {
                 if (rc.canSetFlag(outMsg)) {
                     rc.setFlag(outMsg);
@@ -65,9 +65,9 @@ public class Muckraker {
                     if (!rc.onTheMap(rc.getLocation().add(Direction.NORTH))) {
                         // System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
-                        int dx = currentLocation.x - Data.originPoint.x;
-                        int dy = currentLocation.y - Data.originPoint.y;
-                        int outMsg = Communication.coordEncoder("WALL", dx, dy);
+                        int relx = currentLocation.x % 128;
+                        int rely = currentLocation.y % 128;
+                        int outMsg = Communication.relCoordEncoder("WALL", relx, rely);
                         if (rc.canSetFlag(outMsg)) {
                             rc.setFlag(outMsg);
                         }
@@ -80,9 +80,9 @@ public class Muckraker {
                     if (!rc.onTheMap(rc.getLocation().add(Direction.EAST))) {
                         // System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
-                        int dx = currentLocation.x - Data.originPoint.x;
-                        int dy = currentLocation.y - Data.originPoint.y;
-                        int outMsg = Communication.coordEncoder("WALL", dx, dy);
+                        int relx = currentLocation.x % 128;
+                        int rely = currentLocation.y % 128;
+                        int outMsg = Communication.relCoordEncoder("WALL", relx, rely);
                         if (rc.canSetFlag(outMsg)) {
                             rc.setFlag(outMsg);
                         }
@@ -95,9 +95,9 @@ public class Muckraker {
                     if (!rc.onTheMap(rc.getLocation().add(Direction.SOUTH))) {
                         // System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
-                        int dx = currentLocation.x - Data.originPoint.x;
-                        int dy = currentLocation.y - Data.originPoint.y;
-                        int outMsg = Communication.coordEncoder("WALL", dx, dy);
+                        int relx = currentLocation.x % 128;
+                        int rely = currentLocation.y % 128;
+                        int outMsg = Communication.relCoordEncoder("WALL", relx, rely);
                         if (rc.canSetFlag(outMsg)) {
                             rc.setFlag(outMsg);
                         }
@@ -110,9 +110,9 @@ public class Muckraker {
                     if (!rc.onTheMap(rc.getLocation().add(Direction.WEST))) {
                         // System.out.println("WALL!");
                         MapLocation currentLocation = rc.getLocation();
-                        int dx = currentLocation.x - Data.originPoint.x;
-                        int dy = currentLocation.y - Data.originPoint.y;
-                        int outMsg = Communication.coordEncoder("WALL", dx, dy);
+                        int relx = currentLocation.x % 128;
+                        int rely = currentLocation.y % 128;
+                        int outMsg = Communication.relCoordEncoder("WALL", relx, rely);
                         if (rc.canSetFlag(outMsg)) {
                             rc.setFlag(outMsg);
                         }
@@ -130,26 +130,21 @@ public class Muckraker {
             for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius)) {
                 // System.out.println(robot.toString());
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER && robot.getTeam() == rc.getTeam().opponent()) {
-                    MapLocation baseLocation = robot.getLocation();
-                    int dx = baseLocation.x - Data.originPoint.x;
-                    int dy = baseLocation.y - Data.originPoint.y;
-                    int outMsg = Communication.coordEncoder("ENEMY", dx, dy);
-                    // System.out.println("Found Enemy Base:" + outMsg);
+                    MapLocation robotLocation = robot.getLocation();
+                    int relx = robotLocation.x % 128;
+                    int rely = robotLocation.y % 128;
+                    int outMsg = Communication.relCoordEncoder("ENEMY", relx, rely);
                     if (rc.canSetFlag(outMsg)) {
                         rc.setFlag(outMsg);
                     }
-                    // end = true;
                 } else if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER && robot.getTeam() == Team.NEUTRAL) {
-                    // System.out.println("NUETRAL");
-                    MapLocation baseLocation = robot.getLocation();
-                    int dx = baseLocation.x - Data.originPoint.x;
-                    int dy = baseLocation.y - Data.originPoint.y;
-                    int outMsg = Communication.coordEncoder("NEUTRAL", dx, dy);
-                    // System.out.println("Found Enemy Base:" + outMsg);
+                    MapLocation robotLocation = robot.getLocation();
+                    int relx = robotLocation.x % 128;
+                    int rely = robotLocation.y % 128;
+                    int outMsg = Communication.relCoordEncoder("NEUTRAL", relx, rely);
                     if (rc.canSetFlag(outMsg)) {
                         rc.setFlag(outMsg);
                     }
-                    // end = true;
                 }
             }
         }
@@ -184,15 +179,13 @@ public class Muckraker {
                         //mostly for when mucks are going to possible coords
                         //and they are wrong, so they switch targets
                         //System.out.println("NEW TARGET");
-                        MapLocation newTarget = robot.getLocation();
-                        int dx = newTarget.x - Data.originPoint.x;
-                        int dy = newTarget.y - Data.originPoint.y;
-                        if (dx < 65 && dy < 65) {
-                            int newFlag = Communication.coordEncoder("ENEMY", dx, dy);
-                            if (rc.canSetFlag(newFlag)) {
-                                rc.setFlag(newFlag);
-                                role = Integer.toString(newFlag);
-                            }
+                        MapLocation robotLocation = robot.getLocation();
+                        int relx = robotLocation.x % 128;
+                        int rely = robotLocation.y % 128;
+                        int outMsg = Communication.relCoordEncoder("ENEMY", relx, rely);
+                        if (rc.canSetFlag(outMsg)) {
+                            rc.setFlag(outMsg);
+                            role = Integer.toString(outMsg);
                         }
                     }
                     if (robot.getTeam() == rc.getTeam()) {
@@ -240,12 +233,10 @@ public class Muckraker {
                     }
                 }
             } else if (role.charAt(0) == '2') {
-                int[] coords = Communication.coordDecoder(role);
-                coords[0] += Data.originPoint.x;
-                coords[1] += Data.originPoint.y;
-                // System.out.println("ENEMY TARGET: " + coords[0] + "," + coords[1]);
+                int[] coords = Communication.relCoordDecoder(role);
+                int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+                MapLocation targetLocation = Data.originPoint.translate(distance[0], distance[1]);
 
-                MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
                 if (rc.canSenseLocation(targetLocation)) {
                     RobotInfo robot = rc.senseRobotAtLocation(targetLocation);
                     if (robot != null && robot.getTeam() == rc.getTeam()
@@ -274,6 +265,8 @@ public class Muckraker {
                             role = Integer.toString(rc.getFlag(robot.getID()));
                             // System.out.println(role);
                             Data.originPoint = robot.getLocation();
+                            Data.relOriginPoint[0] = Data.originPoint.x % 128;
+                            Data.relOriginPoint[1] = Data.originPoint.y % 128;
                             Data.initRound = rc.getRoundNum();
                             if (role.equals("100")) {
                                 scoutDirection = rc.getLocation().directionTo(robot.getLocation()).opposite();

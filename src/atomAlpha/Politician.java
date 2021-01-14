@@ -35,15 +35,13 @@ public class Politician {
                         //mostly for when mucks are going to possible coords
                         //and they are wrong, so they switch targets
                         //System.out.println("NEW TARGET");
-                        MapLocation newTarget = robot.getLocation();
-                        int dx = newTarget.x - Data.originPoint.x;
-                        int dy = newTarget.y - Data.originPoint.y;
-                        if (dx < 65 && dy < 65) {
-                            int newFlag = Communication.coordEncoder("ENEMY", dx, dy);
-                            if (rc.canSetFlag(newFlag)) {
-                                rc.setFlag(newFlag);
-                                role = Integer.toString(newFlag);
-                            }
+                        MapLocation robotLocation = robot.getLocation();
+                        int relx = robotLocation.x % 128;
+                        int rely = robotLocation.y % 128;
+                        int outMsg = Communication.relCoordEncoder("ENEMY", relx, rely);
+                        if (rc.canSetFlag(outMsg)) {
+                            rc.setFlag(outMsg);
+                            role = Integer.toString(outMsg);
                         }
                     }
                 }
@@ -77,15 +75,13 @@ public class Politician {
                             rc.move(nextDir);
                         }
                         // System.out.println("NEW TARGET");
-                        MapLocation newTarget = robot.getLocation();
-                        int dx = newTarget.x - Data.originPoint.x;
-                        int dy = newTarget.y - Data.originPoint.y;
-                        if (dx < 65 && dy < 65) {
-                            int newFlag = Communication.coordEncoder("ENEMY", dx, dy);
-                            if (rc.canSetFlag(newFlag)) {
-                                rc.setFlag(newFlag);
-                                role = Integer.toString(newFlag);
-                            }
+                        MapLocation robotLocation = robot.getLocation();
+                        int relx = robotLocation.x % 128;
+                        int rely = robotLocation.y % 128;
+                        int outMsg = Communication.relCoordEncoder("ENEMY", relx, rely);
+                        if (rc.canSetFlag(outMsg)) {
+                            rc.setFlag(outMsg);
+                            role = Integer.toString(outMsg);
                         }
                     }
                     if (robot.getTeam().equals(rc.getTeam())) {
@@ -183,12 +179,9 @@ public class Politician {
                 }
             }
 
-            int[] coords = Communication.coordDecoder(role);
-            MapLocation currentLocation = rc.getLocation();
-            coords[0] += Data.originPoint.x;
-            coords[1] += Data.originPoint.y;
-            // System.out.println("ENEMY TARGET: " + coords[0] + "," + coords[1]);
-            MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
+            int[] coords = Communication.relCoordDecoder(role);
+            int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+            MapLocation targetLocation = Data.originPoint.translate(distance[0], distance[1]);
             if (rc.canSenseLocation(targetLocation)) {
                 RobotInfo robot = rc.senseRobotAtLocation(targetLocation);
                 if (robot != null && robot.getTeam().equals(rc.getTeam())
@@ -348,6 +341,8 @@ public class Politician {
                             // Pathfinding.setStartLocation(rc);
                             role = Integer.toString(rc.getFlag(Data.baseId));
                             Data.originPoint = robot.getLocation();
+                            Data.relOriginPoint[0] = Data.originPoint.x % 128;
+                            Data.relOriginPoint[1] = Data.originPoint.y % 128;
                             Data.initRound = rc.getRoundNum();
                             if (rc.canSetFlag(Integer.parseInt(role))) {
                                 rc.setFlag(Integer.parseInt(role));
