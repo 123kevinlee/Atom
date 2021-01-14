@@ -12,6 +12,8 @@ public class EnlightenmentCenter {
     public static ArrayList<RobotType> spawnOrder = new ArrayList<RobotType>();
     public static int spawnOrderCounter = 0;
     public static int initialSetupCount = 0;
+    public static Direction danger = Direction.CENTER;
+    public static Direction initialDanger = Direction.CENTER;
 
     public static Map<Integer, Direction> scoutIds = new HashMap<Integer, Direction>();
     public static Set<Integer> waller = new HashSet<Integer>(); // fricking waller direction is annoying so they can
@@ -59,46 +61,86 @@ public class EnlightenmentCenter {
             case 3:
                 spawnScout(rc, Direction.SOUTH);
                 break;
-            case 4:
-                spawnFarmer(rc, openSpawnLocation(rc, RobotType.SLANDERER));
+        }
+        if (enemyBases.size() == 0 && possibleEnemyBases.size() == 0 && initialDanger == Direction.CENTER) {
+            spawnFarmer(rc, openSpawnLocation(rc, RobotType.SLANDERER));
+        }
+        spawnOrder(rc);
+    }
+
+    public static void spawnOrder(RobotController rc) throws GameActionException {
+        System.out.println(spawnOrderCounter);
+        switch (spawnOrder.get(spawnOrderCounter % spawnOrder.size())) {
+            case POLITICIAN:
+                Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
+                int currentInfluence = rc.getInfluence();
+                if (currentInfluence / 2 > 11) {
+                    int unitInfluence = Math.max(11, currentInfluence / 25);
+                    if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
+                        MapLocation targetLocation = Data.originPoint;
+                        if (enemyBases.size() > 0) {
+                            targetLocation = enemyBases.iterator().next();
+                        } else if (possibleEnemyBases.size() > 0) {
+                            targetLocation = possibleEnemyBases.iterator().next();
+                        }
+                        int relx = targetLocation.x % 128;
+                        int rely = targetLocation.y % 128;
+                        int flag = Communication.coordEncoder("ENEMY", relx, rely);
+                        if (rc.canSetFlag(flag)) {
+                            rc.setFlag(flag);
+                        }
+                        rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
+                        spawnOrderCounter++;
+                    }
+                } else {
+                    spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
+                    int unitInfluence = 1;
+                    if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
+                        MapLocation targetLocation = Data.originPoint;
+                        if (enemyBases.size() > 0) {
+                            targetLocation = enemyBases.iterator().next();
+                        } else if (possibleEnemyBases.size() > 0) {
+                            targetLocation = possibleEnemyBases.iterator().next();
+                        }
+                        int relx = targetLocation.x % 128;
+                        int rely = targetLocation.y % 128;
+                        int flag = Communication.coordEncoder("ENEMY", relx, rely);
+                        if (rc.canSetFlag(flag)) {
+                            rc.setFlag(flag);
+                        }
+                        rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
+                        spawnOrderCounter++;
+                    }
+                }
                 break;
-            case 5:
-                spawnFarmer(rc, openSpawnLocation(rc, RobotType.SLANDERER));
+            case MUCKRAKER:
+                spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
+                int unitInfluence = 1;
+                if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
+                    MapLocation targetLocation = Data.originPoint;
+                    if (enemyBases.size() > 0) {
+                        targetLocation = enemyBases.iterator().next();
+                    } else if (possibleEnemyBases.size() > 0) {
+                        targetLocation = possibleEnemyBases.iterator().next();
+                    }
+                    int relx = targetLocation.x % 128;
+                    int rely = targetLocation.y % 128;
+                    int flag = Communication.coordEncoder("ENEMY", relx, rely);
+                    if (rc.canSetFlag(flag)) {
+                        rc.setFlag(flag);
+                    }
+                    rc.buildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence);
+                    spawnOrderCounter++;
+                }
                 break;
-            case 6:
-                spawnFarmer(rc, openSpawnLocation(rc, RobotType.SLANDERER));
+            case SLANDERER:
+                spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
+                spawnFarmer(rc, spawnDir);
+                spawnOrderCounter++;
                 break;
-            case 7:
-                spawnFarmer(rc, openSpawnLocation(rc, RobotType.SLANDERER));
-                break;
-            case 8:
-                spawnScout(rc, Direction.NORTHEAST);
-                break;
-            case 9:
-                spawnScout(rc, Direction.SOUTHEAST);
-                break;
-            case 10:
-                spawnScout(rc, Direction.SOUTHWEST);
-                break;
-            case 11:
-                spawnScout(rc, Direction.NORTHWEST);
-                break;
-            // case 12:
-            //     spawnFarmer(rc, openSpawnLocation(rc, RobotType.SLANDERER));
-            //     break;
-            // case 13:
-            //     spawnFarmer(rc, openSpawnLocation(rc, RobotType.SLANDERER));
-            //     break;
-            // case 14:
-            //     spawnFarmer(rc, openSpawnLocation(rc, RobotType.SLANDERER));
-            //     break;
-            // case 15:
-            //     spawnFarmer(rc, openSpawnLocation(rc, RobotType.SLANDERER));
-            //     break;
             default:
                 break;
         }
-        System.out.println(initialSetupCount);
     }
 
     public static void spawnScout(RobotController rc, Direction dir) throws GameActionException {
@@ -114,7 +156,7 @@ public class EnlightenmentCenter {
                     }
                 }
             }
-            if (initialSetupCount < 16) {
+            if (initialSetupCount < 4) {
                 initialSetupCount++;
             }
         }
@@ -123,18 +165,22 @@ public class EnlightenmentCenter {
     public static void spawnFarmer(RobotController rc, Direction dir) throws GameActionException {
         int optimalInfluence = 21;
         for (int i = 0; i < optimalFarmingInfluence.length; i++) {
-            if (optimalFarmingInfluence[i] < (int) ((2 / 3) * (rc.getInfluence()))) {
+            if (optimalFarmingInfluence[i] * 2 < rc.getInfluence()) {
                 optimalInfluence = optimalFarmingInfluence[i];
             }
         }
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, optimalInfluence)) {
-            if (rc.canSetFlag(0)) {
-                rc.setFlag(0);
+            int temp = 0;
+            Direction[] directions = Data.directions;
+            for (int i = 0; i < directions.length; i++) {
+                if (directions[i] == initialDanger) {
+                    temp = i;
+                }
+            }
+            if (rc.canSetFlag(temp)) {
+                rc.setFlag(temp);
             }
             rc.buildRobot(RobotType.SLANDERER, dir, optimalInfluence);
-        }
-        if (initialSetupCount < 16) {
-            initialSetupCount++;
         }
     }
 
@@ -232,6 +278,15 @@ public class EnlightenmentCenter {
                         MapLocation alliedBase = Data.originPoint.translate(distance[0], distance[1]);
                         alliedBases.add(alliedBase);
                         //System.out.println("ALLY BASES:" + alliedBases.toString());
+                    }
+                    //recieved warning
+                    else if (msg.charAt(0) == '7') {
+                        int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+                        MapLocation danger = Data.originPoint.translate(distance[0], distance[1]);
+                        if (initialDanger == Direction.CENTER) {
+                            initialDanger = Data.originPoint.directionTo(danger);
+                            System.out.println("FOUND INITIAL DANGER" + initialDanger);
+                        }
                     }
                     //recieved wall coords
                     //wall coord will only be added if it has not been discovered before
@@ -424,15 +479,11 @@ public class EnlightenmentCenter {
         Data.relOriginPoint[0] = Data.originPoint.x % 128;
         Data.relOriginPoint[1] = Data.originPoint.y % 128;
 
-        spawnOrder.add(RobotType.MUCKRAKER);
         spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.SLANDERER);
-        spawnOrder.add(RobotType.MUCKRAKER);
         spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.MUCKRAKER);
-        spawnOrder.add(RobotType.MUCKRAKER);
-        spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.SLANDERER);
     }
 }

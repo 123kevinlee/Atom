@@ -3,18 +3,25 @@ package atom;
 import battlecode.common.*;
 
 public class Slanderer {
-    public static Direction scoutDirection;
-    public static String cornerRole = "";
-    public static boolean end = false;
+    public static Direction safeDirection = Direction.CENTER;
     public static String role = "";
 
     public static void run(RobotController rc) throws GameActionException {
+        int baseFlag = -1;
+        if (rc.canGetFlag(Data.baseId)) {
+            baseFlag = rc.getFlag(Data.baseId);
+        }
+        if (baseFlag != -1) {
+            if (baseFlag > 0 && baseFlag <= 7) {
+                safeDirection = Data.directions[baseFlag].opposite();
+            }
+        }
         logic(rc);
     }
 
     public static void logic(RobotController rc) throws GameActionException {
         Direction randomDir = Data.directions[(int) (Math.random() * 8)];
-        int boundary = 16;
+        int boundary = 14;
         if (rc.getInfluence() == 150) {
             boundary = 6;
         }
@@ -23,7 +30,7 @@ public class Slanderer {
             RobotInfo[] robots = rc.senseNearbyRobots(20, rc.getTeam().opponent());
             for (RobotInfo robot : robots) {
                 if (robot.getType().equals(RobotType.MUCKRAKER)) {
-                    Direction nextDir = Pathfinding.basicBugToBase(rc,
+                    Direction nextDir = Pathfinding.basicBug(rc,
                             rc.getLocation().add(rc.getLocation().directionTo(robot.getLocation()).opposite()));
                     if (rc.canMove(nextDir)) {
                         rc.move(nextDir);
@@ -33,15 +40,24 @@ public class Slanderer {
             }
         }
 
+        if (safeDirection != Direction.CENTER) {
+            Direction nextDir = Pathfinding.basicBug(rc, Data.originPoint.add(safeDirection).add(safeDirection)
+                    .add(safeDirection).add(safeDirection).add(safeDirection).add(safeDirection));
+            if (rc.canMove(nextDir)) {
+                rc.move(nextDir);
+                return;
+            }
+        }
+
         if (rc.getLocation().distanceSquaredTo(Data.originPoint) < 4) {
-            Direction nextDir = Pathfinding.basicBugToBase(rc,
+            Direction nextDir = Pathfinding.basicBug(rc,
                     rc.getLocation().add(rc.getLocation().directionTo(Data.originPoint).opposite()));
             if (rc.canMove(nextDir)) {
                 rc.move(nextDir);
                 return;
             }
         } else if (rc.getLocation().distanceSquaredTo(Data.originPoint) > boundary) {
-            Direction nextDir = Pathfinding.basicBugToBase(rc,
+            Direction nextDir = Pathfinding.basicBug(rc,
                     rc.getLocation().add(rc.getLocation().directionTo(Data.originPoint)));
             if (rc.canMove(nextDir)) {
                 rc.move(nextDir);
@@ -49,7 +65,7 @@ public class Slanderer {
             }
         }
 
-        Direction nextDir = Pathfinding.basicBugToBase(rc, rc.getLocation().add(randomDir));
+        Direction nextDir = Pathfinding.basicBug(rc, rc.getLocation().add(randomDir));
         if (rc.canMove(nextDir)) {
             rc.move(nextDir);
         }

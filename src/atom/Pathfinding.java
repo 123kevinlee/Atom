@@ -4,7 +4,7 @@ import java.util.*;
 import battlecode.common.*;
 
 public class Pathfinding {
-    public static Direction basicBugToBase(RobotController rc, MapLocation target) throws GameActionException {
+    public static Direction basicBug(RobotController rc, MapLocation target) throws GameActionException {
         Direction dir = rc.getLocation().directionTo(target);
         // System.out.println(dir);
         if (dir == null) {

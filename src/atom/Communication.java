@@ -22,6 +22,9 @@ public class Communication {
             case "ALLY":
                 outMsg += "6";
                 break;
+            case "WARN":
+                outMsg += "7";
+                break;
         }
         DecimalFormat df = new DecimalFormat("000");
 
