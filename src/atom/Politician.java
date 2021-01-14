@@ -1,4 +1,4 @@
-package atomAlpha;
+package atom;
 
 import battlecode.common.*;
 
@@ -32,31 +32,26 @@ public class Politician {
                         if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
                         }
-                        //mostly for when mucks are going to possible coords
-                        //and they are wrong, so they switch targets
-                        //System.out.println("NEW TARGET");
-                        MapLocation newTarget = robot.getLocation();
-                        int dx = newTarget.x - Data.originPoint.x;
-                        int dy = newTarget.y - Data.originPoint.y;
-                        if (dx < 65 && dy < 65) {
-                            int newFlag = Communication.coordEncoder("ENEMY", dx, dy);
-                            if (rc.canSetFlag(newFlag)) {
-                                rc.setFlag(newFlag);
-                                role = Integer.toString(newFlag);
-                            }
-                        }
+                        // //mostly for when mucks are going to possible coords
+                        // //and they are wrong, so they switch targets
+                        // //System.out.println("NEW TARGET");
+                        // MapLocation newTarget = robot.getLocation();
+                        // int dx = newTarget.x - Data.originPoint.x;
+                        // int dy = newTarget.y - Data.originPoint.y;
+                        // if (dx < 65 && dy < 65) {
+                        //     int newFlag = Communication.coordEncoder("ENEMY", dx, dy);
+                        //     if (rc.canSetFlag(newFlag)) {
+                        //         rc.setFlag(newFlag);
+                        //         role = Integer.toString(newFlag);
+                        //     }
+                        // }
                     }
                 }
             }
         }
 
         //logic for politicians that just converted from enemy politician or a slanderer
-        if (role.equals("") || role.equals("1")) {
-            if (rc.canSetFlag(1)) {
-                rc.setFlag(1);
-                role = "1";
-            }
-
+        if (role.equals("")) {
             //logic for converted enemy politicians
             if (Data.slandererConvertDirection.equals(Direction.CENTER)) {
                 isConvertedEnemy(rc);
@@ -77,141 +72,136 @@ public class Politician {
                             rc.move(nextDir);
                         }
                         // System.out.println("NEW TARGET");
-                        MapLocation newTarget = robot.getLocation();
-                        int dx = newTarget.x - Data.originPoint.x;
-                        int dy = newTarget.y - Data.originPoint.y;
-                        if (dx < 65 && dy < 65) {
-                            int newFlag = Communication.coordEncoder("ENEMY", dx, dy);
-                            if (rc.canSetFlag(newFlag)) {
-                                rc.setFlag(newFlag);
-                                role = Integer.toString(newFlag);
-                            }
-                        }
+                        // MapLocation newTarget = robot.getLocation();
+                        // int dx = newTarget.x - Data.originPoint.x;
+                        // int dy = newTarget.y - Data.originPoint.y;
+                        // if (dx < 65 && dy < 65) {
+                        //     int newFlag = Communication.coordEncoder("ENEMY", dx, dy);
+                        //     if (rc.canSetFlag(newFlag)) {
+                        //         rc.setFlag(newFlag);
+                        //         role = Integer.toString(newFlag);
+                        //     }
+                        // }
                     }
-                    if (robot.getTeam().equals(rc.getTeam())) {
-                        if (rc.canGetFlag(robot.getID())) {
-                            String allyFlag = Integer.toString(rc.getFlag(robot.getID()));
-                            String thisFlag = Integer.toString(rc.getFlag(rc.getID()));
-                            //if a ally's flag has the same target coords but the prefix is 3, that means the ec has been converted
-                            if (allyFlag.charAt(0) == '3') {
-                                String ending = thisFlag.substring(1);
-                                if (allyFlag.substring(1).equals(ending)) {
-                                    if (rc.canSetFlag(Integer.parseInt(allyFlag))) {
-                                        rc.setFlag(Integer.parseInt(allyFlag));
-                                        role = allyFlag;
-                                    }
-                                }
-                            }
-                            //if a ally's flag has diff target coords and this unit has already converted its target, it will switch targets
-                            if (allyFlag.charAt(0) == '2') {
-                                String ending = Integer.toString(rc.getFlag(rc.getID())).substring(1);
-                                if (!allyFlag.substring(1).equals(ending)) {
-                                    role = allyFlag;
-                                    if (rc.canSetFlag(Integer.parseInt(allyFlag))) {
-                                        rc.setFlag(Integer.parseInt(allyFlag));
-                                        role = allyFlag;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    // if (robot.getTeam().equals(rc.getTeam())) {
+                    //     if (rc.canGetFlag(robot.getID())) {
+                    //         String allyFlag = Integer.toString(rc.getFlag(robot.getID()));
+                    //         String thisFlag = Integer.toString(rc.getFlag(rc.getID()));
+                    //         //if a ally's flag has the same target coords but the prefix is 3, that means the ec has been converted
+                    //         if (allyFlag.charAt(0) == '3') {
+                    //             String ending = thisFlag.substring(1);
+                    //             if (allyFlag.substring(1).equals(ending)) {
+                    //                 if (rc.canSetFlag(Integer.parseInt(allyFlag))) {
+                    //                     rc.setFlag(Integer.parseInt(allyFlag));
+                    //                     role = allyFlag;
+                    //                 }
+                    //             }
+                    //         }
+                    //         //if a ally's flag has diff target coords and this unit has already converted its target, it will switch targets
+                    //         if (allyFlag.charAt(0) == '2') {
+                    //             String ending = Integer.toString(rc.getFlag(rc.getID())).substring(1);
+                    //             if (!allyFlag.substring(1).equals(ending)) {
+                    //                 role = allyFlag;
+                    //                 if (rc.canSetFlag(Integer.parseInt(allyFlag))) {
+                    //                     rc.setFlag(Integer.parseInt(allyFlag));
+                    //                     role = allyFlag;
+                    //                 }
+                    //             }
+                    //         }
+                    //     }
+                    // }
                 }
             }
-            if (attackable.length != 0) {
-                // The int below discerns which enemy to attack first in the RobotInfo array
-                int priorityEnemy = 0;
+            // if (attackable.length != 0) {
+            //     // The int below discerns which enemy to attack first in the RobotInfo array
+            //     int priorityEnemy = 0;
 
-                for (int i = 0; i < attackable.length; i++) {
-                    if (attackable[i].getType() == RobotType.ENLIGHTENMENT_CENTER) {
-                        ecException = true;
-                        priorityEnemy = i;
-                        desiredActionRadius = 1;
-                        break;
-                    }
-                }
+            //     for (int i = 0; i < attackable.length; i++) {
+            //         if (attackable[i].getType() == RobotType.ENLIGHTENMENT_CENTER) {
+            //             ecException = true;
+            //             priorityEnemy = i;
+            //             desiredActionRadius = 1;
+            //             break;
+            //         }
+            //     }
 
-                if (ecException != true) {
-                    for (int i = 0; i < attackable.length; i++) {
-                        if ((rc.getInfluence() - attackable[i].getInfluence()) >= 11) {
-                            priorityEnemy = i;
-                            break;
-                        } else {
-                            priorityEnemy = -1;
-                        }
-                    }
-                }
+            //     if (ecException != true) {
+            //         for (int i = 0; i < attackable.length; i++) {
+            //             if ((rc.getInfluence() - attackable[i].getInfluence()) >= 11) {
+            //                 priorityEnemy = i;
+            //                 break;
+            //             } else {
+            //                 priorityEnemy = -1;
+            //             }
+            //         }
+            //     }
 
-                // System.out.println(priorityEnemy);
+            //     // System.out.println(priorityEnemy);
 
-                if (priorityEnemy != -1) {
-                    // System.out.println("TRACKING");
-                    RobotInfo closeEnemy = attackable[priorityEnemy];
+            //     if (priorityEnemy != -1) {
+            //         // System.out.println("TRACKING");
+            //         RobotInfo closeEnemy = attackable[priorityEnemy];
 
-                    MapLocation myLoc = rc.getLocation();
-                    MapLocation track = closeEnemy.getLocation();
-                    int[] tracked = new int[2];
+            //         MapLocation myLoc = rc.getLocation();
+            //         MapLocation track = closeEnemy.getLocation();
+            //         int[] tracked = new int[2];
 
-                    tracked[0] += track.x;
-                    tracked[1] += track.y;
+            //         tracked[0] += track.x;
+            //         tracked[1] += track.y;
 
-                    // System.out.println("ENEMY ROBOT: " + tracked[0] + "," + tracked[1]);
+            //         // System.out.println("ENEMY ROBOT: " + tracked[0] + "," + tracked[1]);
 
-                    Direction toCloseEnemy = myLoc.directionTo(track);
-                    if (myLoc.distanceSquaredTo(track) <= desiredActionRadius && rc.canEmpower(desiredActionRadius)) {
-                        rc.empower(desiredActionRadius);
-                        // System.out.println("Empowered");
+            //         Direction toCloseEnemy = myLoc.directionTo(track);
+            //         if (myLoc.distanceSquaredTo(track) <= desiredActionRadius && rc.canEmpower(desiredActionRadius)) {
+            //             rc.empower(desiredActionRadius);
+            //             // System.out.println("Empowered");
 
-                    } else if (rc.canMove(Pathfinding.basicBugToBase(rc, track))) {
-                        rc.move(Pathfinding.basicBugToBase(rc, track));
-                    }
-                }
-            }
+            //         } else if (rc.canMove(Pathfinding.basicBugToBase(rc, track))) {
+            //             rc.move(Pathfinding.basicBugToBase(rc, track));
+            //         }
+            //     }
+            // }
 
-            //if unit's ec has already been converted, make movement random 
-            //***in the future it should run away and find another target***
-            if (role.charAt(0) == '3') {
-                Direction[] directions = Data.directions;
-                Direction randDirection = directions[(int) (Math.random() * directions.length)];
-                if (rc.canMove(randDirection)) {
-                    rc.move(randDirection);
-                } else {
-                    for (int i = 0; i < 8; i++) {
-                        if (rc.canMove(directions[i])) {
-                            rc.move(directions[i]);
-                        }
-                    }
-                }
-            }
+            // //if unit's ec has already been converted, make movement random 
+            // //***in the future it should run away and find another target***
+            // if (role.charAt(0) == '3') {
+            //     Direction[] directions = Data.directions;
+            //     Direction randDirection = directions[(int) (Math.random() * directions.length)];
+            //     if (rc.canMove(randDirection)) {
+            //         rc.move(randDirection);
+            //     } else {
+            //         for (int i = 0; i < 8; i++) {
+            //             if (rc.canMove(directions[i])) {
+            //                 rc.move(directions[i]);
+            //             }
+            //         }
+            //     }
+            // }
 
-            int[] coords = Communication.coordDecoder(role);
-            MapLocation currentLocation = rc.getLocation();
-            coords[0] += Data.originPoint.x;
-            coords[1] += Data.originPoint.y;
-            // System.out.println("ENEMY TARGET: " + coords[0] + "," + coords[1]);
-            MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
-            if (rc.canSenseLocation(targetLocation)) {
-                RobotInfo robot = rc.senseRobotAtLocation(targetLocation);
-                if (robot != null && robot.getTeam().equals(rc.getTeam())
-                        && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
-                    // System.out.println(robot.getTeam());
-                    // System.out.println("MISSING OR CONVERTED");
-                    String convertMsg = "3" + role.substring(1);
-                    if (rc.canSetFlag(Integer.parseInt(convertMsg))) {
-                        rc.setFlag(Integer.parseInt(convertMsg));
-                        role = convertMsg;
-                    }
-                }
-            }
-            Direction nextDir = Pathfinding.basicBugToBase(rc, targetLocation);
-            if (rc.canMove(nextDir)) {
-                rc.move(nextDir);
-            }
+            // int[] coords = Communication.coordDecoder(role);
+            // MapLocation currentLocation = rc.getLocation();
+            // coords[0] += Data.originPoint.x;
+            // coords[1] += Data.originPoint.y;
+            // // System.out.println("ENEMY TARGET: " + coords[0] + "," + coords[1]);
+            // MapLocation targetLocation = new MapLocation(coords[0], coords[1]);
+            // if (rc.canSenseLocation(targetLocation)) {
+            //     RobotInfo robot = rc.senseRobotAtLocation(targetLocation);
+            //     if (robot != null && robot.getTeam().equals(rc.getTeam())
+            //             && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
+            //         // System.out.println(robot.getTeam());
+            //         // System.out.println("MISSING OR CONVERTED");
+            //         String convertMsg = "3" + role.substring(1);
+            //         if (rc.canSetFlag(Integer.parseInt(convertMsg))) {
+            //             rc.setFlag(Integer.parseInt(convertMsg));
+            //             role = convertMsg;
+            //         }
+            //     }
+            // }
+            // Direction nextDir = Pathfinding.basicBugToBase(rc, targetLocation);
+            // if (rc.canMove(nextDir)) {
+            //     rc.move(nextDir);
+            // }
         }
-
-        //4 corner defender logic
-        // else if (role.equals("111")) {
-        //     cornerDefenderLogic(rc);
-        // }
 
         //scatter defender logic
         else if (role.length() == 4 && role.substring(0, 3).equals("112")) {
@@ -253,23 +243,6 @@ public class Politician {
                 rc.move(nextDir);
             }
         }
-    }
-
-    public static void cornerDefenderLogic(RobotController rc) throws GameActionException {
-        // if (Pathfinding.getDefenseReached() == false && rc.isReady()) {
-        //     if (!rc.getLocation().equals(Data.originPoint.add(Direction.NORTHEAST))
-        //             || !rc.getLocation().equals(Data.originPoint.add(Direction.NORTHWEST))
-        //             || !rc.getLocation().equals(Data.originPoint.add(Direction.SOUTHEAST))
-        //             || !rc.getLocation().equals(Data.originPoint.add(Direction.SOUTHWEST))) {
-        //         // Pathfinding.chooseRandomDefenseLocation(rc, Data.originPoint);
-        //     }
-        //     Pathfinding.findDefenseLocation(rc, Data.originPoint);
-        // }
-        // // create a locking mechanism and chasing mechanism
-        // if (rc.canSenseRadiusSquared(9) && defensible.length > 0 && rc.canEmpower(9)) {
-        //     // System.out.println("EMPOWER");
-        //     rc.empower(9);
-        // }
     }
 
     public static void isConvertedSlanderer(RobotController rc) throws GameActionException {
@@ -343,12 +316,13 @@ public class Politician {
             for (RobotInfo robot : rc.senseNearbyRobots(3, rc.getTeam())) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER) {
                     Data.baseId = robot.getID();
+                    role = Integer.toString(rc.getFlag(Data.baseId));
+                    Data.originPoint = robot.getLocation();
+                    Data.relOriginPoint[0] = Data.originPoint.x % 128;
+                    Data.relOriginPoint[1] = Data.originPoint.y % 128;
+                    Data.initRound = rc.getRoundNum();
                     if (rc.canGetFlag(Data.baseId)) {
                         if (rc.canSetFlag(rc.getFlag(Data.baseId))) {
-                            // Pathfinding.setStartLocation(rc);
-                            role = Integer.toString(rc.getFlag(Data.baseId));
-                            Data.originPoint = robot.getLocation();
-                            Data.initRound = rc.getRoundNum();
                             if (rc.canSetFlag(Integer.parseInt(role))) {
                                 rc.setFlag(Integer.parseInt(role));
                             }
