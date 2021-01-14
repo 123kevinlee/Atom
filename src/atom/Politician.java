@@ -9,25 +9,42 @@ public class Politician {
     public static void run(RobotController rc) throws GameActionException {
         Team enemy = rc.getTeam().opponent();
 
-        for (RobotInfo robot : rc.senseNearbyRobots(25)) {
-            if (robot.getTeam().equals(Team.NEUTRAL) || robot.getTeam().equals(rc.getTeam().opponent())) {
-                if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 9)) {
-                    if (rc.canEmpower(9)) {
-                        rc.empower(9);
-                    } else {
-                        Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                        if (rc.canMove(nextDir)) {
-                            rc.move(nextDir);
+        if (rc.canSenseRadiusSquared(25)) {
+            for (RobotInfo robot : rc.senseNearbyRobots(25)) {
+                if (robot.getTeam().equals(Team.NEUTRAL) || robot.getTeam().equals(rc.getTeam().opponent())) {
+                    if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 9)) {
+                        if (rc.canEmpower(9)) {
+                            rc.empower(9);
+                        } else {
+                            Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
+                            if (rc.canMove(nextDir)) {
+                                rc.move(nextDir);
+                            }
+                            // //mostly for when mucks are going to possible coords
+                            // //and they are wrong, so they switch targets
+                            // //System.out.println("NEW TARGET");
+                            int relx = robot.getLocation().x % 128;
+                            int rely = robot.getLocation().y % 128;
+                            int newFlag = Communication.coordEncoder("ENEMY", relx, rely);
+                            if (rc.canSetFlag(newFlag)) {
+                                rc.setFlag(newFlag);
+                                role = Integer.toString(newFlag);
+                            }
                         }
-                        // //mostly for when mucks are going to possible coords
-                        // //and they are wrong, so they switch targets
-                        // //System.out.println("NEW TARGET");
-                        int relx = robot.getLocation().x % 128;
-                        int rely = robot.getLocation().y % 128;
-                        int newFlag = Communication.coordEncoder("ENEMY", relx, rely);
-                        if (rc.canSetFlag(newFlag)) {
-                            rc.setFlag(newFlag);
-                            role = Integer.toString(newFlag);
+                    }
+                }
+            }
+        }
+
+        if (role.equals("1")) {
+            if (rc.canSenseRadiusSquared(25)) {
+                for (RobotInfo robot : rc.senseNearbyRobots(25)) {
+                    if (robot.getTeam().equals(rc.getTeam())) {
+                        Direction away = rc.getLocation().directionTo(robot.getLocation()).opposite();
+                        MapLocation target = rc.getLocation().add(away).add(away).add(away);
+                        away = Pathfinding.basicBug(rc, target);
+                        if (rc.canMove(away)) {
+                            rc.move(away);
                         }
                     }
                 }
@@ -36,16 +53,8 @@ public class Politician {
 
         //logic for politicians that just converted from enemy politician or a slanderer
         if (role.equals("")) {
-            //logic for converted enemy politicians
-            // if (Data.slandererConvertDirection.equals(Direction.CENTER)) {
-            //     isConvertedEnemy(rc);
-            // } else {
-            //     //converted slanderer stuff
-            // }
             isConvertedEnemy(rc);
-        }
-        // System.out.println(role);
-        else if (role.length() == 7) {
+        } else if (role.length() == 7) {
             int[] coords = Communication.relCoordDecoder(role);
             int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
             MapLocation target = Data.originPoint.translate(distance[0], distance[1]);

@@ -62,84 +62,89 @@ public class EnlightenmentCenter {
                 spawnScout(rc, Direction.SOUTH);
                 break;
         }
-        if (enemyBases.size() == 0 && possibleEnemyBases.size() == 0 && initialDanger == Direction.CENTER) {
-            spawnFarmer(rc, openSpawnLocation(rc, RobotType.SLANDERER));
+        // if (enemyBases.size() == 0 && possibleEnemyBases.size() == 0 && initialDanger == Direction.CENTER) {
+        //     spawnFarmer(rc, openSpawnLocation(rc, RobotType.SLANDERER));
+        // }
+        spawnMuckraker(rc);
+        if (rc.getRoundNum() % 200 == 0) {
+            MapLocation targetLocation = Data.originPoint;
+            if (enemyBases.size() > 0) {
+                targetLocation = enemyBases.iterator().next();
+            } else if (possibleEnemyBases.size() > 0) {
+                targetLocation = possibleEnemyBases.iterator().next();
+            }
+            int relx = targetLocation.x % 128;
+            int rely = targetLocation.y % 128;
+            int flag = Communication.coordEncoder("ENEMY", relx, rely);
+            if (rc.canSetFlag(flag)) {
+                rc.setFlag(flag);
+            }
         }
-        spawnOrder(rc);
     }
 
-    public static void spawnOrder(RobotController rc) throws GameActionException {
-        System.out.println(spawnOrderCounter);
-        switch (spawnOrder.get(spawnOrderCounter % spawnOrder.size())) {
-            case POLITICIAN:
-                Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
-                int currentInfluence = rc.getInfluence();
-                if (currentInfluence / 2 > 11) {
-                    int unitInfluence = Math.max(11, currentInfluence / 25);
-                    if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
-                        MapLocation targetLocation = Data.originPoint;
-                        if (enemyBases.size() > 0) {
-                            targetLocation = enemyBases.iterator().next();
-                        } else if (possibleEnemyBases.size() > 0) {
-                            targetLocation = possibleEnemyBases.iterator().next();
-                        }
-                        int relx = targetLocation.x % 128;
-                        int rely = targetLocation.y % 128;
-                        int flag = Communication.coordEncoder("ENEMY", relx, rely);
-                        if (rc.canSetFlag(flag)) {
-                            rc.setFlag(flag);
-                        }
-                        rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
-                        spawnOrderCounter++;
-                    }
-                } else {
-                    spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
-                    int unitInfluence = 1;
-                    if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
-                        MapLocation targetLocation = Data.originPoint;
-                        if (enemyBases.size() > 0) {
-                            targetLocation = enemyBases.iterator().next();
-                        } else if (possibleEnemyBases.size() > 0) {
-                            targetLocation = possibleEnemyBases.iterator().next();
-                        }
-                        int relx = targetLocation.x % 128;
-                        int rely = targetLocation.y % 128;
-                        int flag = Communication.coordEncoder("ENEMY", relx, rely);
-                        if (rc.canSetFlag(flag)) {
-                            rc.setFlag(flag);
-                        }
-                        rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
-                        spawnOrderCounter++;
-                    }
+    public static void spawnTargetedPolitician(RobotController rc) throws GameActionException {
+        Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
+        int currentInfluence = rc.getInfluence();
+        if (currentInfluence / 2 > 11) {
+            int unitInfluence = Math.max(11, currentInfluence / 25);
+            if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
+                MapLocation targetLocation = Data.originPoint;
+                if (enemyBases.size() > 0) {
+                    targetLocation = enemyBases.iterator().next();
+                } else if (possibleEnemyBases.size() > 0) {
+                    targetLocation = possibleEnemyBases.iterator().next();
                 }
-                break;
-            case MUCKRAKER:
-                spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
-                int unitInfluence = 1;
-                if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
-                    MapLocation targetLocation = Data.originPoint;
-                    if (enemyBases.size() > 0) {
-                        targetLocation = enemyBases.iterator().next();
-                    } else if (possibleEnemyBases.size() > 0) {
-                        targetLocation = possibleEnemyBases.iterator().next();
-                    }
-                    int relx = targetLocation.x % 128;
-                    int rely = targetLocation.y % 128;
-                    int flag = Communication.coordEncoder("ENEMY", relx, rely);
-                    if (rc.canSetFlag(flag)) {
-                        rc.setFlag(flag);
-                    }
-                    rc.buildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence);
-                    spawnOrderCounter++;
+                int relx = targetLocation.x % 128;
+                int rely = targetLocation.y % 128;
+                int flag = Communication.coordEncoder("ENEMY", relx, rely);
+                if (rc.canSetFlag(flag)) {
+                    rc.setFlag(flag);
                 }
-                break;
-            case SLANDERER:
-                spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
-                spawnFarmer(rc, spawnDir);
+                rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
                 spawnOrderCounter++;
-                break;
-            default:
-                break;
+            }
+        }
+    }
+
+    public static void spawnTargetedMuckraker(RobotController rc) throws GameActionException {
+        Direction spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
+        int unitInfluence = 1;
+        if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
+            MapLocation targetLocation = Data.originPoint;
+            if (enemyBases.size() > 0) {
+                targetLocation = enemyBases.iterator().next();
+            } else if (possibleEnemyBases.size() > 0) {
+                targetLocation = possibleEnemyBases.iterator().next();
+            }
+            int relx = targetLocation.x % 128;
+            int rely = targetLocation.y % 128;
+            int flag = Communication.coordEncoder("ENEMY", relx, rely);
+            if (rc.canSetFlag(flag)) {
+                rc.setFlag(flag);
+            }
+            rc.buildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence);
+            spawnOrderCounter++;
+        }
+    }
+
+    public static void spawnMuckraker(RobotController rc) throws GameActionException {
+        Direction spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
+        int unitInfluence = 1;
+        if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
+            rc.buildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence);
+            spawnOrderCounter++;
+        }
+    }
+
+    public static void spawnPolitician(RobotController rc) throws GameActionException {
+        Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
+        int unitInfluence = 1;
+        if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
+            if (rc.canSetFlag(1)) {
+                rc.setFlag(1);
+            }
+            rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
+            spawnOrderCounter++;
         }
     }
 
@@ -170,15 +175,8 @@ public class EnlightenmentCenter {
             }
         }
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, optimalInfluence)) {
-            int temp = 0;
-            Direction[] directions = Data.directions;
-            for (int i = 0; i < directions.length; i++) {
-                if (directions[i] == initialDanger) {
-                    temp = i;
-                }
-            }
-            if (rc.canSetFlag(temp)) {
-                rc.setFlag(temp);
+            if (rc.canSetFlag(0)) {
+                rc.setFlag(0);
             }
             rc.buildRobot(RobotType.SLANDERER, dir, optimalInfluence);
         }
@@ -464,9 +462,11 @@ public class EnlightenmentCenter {
 
     //returns an open spawn location around the ec
     public static Direction openSpawnLocation(RobotController rc, RobotType type) throws GameActionException {
-        for (int i = 0; i < Data.directions.length; i++) {
-            if (rc.canBuildRobot(type, Data.directions[i], 1)) {
-                return Data.directions[i];
+        Direction[] directions = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST,
+                Direction.NORTHEAST, Direction.SOUTHWEST, Direction.SOUTHEAST, Direction.NORTHWEST };
+        for (int i = 0; i < directions.length; i++) {
+            if (rc.canBuildRobot(type, directions[i], 1)) {
+                return directions[i];
             }
         }
         return Direction.CENTER;
