@@ -8,7 +8,8 @@ public class Data {
     public static int[] relOriginPoint = new int[2];
     public static int initRound = 0;
 
-    public static Direction slandererConvertDirection = Direction.CENTER;
+    public static Boolean wasSlanderer = false;
+    public static Boolean wasAlly = false;
 
     static final Direction[] directions = { Direction.NORTH, Direction.NORTHEAST, Direction.EAST, Direction.SOUTHEAST,
             Direction.SOUTH, Direction.SOUTHWEST, Direction.WEST, Direction.NORTHWEST, };

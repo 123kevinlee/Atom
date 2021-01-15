@@ -12,8 +12,6 @@ public class EnlightenmentCenter {
     public static ArrayList<RobotType> spawnOrder = new ArrayList<RobotType>();
     public static int spawnOrderCounter = 0;
     public static int initialSetupCount = 0;
-    public static Direction danger = Direction.CENTER;
-    public static Direction initialDanger = Direction.CENTER;
 
     public static Map<Integer, Direction> scoutIds = new HashMap<Integer, Direction>();
     public static Set<Integer> waller = new HashSet<Integer>(); // fricking waller direction is annoying so they can
@@ -26,6 +24,8 @@ public class EnlightenmentCenter {
 
     public static int[] mapBorders = new int[4]; // 0=NORTH 1=EAST 2=SOUTH 3=WEST
     public static boolean mapComplete = false;
+
+    public static MapLocation danger = null;
 
     public static LinkedHashSet<MapLocation> enemyBases = new LinkedHashSet<MapLocation>();
     public static Map<Direction, MapLocation> enemyCoords = new TreeMap<Direction, MapLocation>();
@@ -61,24 +61,6 @@ public class EnlightenmentCenter {
             case 3:
                 spawnScout(rc, Direction.SOUTH);
                 break;
-        }
-        // if (enemyBases.size() == 0 && possibleEnemyBases.size() == 0 && initialDanger == Direction.CENTER) {
-        //     spawnFarmer(rc, openSpawnLocation(rc, RobotType.SLANDERER));
-        // }
-        spawnMuckraker(rc);
-        if (rc.getRoundNum() % 200 == 0) {
-            MapLocation targetLocation = Data.originPoint;
-            if (enemyBases.size() > 0) {
-                targetLocation = enemyBases.iterator().next();
-            } else if (possibleEnemyBases.size() > 0) {
-                targetLocation = possibleEnemyBases.iterator().next();
-            }
-            int relx = targetLocation.x % 128;
-            int rely = targetLocation.y % 128;
-            int flag = Communication.coordEncoder("ENEMY", relx, rely);
-            if (rc.canSetFlag(flag)) {
-                rc.setFlag(flag);
-            }
         }
     }
 
@@ -280,10 +262,8 @@ public class EnlightenmentCenter {
                     //recieved warning
                     else if (msg.charAt(0) == '7') {
                         int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
-                        MapLocation danger = Data.originPoint.translate(distance[0], distance[1]);
-                        if (initialDanger == Direction.CENTER) {
-                            initialDanger = Data.originPoint.directionTo(danger);
-                            System.out.println("FOUND INITIAL DANGER" + initialDanger);
+                        if (danger == null) {
+                            danger = Data.originPoint.translate(distance[0], distance[1]);
                         }
                     }
                     //recieved wall coords

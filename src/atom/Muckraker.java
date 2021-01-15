@@ -13,9 +13,6 @@ public class Muckraker {
         if (rc.canGetFlag(Data.baseId)) {
             baseFlag = rc.getFlag(Data.baseId);
             role = Integer.toString(baseFlag);
-            if (role.length() == 7) {
-                attackMode(rc);
-            }
         }
 
         Team enemy = rc.getTeam().opponent();
@@ -24,7 +21,6 @@ public class Muckraker {
                 if (robot.type.canBeExposed()) {
                     if (rc.canExpose(robot.location)) {
                         rc.expose(robot.location);
-                        return;
                     }
                 }
             }
@@ -32,7 +28,7 @@ public class Muckraker {
 
         if (role.equals("100")) { // scout
             scoutMode(rc);
-        } else {
+        } else if (role.length() == 7) {
             attackMode(rc);
         }
     }
@@ -168,46 +164,24 @@ public class Muckraker {
     }
 
     public static void attackMode(RobotController rc) throws GameActionException {
-        Team enemy = rc.getTeam().opponent();
-        int actionRadius = rc.getType().actionRadiusSquared;
-
-        if (rc.canSenseRadiusSquared(actionRadius)) {
-            for (RobotInfo robot : rc.senseNearbyRobots(actionRadius)) {
-                if (robot.type.canBeExposed() && robot.getTeam().equals(enemy)) {
-                    // It's a slanderer
-                    if (rc.canExpose(robot.location)) {
-                        rc.expose(robot.location);
-                        return;
+        if (rc.canSenseRadiusSquared(30)) {
+            RobotInfo[] robots = rc.senseNearbyRobots(30);
+            for (RobotInfo robot : robots) {
+                if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER && robot.getTeam() == rc.getTeam().opponent()) {
+                    Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
+                    if (rc.canMove(nextDir)) {
+                        rc.move(nextDir);
                     }
-                }
-            }
-        }
-        if (role.length() == 7) {
-            if (rc.canSenseRadiusSquared(30)) {
-                RobotInfo[] robots = rc.senseNearbyRobots(30);
-                for (RobotInfo robot : robots) {
-                    if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
-                            && robot.getTeam() == rc.getTeam().opponent()) {
 
-                        if (rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 4) {
-                            return;
-                        }
-
-                        Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                        if (rc.canMove(nextDir)) {
-                            rc.move(nextDir);
-                        }
-
-                        //mostly for when mucks are going to possible coords
-                        //and they are wrong, so they switch targets
-                        //System.out.println("NEW TARGET");
-                        int relx = robot.getLocation().x % 128;
-                        int rely = robot.getLocation().y % 128;
-                        int newFlag = Communication.coordEncoder("ENEMY", relx, rely);
-                        if (rc.canSetFlag(newFlag)) {
-                            rc.setFlag(newFlag);
-                            role = Integer.toString(newFlag);
-                        }
+                    //mostly for when mucks are going to possible coords
+                    //and they are wrong, so they switch targets
+                    //System.out.println("NEW TARGET");
+                    int relx = robot.getLocation().x % 128;
+                    int rely = robot.getLocation().y % 128;
+                    int newFlag = Communication.coordEncoder("ENEMY", relx, rely);
+                    if (rc.canSetFlag(newFlag)) {
+                        rc.setFlag(newFlag);
+                        role = Integer.toString(newFlag);
                     }
                 }
             }
@@ -218,34 +192,6 @@ public class Muckraker {
             Direction nextDir = Pathfinding.basicBug(rc, target);
             if (rc.canMove(nextDir)) {
                 rc.move(nextDir);
-            }
-        }
-        if (rc.canSenseRadiusSquared(30)) {
-            RobotInfo[] robots = rc.senseNearbyRobots(30);
-            for (RobotInfo robot : robots) {
-                // if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER && robot.getTeam() == rc.getTeam().opponent()) {
-                //     Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                //     if (rc.canMove(nextDir)) {
-                //         rc.move(nextDir);
-                //     }
-
-                //     //mostly for when mucks are going to possible coords
-                //     //and they are wrong, so they switch targets
-                //     //System.out.println("NEW TARGET");
-                //     int relx = robot.getLocation().x % 128;
-                //     int rely = robot.getLocation().y % 128;
-                //     int newFlag = Communication.coordEncoder("ENEMY", relx, rely);
-                //     if (rc.canSetFlag(newFlag)) {
-                //         rc.setFlag(newFlag);
-                //         role = Integer.toString(newFlag);
-                //     }
-                // }
-                if (robot.getTeam().equals(rc.getTeam())) {
-                    Direction away = rc.getLocation().directionTo(robot.getLocation()).opposite();
-                    if (rc.canMove(away)) {
-                        rc.move(away);
-                    }
-                }
             }
         }
     }

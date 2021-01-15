@@ -11,7 +11,7 @@ public class Politician {
 
         if (rc.canSenseRadiusSquared(25)) {
             for (RobotInfo robot : rc.senseNearbyRobots(25)) {
-                if (robot.getTeam().equals(Team.NEUTRAL) || robot.getTeam().equals(rc.getTeam().opponent())) {
+                if (robot.getTeam().equals(Team.NEUTRAL) || robot.getTeam().equals(enemy)) {
                     if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 9)) {
                         if (rc.canEmpower(9)) {
                             rc.empower(9);
@@ -36,32 +36,21 @@ public class Politician {
             }
         }
 
-        if (role.equals("1")) {
-            if (rc.canSenseRadiusSquared(25)) {
-                for (RobotInfo robot : rc.senseNearbyRobots(25)) {
-                    if (robot.getTeam().equals(rc.getTeam())) {
-                        Direction away = rc.getLocation().directionTo(robot.getLocation()).opposite();
-                        MapLocation target = rc.getLocation().add(away).add(away).add(away);
-                        away = Pathfinding.basicBug(rc, target);
-                        if (rc.canMove(away)) {
-                            rc.move(away);
-                        }
-                    }
-                }
-            }
-        }
-
         //logic for politicians that just converted from enemy politician or a slanderer
-        if (role.equals("")) {
+        if (!Data.wasAlly || Data.wasSlanderer) {
             isConvertedEnemy(rc);
         } else if (role.length() == 7) {
-            int[] coords = Communication.relCoordDecoder(role);
-            int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
-            MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
-            Direction nextDir = Pathfinding.basicBug(rc, target);
-            if (rc.canMove(nextDir)) {
-                rc.move(nextDir);
-            }
+            toTarget();
+        }
+    }
+
+    public static void toTarget() {
+        int[] coords = Communication.relCoordDecoder(role);
+        int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+        MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
+        Direction nextDir = Pathfinding.basicBug(rc, target);
+        if (rc.canMove(nextDir)) {
+            rc.move(nextDir);
         }
     }
 

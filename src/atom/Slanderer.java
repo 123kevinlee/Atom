@@ -11,17 +11,13 @@ public class Slanderer {
         if (rc.canGetFlag(Data.baseId)) {
             baseFlag = rc.getFlag(Data.baseId);
         }
-        if (baseFlag != -1) {
-            if (baseFlag > 0 && baseFlag <= 7) {
-                safeDirection = Data.directions[baseFlag].opposite();
-            }
-        }
+
         logic(rc);
     }
 
     public static void logic(RobotController rc) throws GameActionException {
         Direction randomDir = Data.directions[(int) (Math.random() * 8)];
-        int boundary = 14;
+        int boundary = 12;
         if (rc.getInfluence() == 150) {
             boundary = 6;
         }
@@ -40,16 +36,7 @@ public class Slanderer {
             }
         }
 
-        if (safeDirection != Direction.CENTER) {
-            Direction nextDir = Pathfinding.basicBug(rc, Data.originPoint.add(safeDirection).add(safeDirection)
-                    .add(safeDirection).add(safeDirection).add(safeDirection).add(safeDirection));
-            if (rc.canMove(nextDir)) {
-                rc.move(nextDir);
-                return;
-            }
-        }
-
-        if (rc.getLocation().distanceSquaredTo(Data.originPoint) < 4) {
+        if (rc.getLocation().distanceSquaredTo(Data.originPoint) < 6) {
             Direction nextDir = Pathfinding.basicBug(rc,
                     rc.getLocation().add(rc.getLocation().directionTo(Data.originPoint).opposite()));
             if (rc.canMove(nextDir)) {
@@ -82,6 +69,7 @@ public class Slanderer {
                         Data.relOriginPoint[0] = Data.originPoint.x % 128;
                         Data.relOriginPoint[1] = Data.originPoint.y % 128;
                         Data.initRound = rc.getRoundNum();
+                        Data.wasSlanderer = true;
                         if (rc.canSetFlag(rc.getFlag(Data.baseId))) {
                             if (rc.canSetFlag(Integer.parseInt(role))) {
                                 rc.setFlag(Integer.parseInt(role));
