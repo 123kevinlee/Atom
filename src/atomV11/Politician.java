@@ -1,4 +1,4 @@
-package atom;
+package atomV11;
 
 import javax.swing.BoundedRangeModel;
 
@@ -10,15 +10,15 @@ public class Politician {
     public static int boundary = 25;
 
     public static void run(RobotController rc) throws GameActionException {
-        int baseFlag = -1;
-        if (rc.canGetFlag(Data.baseId)) {
-            baseFlag = rc.getFlag(Data.baseId);
-            if (Integer.toString(baseFlag).charAt(0) == '7') {
-                //rc.setFlag(baseFlag);
-                role = Integer.toString(baseFlag);
-            }
-        }
-        System.out.println(role);
+        // int baseFlag = -1;
+        // if (rc.canGetFlag(Data.baseId)) {
+        //     baseFlag = rc.getFlag(Data.baseId);
+        //     if (Integer.toString(baseFlag).charAt(0) != '7') {
+        //         rc.setFlag(baseFlag);
+        //         role = Integer.toString(baseFlag);
+        //     }
+        // }
+        //System.out.println(role);
 
         Team enemy = rc.getTeam().opponent();
 
@@ -27,16 +27,15 @@ public class Politician {
                 RobotInfo[] robots = rc.senseNearbyRobots(25);
                 // System.out.println(robots.toString());
                 for (RobotInfo robot : robots) {
-                    if (robot.getTeam().equals(Team.NEUTRAL) || (robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)
-                            && robot.getTeam().equals(rc.getTeam().opponent()))) {
+                    if (robot.getTeam().equals(Team.NEUTRAL)) {
                         int totalRobotsAround = 0;
                         if (rc.canSenseRadiusSquared(1)) {
                             RobotInfo[] robotS = rc.senseNearbyRobots(1);
                             totalRobotsAround = robotS.length;
                         }
-                        if (totalRobotsAround > 0 && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)
+                        if (totalRobotsAround > 0
                                 && (rc.getInfluence() - 10) / totalRobotsAround > robot.getInfluence()) {
-                            if (rc.getLocation().distanceSquaredTo(robot.getLocation()) == 1) {
+                            if (rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 1) {
                                 if (rc.canEmpower(1)) {
                                     rc.empower(1);
                                 }
@@ -98,10 +97,8 @@ public class Politician {
             //logic for politicians that just converted from enemy politician or a slanderer
             if (!Data.wasAlly || Data.wasSlanderer) {
                 isConvertedEnemy(rc);
-            } else if (role.length() == 7 && role.charAt(0) == '2') {
+            } else if (role.length() == 7) {
                 toTarget(rc);
-            } else if (role.length() == 7 && role.charAt(0) == '7') {
-                toDanger(rc);
             } else {
                 logic(rc);
             }
@@ -114,18 +111,15 @@ public class Politician {
 
         int nearbyAllies = 0;
 
-        MapLocation thisLocation = rc.getLocation();
-
         if (rc.canSenseRadiusSquared(-1)) {
             RobotInfo[] robots = rc.senseNearbyRobots(-1);
             for (RobotInfo robot : robots) {
-                if ((robot.getTeam().equals(enemy) || robot.getTeam().equals(Team.NEUTRAL))
-                        && robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 2)
+                if (robot.getTeam().equals(enemy) && robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 2)
                         && rc.getInfluence() > robot.getInfluence() + 11) {
                     if (rc.canEmpower(2)) {
                         rc.empower(2);
                     }
-                } else if (robot.getTeam().equals(enemy) || robot.getTeam().equals(Team.NEUTRAL)
+                } else if (robot.getTeam().equals(enemy)
                         && robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 25)
                         && rc.getInfluence() + 11 > robot.getInfluence()) {
                     Direction dir = rc.getLocation().directionTo(robot.getLocation());
@@ -135,7 +129,7 @@ public class Politician {
                 }
                 if (robot.getTeam().equals(rc.getTeam())) {
                     nearbyAllies++;
-                    if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 11)) {
+                    if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 4)) {
                         if (rc.canMove(rc.getLocation().directionTo(robot.getLocation()).opposite())) {
                             rc.move(rc.getLocation().directionTo(robot.getLocation()).opposite());
                         }
@@ -152,6 +146,7 @@ public class Politician {
             boundary -= 6;
         }
 
+        MapLocation thisLocation = rc.getLocation();
         if (thisLocation.distanceSquaredTo(Data.originPoint) < boundary) {
             //System.out.println("MOVING TO BOUNDARY");
             if (rc.canMove(thisLocation.directionTo(Data.originPoint).opposite())) {
@@ -176,44 +171,6 @@ public class Politician {
             }
         }
 
-    }
-
-    public static void toDanger(RobotController rc) throws GameActionException {
-        Team ally = rc.getTeam();
-        Team enemy = ally.opponent();
-
-        if (rc.canSenseRadiusSquared(-1)) {
-            RobotInfo[] robots = rc.senseNearbyRobots(-1);
-            for (RobotInfo robot : robots) {
-                if (robot.getTeam().equals(enemy) && robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 2)
-                        && rc.getInfluence() > robot.getInfluence() + 11) {
-                    if (rc.canEmpower(2)) {
-                        rc.empower(2);
-                    }
-                } else if (robot.getTeam().equals(enemy)
-                        && robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 25)
-                        && rc.getInfluence() + 11 > robot.getInfluence()) {
-                    Direction dir = rc.getLocation().directionTo(robot.getLocation());
-                    if (rc.canMove(dir)) {
-                        rc.move(dir);
-                    }
-                } else if (robot.getTeam().equals(rc.getTeam())) {
-                    if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 11)) {
-                        if (rc.canMove(rc.getLocation().directionTo(robot.getLocation()).opposite())) {
-                            rc.move(rc.getLocation().directionTo(robot.getLocation()).opposite());
-                        }
-                    }
-                }
-            }
-        }
-
-        int[] coords = Communication.relCoordDecoder(role);
-        int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
-        MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
-        Direction nextDir = Pathfinding.basicBug(rc, target);
-        if (rc.canMove(nextDir)) {
-            rc.move(nextDir);
-        }
     }
 
     public static void toTarget(RobotController rc) throws GameActionException {
