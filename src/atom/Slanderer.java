@@ -8,8 +8,11 @@ public class Slanderer {
 
     public static void run(RobotController rc) throws GameActionException {
         int baseFlag = -1;
-        if (rc.canGetFlag(Data.baseId)) {
+        if (rc.canGetFlag(Data.baseId) && role.charAt(0) != '7') {
             baseFlag = rc.getFlag(Data.baseId);
+            rc.setFlag(baseFlag);
+            role = Integer.toString(baseFlag);
+            System.out.println("SEE");
         }
 
         logic(rc);
@@ -17,9 +20,9 @@ public class Slanderer {
 
     public static void logic(RobotController rc) throws GameActionException {
         Direction randomDir = Data.directions[(int) (Math.random() * 8)];
-        int boundary = 12;
+        int boundary = 16;
         if (rc.getInfluence() == 150) {
-            boundary = 6;
+            boundary = 8;
         }
 
         if (rc.canSenseRadiusSquared(20)) {
@@ -33,6 +36,18 @@ public class Slanderer {
                         return;
                     }
                 }
+            }
+        }
+
+        if (role.charAt(0) == '7') {
+            int[] coords = Communication.relCoordDecoder(role);
+            int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+            MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
+            Direction nextDir = Pathfinding.basicBug(rc, target).opposite();
+            nextDir = Pathfinding.basicBug(rc,
+                    target.subtract(nextDir).subtract(nextDir).subtract(nextDir).subtract(nextDir));
+            if (rc.canMove(nextDir)) {
+                rc.move(nextDir);
             }
         }
 

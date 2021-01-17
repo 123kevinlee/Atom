@@ -5,9 +5,14 @@ import java.util.*;
 
 public class EnlightenmentCenter {
 
+    /*To Do 
+        Send for neutral bases, send poli to attack bases, send mucks, bidding, make slanderers escape
+    */
     public static int lastInfluenceAmount = 0;
     public static int lastInfluenceGain = 0;
     public static int lastVotes = 0;
+
+    public static boolean cancelFlag = false;
 
     public static ArrayList<RobotType> spawnOrder = new ArrayList<RobotType>();
     public static int spawnOrderCounter = 0;
@@ -34,6 +39,29 @@ public class EnlightenmentCenter {
     public static LinkedHashSet<MapLocation> alliedBases = new LinkedHashSet<MapLocation>();
 
     public static void run(RobotController rc) throws GameActionException {
+
+        if (rc.getFlag(rc.getID()) != 0 && cancelFlag == true) {
+            if (rc.canSetFlag(0)) {
+                rc.setFlag(0);
+            }
+        }
+
+        if (rc.canSenseRadiusSquared(-1)) {
+            RobotInfo[] robots = rc.senseNearbyRobots();
+            for (RobotInfo robot : robots) {
+                if (robot.getTeam().equals(rc.getTeam().opponent())) {
+                    MapLocation robotLocation = robot.getLocation();
+                    int relx = robotLocation.x % 128;
+                    int rely = robotLocation.y % 128;
+                    int flag = Communication.coordEncoder("ENEMY", relx, rely);
+                    if (rc.canSetFlag(flag)) {
+                        rc.setFlag(flag);
+                        cancelFlag = true;
+                    }
+                }
+            }
+        }
+
         calculateInfluenceGain(rc); // calculates the influence gain between last round and this round
         // if (rc.getTeamVotes() < 1501) {
         //     calculateBid(rc); //calculates the amount to bid
@@ -61,30 +89,70 @@ public class EnlightenmentCenter {
             case 3:
                 spawnScout(rc, Direction.SOUTH);
                 break;
+            case 4:
+                spawnScout(rc, Direction.NORTHEAST);
+                break;
+            case 5:
+                spawnScout(rc, Direction.SOUTHWEST);
+                break;
+            case 6:
+                spawnScout(rc, Direction.NORTHWEST);
+                break;
+            case 7:
+                spawnScout(rc, Direction.SOUTHEAST);
+                break;
         }
+
+        System.out.println("INFGAIN:" + lastInfluenceGain);
+
+        if (rc.getRoundNum() > 150) {
+            spawnOrder.remove(RobotType.SLANDERER);
+            spawnOrder.add(RobotType.POLITICIAN);
+        }
+
+        // if (rc.getRobotCount() > 200) {
+        //     spawnOrder.add(RobotType.MUCKRAKER);
+        //     spawnOrder.add(RobotType.MUCKRAKER);
+        // }
+
+        RobotType spawn = spawnOrder.get(spawnOrderCounter % spawnOrder.size());
+        Direction spawnDir = openSpawnLocation(rc, RobotType.SLANDERER);
+        switch (spawn) {
+            case SLANDERER:
+                spawnFarmer(rc, spawnDir);
+                break;
+            case MUCKRAKER:
+                spawnTargetedMuckraker(rc);
+                break;
+            case POLITICIAN:
+                int influence = 14;
+                if (lastInfluenceGain / 2 > 14) {
+                    influence = lastInfluenceGain / 2;
+                }
+                spawnPolitician(rc, influence);
+                break;
+            default:
+                break;
+        }
+        spawnOrderCounter++;
     }
 
-    public static void spawnTargetedPolitician(RobotController rc) throws GameActionException {
+    public static void spawnTargetedPolitician(RobotController rc, int influence) throws GameActionException {
         Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
-        int currentInfluence = rc.getInfluence();
-        if (currentInfluence / 2 > 11) {
-            int unitInfluence = Math.max(11, currentInfluence / 25);
-            if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
-                MapLocation targetLocation = Data.originPoint;
-                if (enemyBases.size() > 0) {
-                    targetLocation = enemyBases.iterator().next();
-                } else if (possibleEnemyBases.size() > 0) {
-                    targetLocation = possibleEnemyBases.iterator().next();
-                }
-                int relx = targetLocation.x % 128;
-                int rely = targetLocation.y % 128;
-                int flag = Communication.coordEncoder("ENEMY", relx, rely);
-                if (rc.canSetFlag(flag)) {
-                    rc.setFlag(flag);
-                }
-                rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
-                spawnOrderCounter++;
+        if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)) {
+            MapLocation targetLocation = Data.originPoint;
+            if (enemyBases.size() > 0) {
+                targetLocation = enemyBases.iterator().next();
+            } else if (possibleEnemyBases.size() > 0) {
+                targetLocation = possibleEnemyBases.iterator().next();
             }
+            int relx = targetLocation.x % 128;
+            int rely = targetLocation.y % 128;
+            int flag = Communication.coordEncoder("ENEMY", relx, rely);
+            if (rc.canSetFlag(flag)) {
+                rc.setFlag(flag);
+            }
+            rc.buildRobot(RobotType.POLITICIAN, spawnDir, influence);
         }
     }
 
@@ -105,7 +173,6 @@ public class EnlightenmentCenter {
                 rc.setFlag(flag);
             }
             rc.buildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence);
-            spawnOrderCounter++;
         }
     }
 
@@ -113,20 +180,20 @@ public class EnlightenmentCenter {
         Direction spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
         int unitInfluence = 1;
         if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
+            if (rc.canSetFlag(0)) {
+                rc.setFlag(0);
+            }
             rc.buildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence);
-            spawnOrderCounter++;
         }
     }
 
-    public static void spawnPolitician(RobotController rc) throws GameActionException {
+    public static void spawnPolitician(RobotController rc, int influence) throws GameActionException {
         Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
-        int unitInfluence = 1;
-        if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence)) {
-            if (rc.canSetFlag(1)) {
-                rc.setFlag(1);
+        if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)) {
+            if (rc.canSetFlag(0)) {
+                rc.setFlag(0);
             }
-            rc.buildRobot(RobotType.POLITICIAN, spawnDir, unitInfluence);
-            spawnOrderCounter++;
+            rc.buildRobot(RobotType.POLITICIAN, spawnDir, influence);
         }
     }
 
@@ -143,7 +210,7 @@ public class EnlightenmentCenter {
                     }
                 }
             }
-            if (initialSetupCount < 4) {
+            if (initialSetupCount < 8) {
                 initialSetupCount++;
             }
         }
@@ -152,7 +219,7 @@ public class EnlightenmentCenter {
     public static void spawnFarmer(RobotController rc, Direction dir) throws GameActionException {
         int optimalInfluence = 21;
         for (int i = 0; i < optimalFarmingInfluence.length; i++) {
-            if (optimalFarmingInfluence[i] * 2 < rc.getInfluence()) {
+            if (optimalFarmingInfluence[i] * 3 < rc.getInfluence()) {
                 optimalInfluence = optimalFarmingInfluence[i];
             }
         }
@@ -239,6 +306,13 @@ public class EnlightenmentCenter {
                         int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
                         MapLocation enemyBase = Data.originPoint.translate(distance[0], distance[1]);
                         enemyBases.add(enemyBase);
+                        int relx = enemyBase.x % 128;
+                        int rely = enemyBase.y % 128;
+                        int baseflag = Communication.coordEncoder("WARN", relx, rely);
+                        if (rc.canSetFlag(baseflag)) {
+                            rc.setFlag(baseflag);
+                            cancelFlag = true;
+                        }
                         //System.out.println("ENEMY BASES:" + enemyBases.toString());
                     }
                     //recieved neutral base coords
@@ -251,6 +325,15 @@ public class EnlightenmentCenter {
                     //recieved beacon from scout
                     else if (msg.charAt(0) == '3') {
                         scoutLastMessage.put((int) key, msg);
+                        int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+                        MapLocation enemyBase = Data.originPoint.translate(distance[0], distance[1]);
+                        int relx = enemyBase.x % 128;
+                        int rely = enemyBase.y % 128;
+                        int baseflag = Communication.coordEncoder("WARN", relx, rely);
+                        if (rc.canSetFlag(baseflag)) {
+                            rc.setFlag(baseflag);
+                            cancelFlag = true;
+                        }
                     }
                     //recieved ally base coords
                     else if (msg.charAt(0) == '6') {

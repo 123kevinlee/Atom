@@ -12,8 +12,11 @@ public class Muckraker {
         int baseFlag = -1;
         if (rc.canGetFlag(Data.baseId)) {
             baseFlag = rc.getFlag(Data.baseId);
-            role = Integer.toString(baseFlag);
+            if (!role.equals("100")) {
+                role = Integer.toString(baseFlag);
+            }
         }
+        //System.out.println(role);
 
         Team enemy = rc.getTeam().opponent();
         if (rc.canSenseRobot(12)) {
