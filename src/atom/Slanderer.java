@@ -8,7 +8,7 @@ public class Slanderer {
 
     public static void run(RobotController rc) throws GameActionException {
         int baseFlag = -1;
-        if (rc.canGetFlag(Data.baseId) && role.charAt(0) != '7') {
+        if (rc.canGetFlag(Data.baseId) && role.charAt(0) == '7') {
             baseFlag = rc.getFlag(Data.baseId);
             rc.setFlag(baseFlag);
             role = Integer.toString(baseFlag);

@@ -39,23 +39,29 @@ public class EnlightenmentCenter {
     public static LinkedHashSet<MapLocation> alliedBases = new LinkedHashSet<MapLocation>();
 
     public static void run(RobotController rc) throws GameActionException {
-        // if (rc.canSenseRadiusSquared(-1)) {
-        //     RobotInfo[] robots = rc.senseNearbyRobots();
-        //     for (RobotInfo robot : robots) {
-        //         if (robot.getTeam().equals(rc.getTeam().opponent())) {
-        //             MapLocation robotLocation = robot.getLocation();
-        //             int relx = robotLocation.x % 128;
-        //             int rely = robotLocation.y % 128;
-        //             int flag = Communication.coordEncoder("ENEMY", relx, rely);
-        //             if (rc.canSetFlag(flag)) {
-        //                 rc.setFlag(flag);
-        //             }
-        //         }
-        //     }
-        // }
+        if (rc.canSenseRadiusSquared(-1)) {
+            RobotInfo[] robots = rc.senseNearbyRobots();
+            for (RobotInfo robot : robots) {
+                if (robot.getTeam().equals(rc.getTeam().opponent())
+                        && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
+                    enemyBases.add(robot.getLocation());
+                    spawnTakeoverPolitician(rc, 150, enemyBases.iterator().next());
+                } else if (robot.getTeam().equals(Team.NEUTRAL)) {
+                    neutralBases.put(robot.getLocation(), robot.getInfluence());
+                } else if (robot.getTeam().equals(rc.getTeam().opponent())) {
+                    MapLocation robotLocation = robot.getLocation();
+                    int relx = robotLocation.x % 128;
+                    int rely = robotLocation.y % 128;
+                    int flag = Communication.coordEncoder("WARN", relx, rely);
+                    if (rc.canSetFlag(flag)) {
+                        rc.setFlag(flag);
+                    }
+                }
+            }
+        }
 
         calculateInfluenceGain(rc); // calculates the influence gain between last round and this round
-        if (rc.getTeamVotes() < 1501) {
+        if (rc.getTeamVotes() < 701) {
             calculateBid(rc); //calculates the amount to bid
         }
 
@@ -68,45 +74,47 @@ public class EnlightenmentCenter {
                 rc.buildRobot(RobotType.SLANDERER, Direction.SOUTH, 150);
             }
         }
-        switch (initialSetupCount) {
-            case 0:
-                spawnScout(rc, Direction.NORTH);
-                break;
-            case 1:
-                spawnScout(rc, Direction.EAST);
-                break;
-            case 2:
-                spawnScout(rc, Direction.WEST);
-                break;
-            case 3:
-                spawnScout(rc, Direction.SOUTH);
-                break;
-            case 4:
-                spawnScout(rc, Direction.NORTHEAST);
-                break;
-            case 5:
-                spawnScout(rc, Direction.SOUTHWEST);
-                break;
-            case 6:
-                spawnScout(rc, Direction.NORTHWEST);
-                break;
-            case 7:
-                spawnScout(rc, Direction.SOUTHEAST);
-                break;
+        if (rc.getRoundNum() < 20) {
+            switch (initialSetupCount) {
+                case 0:
+                    spawnScout(rc, Direction.NORTH);
+                    break;
+                case 1:
+                    spawnScout(rc, Direction.EAST);
+                    break;
+                case 2:
+                    spawnScout(rc, Direction.WEST);
+                    break;
+                case 3:
+                    spawnScout(rc, Direction.SOUTH);
+                    break;
+                case 4:
+                    spawnScout(rc, Direction.NORTHEAST);
+                    break;
+                case 5:
+                    spawnScout(rc, Direction.SOUTHWEST);
+                    break;
+                case 6:
+                    spawnScout(rc, Direction.NORTHWEST);
+                    break;
+                case 7:
+                    spawnScout(rc, Direction.SOUTHEAST);
+                    break;
+            }
         }
 
         System.out.println("INFGAIN:" + lastInfluenceGain);
         Object[] neutralBaseKeys = neutralBases.keySet().toArray();
         for (Object key : neutralBaseKeys) {
-            if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 150) {
+            if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 50) {
                 spawnTakeoverPolitician(rc, neutralBases.get(key) + 11, (MapLocation) key);
                 //System.out.println("BIG BOI SPAWNED FOR" + key.toString());
             }
         }
 
-        if ((enemyBases.size() > 0 || possibleEnemyBases.size() > 0) && !spawnOrder.contains(RobotType.MUCKRAKER)) {
-            spawnOrder.add(RobotType.MUCKRAKER);
-        }
+        // if ((enemyBases.size() > 0 || possibleEnemyBases.size() > 0) && !spawnOrder.contains(RobotType.MUCKRAKER)) {
+        //     spawnOrder.add(RobotType.MUCKRAKER);
+        // }
 
         RobotType spawn = spawnOrder.get(spawnOrderCounter % spawnOrder.size());
         Direction spawnDir = openSpawnLocation(rc, RobotType.SLANDERER);
@@ -266,12 +274,12 @@ public class EnlightenmentCenter {
             wonLastRound = true;
         }
         System.out.println("Won Last Round:" + wonLastRound);
-        if (round > 300 && round < 600) {
+        if (round > 300 && round < 500) {
             if (rc.canBid(3)) {
                 rc.bid(3);
                 System.out.println("Bid default");
             }
-        } else if (round >= 600) {
+        } else if (round >= 500) {
             if (wonLastRound == false) {
                 if (rc.canBid((int) (lastInfluenceGain))) {
                     rc.bid((int) (lastInfluenceGain));
