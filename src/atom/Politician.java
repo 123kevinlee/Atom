@@ -194,6 +194,12 @@ public class Politician {
                     if (rc.canMove(dir)) {
                         rc.move(dir);
                     }
+                } else if (robot.getTeam().equals(rc.getTeam())) {
+                    if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 11)) {
+                        if (rc.canMove(rc.getLocation().directionTo(robot.getLocation()).opposite())) {
+                            rc.move(rc.getLocation().directionTo(robot.getLocation()).opposite());
+                        }
+                    }
                 }
             }
         }

@@ -61,7 +61,7 @@ public class EnlightenmentCenter {
         }
 
         calculateInfluenceGain(rc); // calculates the influence gain between last round and this round
-        if (rc.getTeamVotes() < 701) {
+        if (rc.getTeamVotes() < 751) {
             calculateBid(rc); //calculates the amount to bid
         }
 
@@ -222,6 +222,7 @@ public class EnlightenmentCenter {
         if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, 1)) {
             if (rc.canSetFlag(100)) {
                 rc.setFlag(100);
+                System.out.println("SETFLAG100");
             }
             rc.buildRobot(RobotType.MUCKRAKER, dir, 1);
             if (rc.canSenseRadiusSquared(2)) {

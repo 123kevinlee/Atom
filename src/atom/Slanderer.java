@@ -14,7 +14,6 @@ public class Slanderer {
             role = Integer.toString(baseFlag);
             //System.out.println("SEE");
         }
-
         logic(rc);
     }
 
