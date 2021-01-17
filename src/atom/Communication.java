@@ -37,4 +37,19 @@ public class Communication {
         int[] temp = new int[] { Integer.parseInt(msg.substring(0, 3)), Integer.parseInt(msg.substring(3)) };
         return temp;
     }
+
+    public static int neutralCoordEncoder(int influence, int relx, int rely) {
+        String outMsg = "1";
+        if (influence % 100 == 0) {
+            influence /= 100;
+        } else {
+            influence += 100;
+            influence /= 100;
+        }
+        outMsg += Integer.toString(influence);
+        DecimalFormat df = new DecimalFormat("000");
+
+        outMsg += df.format(relx) + df.format(rely);
+        return Integer.parseInt(outMsg);
+    }
 }

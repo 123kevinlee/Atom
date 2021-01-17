@@ -22,24 +22,32 @@ public class Politician {
 
         Team enemy = rc.getTeam().opponent();
 
-        if (rc.canSenseRadiusSquared(25)) {
-            for (RobotInfo robot : rc.senseNearbyRobots(25)) {
-                if (robot.getTeam().equals(Team.NEUTRAL)
-                        || (robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER) && robot.getTeam().equals(enemy))) {
-                    if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 9)) {
-                        if (rc.canEmpower(9)) {
-                            rc.empower(9);
-                        } else {
+        if (role.length() > 0 && role.charAt(0) == '5') {
+            if (rc.canSenseRadiusSquared(25)) {
+                RobotInfo[] robots = rc.senseNearbyRobots(25);
+                // System.out.println(robots.toString());
+                for (RobotInfo robot : robots) {
+                    if (robot.getTeam().equals(Team.NEUTRAL)) {
+                        int totalRobotsAround = 0;
+                        if (rc.canSenseRadiusSquared(1)) {
+                            RobotInfo[] robotS = rc.senseNearbyRobots(1);
+                            totalRobotsAround = robotS.length;
+                        }
+                        if (totalRobotsAround > 0
+                                && (rc.getInfluence() - 10) / totalRobotsAround > robot.getInfluence()) {
+                            if (rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 1) {
+                                if (rc.canEmpower(1)) {
+                                    rc.empower(1);
+                                }
+                            }
                             Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
                             if (rc.canMove(nextDir)) {
                                 rc.move(nextDir);
                             }
-                            // //mostly for when mucks are going to possible coords
-                            // //and they are wrong, so they switch targets
-                            // //System.out.println("NEW TARGET");
+                            // System.out.println("NEW TARGET");
                             int relx = robot.getLocation().x % 128;
                             int rely = robot.getLocation().y % 128;
-                            int newFlag = Communication.coordEncoder("ENEMY", relx, rely);
+                            int newFlag = Communication.coordEncoder("NEUTRAL", relx, rely);
                             if (rc.canSetFlag(newFlag)) {
                                 rc.setFlag(newFlag);
                                 role = Integer.toString(newFlag);
@@ -48,15 +56,52 @@ public class Politician {
                     }
                 }
             }
-        }
-
-        //logic for politicians that just converted from enemy politician or a slanderer
-        if (!Data.wasAlly || Data.wasSlanderer) {
-            isConvertedEnemy(rc);
-        } else if (role.length() == 7) {
-            toTarget(rc);
+            int[] coords = Communication.relCoordDecoder(role);
+            System.out.println(role);
+            int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+            MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
+            System.out.println(target.toString());
+            Direction nextDir = Pathfinding.basicBug(rc, target);
+            if (rc.canMove(nextDir)) {
+                rc.move(nextDir);
+            }
         } else {
-            logic(rc);
+            if (rc.canSenseRadiusSquared(25)) {
+                for (RobotInfo robot : rc.senseNearbyRobots(25)) {
+                    if (robot.getTeam().equals(Team.NEUTRAL) || (robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)
+                            && robot.getTeam().equals(enemy))) {
+                        if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 9)) {
+                            if (rc.canEmpower(9)) {
+                                rc.empower(9);
+                            } else {
+                                Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
+                                if (rc.canMove(nextDir)) {
+                                    rc.move(nextDir);
+                                }
+                                // //mostly for when mucks are going to possible coords
+                                // //and they are wrong, so they switch targets
+                                // //System.out.println("NEW TARGET");
+                                int relx = robot.getLocation().x % 128;
+                                int rely = robot.getLocation().y % 128;
+                                int newFlag = Communication.coordEncoder("ENEMY", relx, rely);
+                                if (rc.canSetFlag(newFlag)) {
+                                    rc.setFlag(newFlag);
+                                    role = Integer.toString(newFlag);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            //logic for politicians that just converted from enemy politician or a slanderer
+            if (!Data.wasAlly || Data.wasSlanderer) {
+                isConvertedEnemy(rc);
+            } else if (role.length() == 7) {
+                toTarget(rc);
+            } else {
+                logic(rc);
+            }
         }
     }
 

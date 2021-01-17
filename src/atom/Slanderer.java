@@ -12,7 +12,7 @@ public class Slanderer {
             baseFlag = rc.getFlag(Data.baseId);
             rc.setFlag(baseFlag);
             role = Integer.toString(baseFlag);
-            System.out.println("SEE");
+            //System.out.println("SEE");
         }
 
         logic(rc);

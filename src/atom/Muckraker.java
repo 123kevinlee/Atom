@@ -122,6 +122,20 @@ public class Muckraker {
             if (rc.canSetFlag(outMsg)) {
                 rc.setFlag(outMsg);
             }
+        } else {
+            Direction[] directions = Data.directions;
+            for (Direction dir : directions) {
+                if (rc.onTheMap(rc.getLocation().add(dir)) == false) {
+                    scoutDirection = scoutDirection.opposite();
+                    nextDir = Pathfinding.basicBug(rc, rc.getLocation().add(scoutDirection).add(scoutDirection));
+                    if (rc.canMove(nextDir)) {
+                        rc.move(nextDir);
+                        MapLocation currentLocation = rc.getLocation();
+                        int relx = currentLocation.x % 128;
+                        int rely = currentLocation.y % 128;
+                    }
+                }
+            }
         }
 
         int sensorRadius = rc.getType().sensorRadiusSquared;
@@ -139,7 +153,8 @@ public class Muckraker {
                     MapLocation robotLocation = robot.getLocation();
                     int relx = robotLocation.x % 128;
                     int rely = robotLocation.y % 128;
-                    int outMsg = Communication.coordEncoder("NEUTRAL", relx, rely);
+                    int influence = robot.getInfluence();
+                    int outMsg = Communication.neutralCoordEncoder(influence, relx, rely);
                     if (rc.canSetFlag(outMsg)) {
                         rc.setFlag(outMsg);
                     }

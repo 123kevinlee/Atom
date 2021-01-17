@@ -1,6 +1,8 @@
 package atom;
 
 import battlecode.common.*;
+import battlecode.schema.SpawnedBodyTable;
+
 import java.util.*;
 
 public class EnlightenmentCenter {
@@ -11,8 +13,6 @@ public class EnlightenmentCenter {
     public static int lastInfluenceAmount = 0;
     public static int lastInfluenceGain = 0;
     public static int lastVotes = 0;
-
-    public static boolean cancelFlag = false;
 
     public static ArrayList<RobotType> spawnOrder = new ArrayList<RobotType>();
     public static int spawnOrderCounter = 0;
@@ -39,33 +39,25 @@ public class EnlightenmentCenter {
     public static LinkedHashSet<MapLocation> alliedBases = new LinkedHashSet<MapLocation>();
 
     public static void run(RobotController rc) throws GameActionException {
-
-        if (rc.getFlag(rc.getID()) != 0 && cancelFlag == true) {
-            if (rc.canSetFlag(0)) {
-                rc.setFlag(0);
-            }
-        }
-
-        if (rc.canSenseRadiusSquared(-1)) {
-            RobotInfo[] robots = rc.senseNearbyRobots();
-            for (RobotInfo robot : robots) {
-                if (robot.getTeam().equals(rc.getTeam().opponent())) {
-                    MapLocation robotLocation = robot.getLocation();
-                    int relx = robotLocation.x % 128;
-                    int rely = robotLocation.y % 128;
-                    int flag = Communication.coordEncoder("ENEMY", relx, rely);
-                    if (rc.canSetFlag(flag)) {
-                        rc.setFlag(flag);
-                        cancelFlag = true;
-                    }
-                }
-            }
-        }
+        // if (rc.canSenseRadiusSquared(-1)) {
+        //     RobotInfo[] robots = rc.senseNearbyRobots();
+        //     for (RobotInfo robot : robots) {
+        //         if (robot.getTeam().equals(rc.getTeam().opponent())) {
+        //             MapLocation robotLocation = robot.getLocation();
+        //             int relx = robotLocation.x % 128;
+        //             int rely = robotLocation.y % 128;
+        //             int flag = Communication.coordEncoder("ENEMY", relx, rely);
+        //             if (rc.canSetFlag(flag)) {
+        //                 rc.setFlag(flag);
+        //             }
+        //         }
+        //     }
+        // }
 
         calculateInfluenceGain(rc); // calculates the influence gain between last round and this round
-        // if (rc.getTeamVotes() < 1501) {
-        //     calculateBid(rc); //calculates the amount to bid
-        // }
+        if (rc.getTeamVotes() < 1501) {
+            calculateBid(rc); //calculates the amount to bid
+        }
 
         if (scoutIds.size() > 0) {
             listenForScoutMessages(rc);
@@ -104,22 +96,20 @@ public class EnlightenmentCenter {
         }
 
         System.out.println("INFGAIN:" + lastInfluenceGain);
-
-        if (rc.getRoundNum() > 150) {
-            spawnOrder.remove(RobotType.SLANDERER);
-            spawnOrder.add(RobotType.POLITICIAN);
+        Object[] neutralBaseKeys = neutralBases.keySet().toArray();
+        for (Object key : neutralBaseKeys) {
+            if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 150) {
+                spawnTakeoverPolitician(rc, neutralBases.get(key) + 11, (MapLocation) key);
+                //System.out.println("BIG BOI SPAWNED FOR" + key.toString());
+            }
         }
-
-        // if (rc.getRobotCount() > 200) {
-        //     spawnOrder.add(RobotType.MUCKRAKER);
-        //     spawnOrder.add(RobotType.MUCKRAKER);
-        // }
 
         RobotType spawn = spawnOrder.get(spawnOrderCounter % spawnOrder.size());
         Direction spawnDir = openSpawnLocation(rc, RobotType.SLANDERER);
         switch (spawn) {
             case SLANDERER:
-                spawnFarmer(rc, spawnDir);
+                if (lastInfluenceGain <= 250)
+                    spawnFarmer(rc, spawnDir);
                 break;
             case MUCKRAKER:
                 spawnTargetedMuckraker(rc);
@@ -153,6 +143,21 @@ public class EnlightenmentCenter {
                 rc.setFlag(flag);
             }
             rc.buildRobot(RobotType.POLITICIAN, spawnDir, influence);
+        }
+    }
+
+    public static void spawnTakeoverPolitician(RobotController rc, int influence, MapLocation target)
+            throws GameActionException {
+        Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
+        if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)) {
+            int relx = target.x % 128;
+            int rely = target.y % 128;
+            int flag = Communication.coordEncoder("NEUTRAL", relx, rely);
+            if (rc.canSetFlag(flag)) {
+                rc.setFlag(flag);
+            }
+            rc.buildRobot(RobotType.POLITICIAN, spawnDir, influence);
+            neutralBases.put(target, 1000);
         }
     }
 
@@ -253,37 +258,21 @@ public class EnlightenmentCenter {
             wonLastRound = true;
         }
         System.out.println("Won Last Round:" + wonLastRound);
-        if (round > 500 && round < 750) {
+        if (round > 300 && round < 600) {
             if (rc.canBid(3)) {
                 rc.bid(3);
                 System.out.println("Bid default");
             }
-        } else if (round >= 750) {
+        } else if (round >= 600) {
             if (wonLastRound == false) {
                 if (rc.canBid((int) (lastInfluenceGain))) {
                     rc.bid((int) (lastInfluenceGain));
-                    System.out.println("Bid:" + (int) (lastInfluenceGain));
+                    //System.out.println("Bid:" + (int) (lastInfluenceGain));
                 }
             }
             if (rc.canBid(lastInfluenceGain / 3)) {
                 rc.bid(lastInfluenceGain / 3);
-                System.out.println("Bid:" + lastInfluenceGain / 3);
-            } else if (round >= 2000) {
-                if (wonLastRound == false) {
-                    if (rc.canBid((int) (lastInfluenceGain + 50))) {
-                        rc.bid((int) (lastInfluenceGain + 50));
-                        System.out.println("Bid:" + (int) (lastInfluenceGain + 50));
-                    } else {
-                        if (rc.canBid((int) (lastInfluenceGain))) {
-                            rc.bid((int) (lastInfluenceGain));
-                            System.out.println("Bid:" + (int) (lastInfluenceGain));
-                        }
-                    }
-                }
-                if (rc.canBid(lastInfluenceGain / 3)) {
-                    rc.bid(lastInfluenceGain / 3);
-                    System.out.println("Bid:" + lastInfluenceGain / 3);
-                }
+                //System.out.println("Bid:" + lastInfluenceGain / 3);
             }
         }
     }
@@ -296,9 +285,19 @@ public class EnlightenmentCenter {
         for (Object key : keys) {
             if (rc.canGetFlag((int) key)) {
                 int flag = rc.getFlag((int) key);
-                if (flag != 0 && Integer.toString(flag).length() == 7) {
+                if (flag != 0 && Integer.toString(flag).length() >= 7) {
                     //System.out.println("id: " + key + " msg:" + flag);
                     String msg = Integer.toString(flag);
+                    if (msg.length() == 8) {
+                        if (msg.charAt(0) == '1') {
+                            int[] coords = Communication.relCoordDecoder(msg.substring(1));
+                            int influence = Integer.parseInt(Character.toString(msg.charAt(1))) * 100;
+                            int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+                            MapLocation neutralBase = Data.originPoint.translate(distance[0], distance[1]);
+                            neutralBases.put(neutralBase, influence);
+                            System.out.println("NEUTRAL BASES:" + neutralBases.toString());
+                        }
+                    }
                     int[] coords = Communication.relCoordDecoder(msg);
 
                     //recieved enemy base coords
@@ -306,34 +305,14 @@ public class EnlightenmentCenter {
                         int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
                         MapLocation enemyBase = Data.originPoint.translate(distance[0], distance[1]);
                         enemyBases.add(enemyBase);
-                        int relx = enemyBase.x % 128;
-                        int rely = enemyBase.y % 128;
-                        int baseflag = Communication.coordEncoder("WARN", relx, rely);
-                        if (rc.canSetFlag(baseflag)) {
-                            rc.setFlag(baseflag);
-                            cancelFlag = true;
-                        }
+
                         //System.out.println("ENEMY BASES:" + enemyBases.toString());
                     }
                     //recieved neutral base coords
-                    else if (msg.charAt(0) == '5') {
-                        int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
-                        MapLocation neutralBase = Data.originPoint.translate(distance[0], distance[1]);
-                        neutralBases.put(neutralBase, 501);
-                        //System.out.println("NEUTRAL BASES:" + neutralBases.toString());
-                    }
+
                     //recieved beacon from scout
                     else if (msg.charAt(0) == '3') {
                         scoutLastMessage.put((int) key, msg);
-                        int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
-                        MapLocation enemyBase = Data.originPoint.translate(distance[0], distance[1]);
-                        int relx = enemyBase.x % 128;
-                        int rely = enemyBase.y % 128;
-                        int baseflag = Communication.coordEncoder("WARN", relx, rely);
-                        if (rc.canSetFlag(baseflag)) {
-                            rc.setFlag(baseflag);
-                            cancelFlag = true;
-                        }
                     }
                     //recieved ally base coords
                     else if (msg.charAt(0) == '6') {
