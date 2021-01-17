@@ -104,12 +104,17 @@ public class EnlightenmentCenter {
             }
         }
 
+        if ((enemyBases.size() > 0 || possibleEnemyBases.size() > 0) && !spawnOrder.contains(RobotType.MUCKRAKER)) {
+            spawnOrder.add(RobotType.MUCKRAKER);
+        }
+
         RobotType spawn = spawnOrder.get(spawnOrderCounter % spawnOrder.size());
         Direction spawnDir = openSpawnLocation(rc, RobotType.SLANDERER);
         switch (spawn) {
             case SLANDERER:
                 if (lastInfluenceGain <= 250)
                     spawnFarmer(rc, spawnDir);
+                spawnTargetedMuckraker(rc);
                 break;
             case MUCKRAKER:
                 spawnTargetedMuckraker(rc);
@@ -164,13 +169,14 @@ public class EnlightenmentCenter {
     public static void spawnTargetedMuckraker(RobotController rc) throws GameActionException {
         Direction spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
         int unitInfluence = 1;
-        if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
-            MapLocation targetLocation = Data.originPoint;
-            if (enemyBases.size() > 0) {
-                targetLocation = enemyBases.iterator().next();
-            } else if (possibleEnemyBases.size() > 0) {
-                targetLocation = possibleEnemyBases.iterator().next();
-            }
+        MapLocation targetLocation = Data.originPoint;
+        if (enemyBases.size() > 0) {
+            targetLocation = enemyBases.iterator().next();
+        } else if (possibleEnemyBases.size() > 0) {
+            targetLocation = possibleEnemyBases.iterator().next();
+        }
+        if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)
+                && !targetLocation.equals(Data.originPoint)) {
             int relx = targetLocation.x % 128;
             int rely = targetLocation.y % 128;
             int flag = Communication.coordEncoder("ENEMY", relx, rely);
@@ -199,6 +205,8 @@ public class EnlightenmentCenter {
                 rc.setFlag(0);
             }
             rc.buildRobot(RobotType.POLITICIAN, spawnDir, influence);
+        } else {
+            spawnTargetedMuckraker(rc);
         }
     }
 

@@ -9,13 +9,13 @@ public class Muckraker {
     public static String role = "";
 
     public static void run(RobotController rc) throws GameActionException {
-        int baseFlag = -1;
-        if (rc.canGetFlag(Data.baseId)) {
-            baseFlag = rc.getFlag(Data.baseId);
-            if (!role.equals("100")) {
-                role = Integer.toString(baseFlag);
-            }
-        }
+        // int baseFlag = -1;
+        // if (rc.canGetFlag(Data.baseId)) {
+        //     baseFlag = rc.getFlag(Data.baseId);
+        //     if (!role.equals("100")) {
+        //         role = Integer.toString(baseFlag);
+        //     }
+        // }
         //System.out.println(role);
 
         Team enemy = rc.getTeam().opponent();
@@ -182,6 +182,7 @@ public class Muckraker {
     }
 
     public static void attackMode(RobotController rc) throws GameActionException {
+        System.out.println("HERE");
         if (rc.canSenseRadiusSquared(30)) {
             RobotInfo[] robots = rc.senseNearbyRobots(30);
             for (RobotInfo robot : robots) {
@@ -203,14 +204,13 @@ public class Muckraker {
                     }
                 }
             }
-
-            int[] coords = Communication.relCoordDecoder(role);
-            int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
-            MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
-            Direction nextDir = Pathfinding.basicBug(rc, target);
-            if (rc.canMove(nextDir)) {
-                rc.move(nextDir);
-            }
+        }
+        int[] coords = Communication.relCoordDecoder(role);
+        int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+        MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
+        Direction nextDir = Pathfinding.basicBug(rc, target);
+        if (rc.canMove(nextDir)) {
+            rc.move(nextDir);
         }
     }
 
