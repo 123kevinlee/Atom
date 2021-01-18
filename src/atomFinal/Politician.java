@@ -94,6 +94,7 @@ public class Politician {
                         Direction dir = thisLocation.directionTo(robot.getLocation());
                         if (rc.canMove(dir)) {
                             rc.move(dir);
+                            System.out.println("CHASING:" + dir);
                         }
                     }
                 }
@@ -115,8 +116,10 @@ public class Politician {
 
                 if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)
                         && thisInfluence < robot.getInfluence() - 10) {
-                    if (rc.canMove(rc.getLocation().directionTo(robot.getLocation()).opposite())) {
-                        rc.move(rc.getLocation().directionTo(robot.getLocation()).opposite());
+                    Direction dir = rc.getLocation().directionTo(robot.getLocation()).opposite();
+                    if (rc.canMove(dir)) {
+                        rc.move(dir);
+                        System.out.println("RUNNING FROM ENEMY:" + dir);
                     }
                 } else if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)) {
                     if (thisLocation.isAdjacentTo(robot.getLocation())) {
@@ -127,6 +130,7 @@ public class Politician {
                         Direction dir = thisLocation.directionTo(robot.getLocation());
                         if (rc.canMove(dir)) {
                             rc.move(dir);
+                            System.out.println("CHASING:" + dir);
                         }
                     }
                 }
@@ -140,15 +144,20 @@ public class Politician {
                             Direction dir = thisLocation.directionTo(robot.getLocation());
                             if (rc.canMove(dir)) {
                                 rc.move(dir);
+                                System.out.println("CHASING:" + dir);
                             }
                         }
                     }
                 }
                 if (robotTeam.equals(rc.getTeam())) {
                     nearbyAllies++;
-                    if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 2)) {
-                        if (rc.canMove(rc.getLocation().directionTo(robot.getLocation()).opposite())) {
-                            rc.move(rc.getLocation().directionTo(robot.getLocation()).opposite());
+                    if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 2)
+                            && thisLocation.distanceSquaredTo(Data.originPoint) >= boundary - 4) {
+                        // if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 2)) {
+                        Direction dir = rc.getLocation().directionTo(robot.getLocation()).opposite();
+                        if (rc.canMove(dir)) {
+                            rc.move(dir);
+                            System.out.println("RUNNING FROM TEAMMATE:" + dir);
                         }
                     }
                 }
@@ -182,13 +191,14 @@ public class Politician {
             //System.out.println("GOING IN DETERMINED DIRECTION:" + determinedDirection);
             //determinedDirection = Pathfinding.basicBug(rc, thisLocation.add(determinedDirection));
             if (rc.canMove(determinedDirection)) {
-                //System.out.println("MOVED" + determinedDirection);
+                System.out.println("MOVED AWAY FROM WALL" + determinedDirection);
                 rc.move(determinedDirection);
             }
         } else if (thisLocation.distanceSquaredTo(Data.originPoint) < boundary) {
             //System.out.println("MOVING TO BOUNDARY");
             if (rc.canMove(thisLocation.directionTo(Data.originPoint).opposite())) {
                 rc.move(thisLocation.directionTo(Data.originPoint).opposite());
+                System.out.println("MOVED TO BOUNDARY:" + thisLocation.directionTo(Data.originPoint).opposite());
             }
 
         } else if (thisLocation.distanceSquaredTo(Data.originPoint) >= boundary) {
@@ -200,6 +210,7 @@ public class Politician {
             if (rc.canMove(thisLocation.directionTo(Data.originPoint))) {
                 //System.out.println("MOVING BACK");
                 rc.move(thisLocation.directionTo(Data.originPoint));
+                System.out.println("MOVED BACK FROM BOUNDARY:" + thisLocation.directionTo(Data.originPoint));
             }
             //}
         }
@@ -208,6 +219,7 @@ public class Politician {
         for (Direction direction : directions) {
             if (rc.canMove(direction)) {
                 rc.move(direction);
+                System.out.println("MOVE RANDOM:" + direction);
             }
         }
     }
