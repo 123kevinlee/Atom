@@ -112,9 +112,9 @@ public class EnlightenmentCenter {
             }
         }
 
-        // if (rc.getRoundNum() > 500 && !spawnOrder.contains(RobotType.MUCKRAKER)) {
-        //     spawnOrder.add(RobotType.MUCKRAKER);
-        // }
+        if (rc.getRoundNum() > 500 && !spawnOrder.contains(RobotType.MUCKRAKER)) {
+            spawnOrder.add(RobotType.MUCKRAKER);
+        }
 
         RobotType spawn = spawnOrder.get(spawnOrderCounter % spawnOrder.size());
         Direction spawnDir = openSpawnLocation(rc, RobotType.SLANDERER);
