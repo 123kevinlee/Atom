@@ -1,35 +1,35 @@
-package atom;
+package atomFinal;
 
 import battlecode.common.*;
 
 public class Slanderer {
     public static Direction safeDirection = Direction.CENTER;
     public static String role = "";
+    public static int boundary = 16;
 
     public static void run(RobotController rc) throws GameActionException {
-        int baseFlag = -1;
-        if (rc.canGetFlag(Data.baseId) && role.charAt(0) == '7') {
-            baseFlag = rc.getFlag(Data.baseId);
-            rc.setFlag(baseFlag);
-            role = Integer.toString(baseFlag);
-            //System.out.println("SEE");
-        }
+        System.out.println("HERE");
         logic(rc);
     }
 
     public static void logic(RobotController rc) throws GameActionException {
         Direction randomDir = Data.directions[(int) (Math.random() * 8)];
         int boundary = 16;
-        if (rc.getInfluence() == 150) {
+        System.out.println("HERE");
+        if (rc.getInfluence() == 130 && rc.getRoundNum() - Data.initRound < 5) {
+            if (rc.canMove(Direction.SOUTH)) {
+                rc.move(Direction.SOUTH);
+            }
             boundary = 8;
         }
 
+        MapLocation thisLocation = rc.getLocation();
         if (rc.canSenseRadiusSquared(20)) {
             RobotInfo[] robots = rc.senseNearbyRobots(20, rc.getTeam().opponent());
             for (RobotInfo robot : robots) {
                 if (robot.getType().equals(RobotType.MUCKRAKER)) {
                     Direction nextDir = Pathfinding.basicBug(rc,
-                            rc.getLocation().add(rc.getLocation().directionTo(robot.getLocation()).opposite()));
+                            thisLocation.add(thisLocation.directionTo(robot.getLocation()).opposite()));
                     if (rc.canMove(nextDir)) {
                         rc.move(nextDir);
                         return;
@@ -38,28 +38,28 @@ public class Slanderer {
             }
         }
 
-        if (role.charAt(0) == '7') {
-            int[] coords = Communication.relCoordDecoder(role);
-            int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
-            MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
-            Direction nextDir = Pathfinding.basicBug(rc, target).opposite();
-            nextDir = Pathfinding.basicBug(rc,
-                    target.subtract(nextDir).subtract(nextDir).subtract(nextDir).subtract(nextDir));
-            if (rc.canMove(nextDir)) {
-                rc.move(nextDir);
-            }
-        }
+        // if (role.charAt(0) == '7') {
+        //     int[] coords = Communication.relCoordDecoder(role);
+        //     int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+        //     MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
+        //     Direction nextDir = Pathfinding.basicBug(rc, target).opposite();
+        //     nextDir = Pathfinding.basicBug(rc,
+        //             target.subtract(nextDir).subtract(nextDir).subtract(nextDir).subtract(nextDir));
+        //     if (rc.canMove(nextDir)) {
+        //         rc.move(nextDir);
+        //     }
+        // }
 
-        if (rc.getLocation().distanceSquaredTo(Data.originPoint) < 6) {
+        if (thisLocation.distanceSquaredTo(Data.originPoint) < 6) {
+            System.out.println("AWAY");
             Direction nextDir = Pathfinding.basicBug(rc,
-                    rc.getLocation().add(rc.getLocation().directionTo(Data.originPoint).opposite()));
+                    thisLocation.add(thisLocation.directionTo(Data.originPoint).opposite()));
             if (rc.canMove(nextDir)) {
                 rc.move(nextDir);
                 return;
             }
-        } else if (rc.getLocation().distanceSquaredTo(Data.originPoint) > boundary) {
-            Direction nextDir = Pathfinding.basicBug(rc,
-                    rc.getLocation().add(rc.getLocation().directionTo(Data.originPoint)));
+        } else if (thisLocation.distanceSquaredTo(Data.originPoint) > boundary) {
+            Direction nextDir = Pathfinding.basicBug(rc, thisLocation.add(thisLocation.directionTo(Data.originPoint)));
             if (rc.canMove(nextDir)) {
                 rc.move(nextDir);
                 return;
@@ -83,7 +83,6 @@ public class Slanderer {
                         Data.relOriginPoint[0] = Data.originPoint.x % 128;
                         Data.relOriginPoint[1] = Data.originPoint.y % 128;
                         Data.initRound = rc.getRoundNum();
-                        Data.wasSlanderer = true;
                         if (rc.canSetFlag(rc.getFlag(Data.baseId))) {
                             if (rc.canSetFlag(Integer.parseInt(role))) {
                                 rc.setFlag(Integer.parseInt(role));

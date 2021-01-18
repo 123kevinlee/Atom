@@ -1,4 +1,4 @@
-package atom;
+package atomFinal;
 
 import battlecode.common.*;
 
@@ -9,12 +9,20 @@ public class Muckraker {
     public static String role = "";
 
     public static void run(RobotController rc) throws GameActionException {
+        System.out.println("HERE");
         Team enemy = rc.getTeam().opponent();
-        if (rc.canSenseRobot(12)) {
-            for (RobotInfo robot : rc.senseNearbyRobots(12, enemy)) {
-                if (robot.getType().equals(RobotType.SLANDERER)) {
+        MapLocation thisLocation = rc.getLocation();
+        if (rc.canDetectRadiusSquared(30)) {
+            for (RobotInfo robot : rc.senseNearbyRobots(30, enemy)) {
+                System.out.println("FOUND ROBOT");
+                if (robot.getType().canBeExposed()) {
                     if (rc.canExpose(robot.location)) {
+                        System.out.println("EXPOSING");
                         rc.expose(robot.location);
+                    } else {
+                        if (rc.canMove(thisLocation.directionTo(robot.getLocation()))) {
+                            rc.move(thisLocation.directionTo(robot.getLocation()));
+                        }
                     }
                 }
             }
@@ -24,82 +32,44 @@ public class Muckraker {
             scoutMode(rc);
         } else if (role.length() == 7) {
             attackMode(rc);
+        } else {
+            logic(rc);
+        }
+    }
+
+    public static void logic(RobotController rc) throws GameActionException {
+        System.out.println("HERE");
+        Direction[] directions = Data.directions;
+        if (scoutDirection == null) {
+            scoutDirection = directions[(int) (Math.random() * 8)];
+            System.out.println("SCOUTDIRECTION:" + scoutDirection);
+        } else {
+            if (rc.canMove(scoutDirection)) {
+                rc.move(scoutDirection);
+                System.out.println("MOVED SCOUTDIRECTION:" + scoutDirection);
+            } else {
+                for (Direction dir : directions) {
+                    if (rc.canMove(dir)) {
+                        rc.move(dir);
+                    }
+                }
+            }
         }
     }
 
     public static void scoutMode(RobotController rc) throws GameActionException {
         if (!rc.onTheMap(rc.getLocation().add(scoutDirection))) {
-            switch (scoutDirection) {
-                case NORTH:
-                    if (!rc.onTheMap(rc.getLocation().add(Direction.NORTH))) {
-                        MapLocation currentLocation = rc.getLocation();
-                        int relx = currentLocation.x % 128;
-                        int rely = currentLocation.y % 128;
-                        int outMsg = Communication.coordEncoder("WALL", relx, rely);
-                        if (rc.canSetFlag(outMsg)) {
-                            rc.setFlag(outMsg);
-                        }
-                        scoutDirection = scoutDirection.opposite();
-                        Direction nextDir = Pathfinding.basicBug(rc,
-                                rc.getLocation().add(scoutDirection).add(scoutDirection));
-                        if (rc.canMove(nextDir)) {
-                            rc.move(nextDir);
-                        }
-                    }
-                    break;
-                case EAST:
-                    if (!rc.onTheMap(rc.getLocation().add(Direction.EAST))) {
-                        MapLocation currentLocation = rc.getLocation();
-                        int relx = currentLocation.x % 128;
-                        int rely = currentLocation.y % 128;
-                        int outMsg = Communication.coordEncoder("WALL", relx, rely);
-                        if (rc.canSetFlag(outMsg)) {
-                            rc.setFlag(outMsg);
-                        }
-                        scoutDirection = scoutDirection.opposite();
-                        Direction nextDir = Pathfinding.basicBug(rc,
-                                rc.getLocation().add(scoutDirection).add(scoutDirection));
-                        if (rc.canMove(nextDir)) {
-                            rc.move(nextDir);
-                        }
-                    }
-                    break;
-                case SOUTH:
-                    if (!rc.onTheMap(rc.getLocation().add(Direction.SOUTH))) {
-                        MapLocation currentLocation = rc.getLocation();
-                        int relx = currentLocation.x % 128;
-                        int rely = currentLocation.y % 128;
-                        int outMsg = Communication.coordEncoder("WALL", relx, rely);
-                        if (rc.canSetFlag(outMsg)) {
-                            rc.setFlag(outMsg);
-                        }
-                        scoutDirection = scoutDirection.opposite();
-                        Direction nextDir = Pathfinding.basicBug(rc,
-                                rc.getLocation().add(scoutDirection).add(scoutDirection));
-                        if (rc.canMove(nextDir)) {
-                            rc.move(nextDir);
-                        }
-                    }
-                    break;
-                case WEST:
-                    if (!rc.onTheMap(rc.getLocation().add(Direction.WEST))) {
-                        MapLocation currentLocation = rc.getLocation();
-                        int relx = currentLocation.x % 128;
-                        int rely = currentLocation.y % 128;
-                        int outMsg = Communication.coordEncoder("WALL", relx, rely);
-                        if (rc.canSetFlag(outMsg)) {
-                            rc.setFlag(outMsg);
-                        }
-                        scoutDirection = scoutDirection.opposite();
-                        Direction nextDir = Pathfinding.basicBug(rc,
-                                rc.getLocation().add(scoutDirection).add(scoutDirection));
-                        if (rc.canMove(nextDir)) {
-                            rc.move(nextDir);
-                        }
-                    }
-                    break;
-                default:
-                    break;
+            MapLocation currentLocation = rc.getLocation();
+            int relx = currentLocation.x % 128;
+            int rely = currentLocation.y % 128;
+            int outMsg = Communication.coordEncoder("WALL", relx, rely);
+            if (rc.canSetFlag(outMsg)) {
+                rc.setFlag(outMsg);
+            }
+            scoutDirection = scoutDirection.opposite();
+            Direction nextDir = Pathfinding.basicBug(rc, rc.getLocation().add(scoutDirection).add(scoutDirection));
+            if (rc.canMove(nextDir)) {
+                rc.move(nextDir);
             }
         }
 
@@ -112,20 +82,6 @@ public class Muckraker {
             int outMsg = Communication.coordEncoder("BEACON", relx, rely);
             if (rc.canSetFlag(outMsg)) {
                 rc.setFlag(outMsg);
-            }
-        } else {
-            Direction[] directions = Data.directions;
-            for (Direction dir : directions) {
-                if (rc.onTheMap(rc.getLocation().add(dir)) == false) {
-                    scoutDirection = scoutDirection.opposite();
-                    nextDir = Pathfinding.basicBug(rc, rc.getLocation().add(scoutDirection).add(scoutDirection));
-                    if (rc.canMove(nextDir)) {
-                        rc.move(nextDir);
-                        MapLocation currentLocation = rc.getLocation();
-                        int relx = currentLocation.x % 128;
-                        int rely = currentLocation.y % 128;
-                    }
-                }
             }
         }
 

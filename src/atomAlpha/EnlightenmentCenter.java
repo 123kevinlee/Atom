@@ -178,11 +178,11 @@ public class EnlightenmentCenter {
             lastVotes++;
             wonLastRound = true;
         }
-        System.out.println("Won Last Round:" + wonLastRound);
+        //System.out.println("Won Last Round:" + wonLastRound);
         if (round > 500 && round < 750) {
             if (rc.canBid(3)) {
                 rc.bid(3);
-                System.out.println("Bid default");
+                //System.out.println("Bid default");
             }
         } else if (round >= 750) {
             if (wonLastRound == false) {

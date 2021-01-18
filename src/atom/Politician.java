@@ -61,10 +61,10 @@ public class Politician {
                 }
             }
             int[] coords = Communication.relCoordDecoder(role);
-            System.out.println(role);
+            //System.out.println(role);
             int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
             MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
-            System.out.println(target.toString());
+            //System.out.println(target.toString());
             Direction nextDir = Pathfinding.basicBug(rc, target);
             if (rc.canMove(nextDir)) {
                 rc.move(nextDir);

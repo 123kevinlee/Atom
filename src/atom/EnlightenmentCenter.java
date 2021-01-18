@@ -103,7 +103,7 @@ public class EnlightenmentCenter {
             //}
         }
 
-        System.out.println("INFGAIN:" + lastInfluenceGain);
+        //System.out.println("INFGAIN:" + lastInfluenceGain);
         Object[] neutralBaseKeys = neutralBases.keySet().toArray();
         for (Object key : neutralBaseKeys) {
             if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 75) {
@@ -239,7 +239,7 @@ public class EnlightenmentCenter {
         if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, 1)) {
             if (rc.canSetFlag(100)) {
                 rc.setFlag(100);
-                System.out.println("SETFLAG100");
+                //System.out.println("SETFLAG100");
             }
             rc.buildRobot(RobotType.MUCKRAKER, dir, 1);
             if (rc.canSenseRadiusSquared(2)) {
@@ -329,7 +329,7 @@ public class EnlightenmentCenter {
                             int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
                             MapLocation neutralBase = Data.originPoint.translate(distance[0], distance[1]);
                             neutralBases.put(neutralBase, influence);
-                            System.out.println("NEUTRAL BASES:" + neutralBases.toString());
+                            //System.out.println("NEUTRAL BASES:" + neutralBases.toString());
                         }
                     }
                     int[] coords = Communication.relCoordDecoder(msg);
@@ -407,7 +407,7 @@ public class EnlightenmentCenter {
                             }
                         }
                         if (zeroCount == 1 && !mapComplete) {
-                            System.out.println("Calculating World Map...");
+                            //System.out.println("Calculating World Map...");
                             int missingIndex = 0;
                             for (int i = 0; i < mapBorders.length; i++) {
                                 if (mapBorders[i] == 0) {

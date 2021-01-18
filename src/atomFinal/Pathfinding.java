@@ -1,4 +1,6 @@
-package atom;
+package atomFinal;
+
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 
 import java.util.*;
 import battlecode.common.*;
@@ -12,10 +14,12 @@ public class Pathfinding {
         }
         if (rc.getLocation().distanceSquaredTo(target) == 1) {
             // do something
+            return Direction.CENTER;
         } else if (rc.canMove(dir)) {
             return dir;
         } else {
             Direction attemptDir = Direction.CENTER;
+            Direction returnDirection = Direction.CENTER;
             for (int i = 1; i < 8; i++) {
                 switch (i) {
                     case 1:
@@ -43,11 +47,11 @@ public class Pathfinding {
                         break;
                 }
                 if (rc.canMove(attemptDir)) {
-                    return attemptDir;
+                    returnDirection = attemptDir;
                 }
             }
+            return returnDirection;
         }
-        return Direction.CENTER;
     }
 
     public static int[] getDistance(int[] ref, int[] target) {

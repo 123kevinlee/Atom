@@ -1,4 +1,4 @@
-package atom;
+package atomFinal;
 
 import battlecode.common.*;
 

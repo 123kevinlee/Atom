@@ -1,7 +1,6 @@
-package atom;
+package atomFinal;
 
 import java.text.*;
-import battlecode.common.RobotType;
 
 public class Communication {
     public static int coordEncoder(String type, int relx, int rely) {

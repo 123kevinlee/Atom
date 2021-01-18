@@ -1,4 +1,4 @@
-package atom;
+package atomFinal;
 
 import battlecode.common.*;
 import battlecode.schema.SpawnedBodyTable;
@@ -39,7 +39,7 @@ public class EnlightenmentCenter {
     public static LinkedHashSet<MapLocation> alliedBases = new LinkedHashSet<MapLocation>();
 
     public static void run(RobotController rc) throws GameActionException {
-        if (rc.canSenseRadiusSquared(-1)) {
+        if (rc.canSenseRadiusSquared(40)) {
             RobotInfo[] robots = rc.senseNearbyRobots();
             for (RobotInfo robot : robots) {
                 if (robot.getTeam().equals(rc.getTeam().opponent())
@@ -48,15 +48,22 @@ public class EnlightenmentCenter {
                     spawnTakeoverPolitician(rc, 150, enemyBases.iterator().next());
                 } else if (robot.getTeam().equals(Team.NEUTRAL)) {
                     neutralBases.put(robot.getLocation(), robot.getInfluence());
-                } else if (robot.getTeam().equals(rc.getTeam().opponent())) {
-                    MapLocation robotLocation = robot.getLocation();
-                    int relx = robotLocation.x % 128;
-                    int rely = robotLocation.y % 128;
-                    int flag = Communication.coordEncoder("WARN", relx, rely);
-                    if (rc.canSetFlag(flag) && Integer.toString(rc.getFlag(rc.getID())).charAt(0) != '5') {
-                        rc.setFlag(flag);
-                    }
                 }
+                // else if (robot.getTeam().equals(rc.getTeam().opponent())) {
+                //     MapLocation robotLocation = robot.getLocation();
+                //     int relx = robotLocation.x % 128;
+                //     int rely = robotLocation.y % 128;
+                //     int flag = Communication.coordEncoder("WARN", relx, rely);
+                //     if (rc.canSetFlag(flag)) {
+                //         rc.setFlag(flag);
+                //         int influence = 1;
+                //         if (lastInfluenceGain / 2 > 14) {
+                //             influence = lastInfluenceGain / 2;
+                //         }
+                //         spawnTargetedMuckraker(rc, influence);
+                //         Clock.yield();
+                //     }
+                // }
             }
         }
 
@@ -112,12 +119,34 @@ public class EnlightenmentCenter {
             }
         }
 
-        if (rc.getRoundNum() > 500 && !spawnOrder.contains(RobotType.MUCKRAKER)) {
-            spawnOrder.add(RobotType.MUCKRAKER);
-        }
-
         RobotType spawn = spawnOrder.get(spawnOrderCounter % spawnOrder.size());
         Direction spawnDir = openSpawnLocation(rc, RobotType.SLANDERER);
+        if (enemyBases.size() > 0 || possibleEnemyBases.size() > 0) {
+            System.out.println("HERE");
+            ArrayList<Direction> directions = new ArrayList<Direction>();
+            if (enemyBases.size() > 0) {
+                Direction towards = rc.getLocation().directionTo(enemyBases.iterator().next());
+                directions.add(towards);
+                directions.add(towards.rotateLeft());
+                directions.add(towards.rotateRight());
+                directions.add(towards.rotateLeft().rotateLeft());
+                directions.add(towards.rotateRight().rotateRight());
+                directions.add(towards.opposite().rotateLeft());
+                directions.add(towards.opposite().rotateRight());
+                directions.add(towards.opposite());
+            } else if (possibleEnemyBases.size() > 0) {
+                Direction towards = rc.getLocation().directionTo(possibleEnemyBases.iterator().next());
+                directions.add(towards);
+                directions.add(towards.rotateLeft());
+                directions.add(towards.rotateRight());
+                directions.add(towards.rotateLeft().rotateLeft());
+                directions.add(towards.rotateRight().rotateRight());
+                directions.add(towards.opposite().rotateLeft());
+                directions.add(towards.opposite().rotateRight());
+                directions.add(towards.opposite());
+            }
+            spawnDir = openSpawnLocation(rc, RobotType.SLANDERER, directions);
+        }
         switch (spawn) {
             case SLANDERER:
                 int influence = 1;
@@ -126,30 +155,17 @@ public class EnlightenmentCenter {
                 }
                 if (lastInfluenceGain <= 250)
                     spawnFarmer(rc, spawnDir);
-                spawnTargetedMuckraker(rc, influence);
+                spawnTargetedMuckraker(rc, influence / 2);
                 break;
             case MUCKRAKER:
-                influence = 1;
-                if (lastInfluenceGain / 2 > 14) {
-                    influence = lastInfluenceGain / 2;
-                }
-                spawnTargetedMuckraker(rc, influence);
+                spawnMuckraker(rc);
                 break;
             case POLITICIAN:
                 influence = 14;
-                if (lastInfluenceGain / 2 > 14) {
-                    influence = lastInfluenceGain / 2;
+                if (lastInfluenceGain > 14) {
+                    influence = lastInfluenceGain;
                 }
-                if (rc.getRoundNum() > 500) {
-                    int randNum = (int) (Math.random() * 5);
-                    if (randNum == 0) {
-                        spawnTargetedPolitician(rc, influence);
-                    } else {
-                        spawnPolitician(rc, influence);
-                    }
-                } else {
-                    spawnPolitician(rc, influence);
-                }
+                spawnPolitician(rc, influence);
                 break;
             default:
                 break;
@@ -548,6 +564,16 @@ public class EnlightenmentCenter {
         return Direction.CENTER;
     }
 
+    public static Direction openSpawnLocation(RobotController rc, RobotType type, ArrayList<Direction> directions)
+            throws GameActionException {
+        for (Direction dir : directions) {
+            if (rc.canBuildRobot(type, dir, 1)) {
+                return dir;
+            }
+        }
+        return Direction.CENTER;
+    }
+
     public static void init(RobotController rc) throws GameActionException {
         Data.originPoint = rc.getLocation();
         Data.initRound = rc.getRoundNum();
@@ -561,7 +587,12 @@ public class EnlightenmentCenter {
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.SLANDERER);
-
-        //spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.SLANDERER);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.SLANDERER);
+        spawnOrder.add(RobotType.MUCKRAKER);
     }
 }
