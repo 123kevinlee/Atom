@@ -21,7 +21,7 @@ public class Muckraker {
         Team enemy = rc.getTeam().opponent();
         if (rc.canSenseRobot(12)) {
             for (RobotInfo robot : rc.senseNearbyRobots(12, enemy)) {
-                if (robot.type.canBeExposed()) {
+                if (robot.getType().equals(RobotType.SLANDERER)) {
                     if (rc.canExpose(robot.location)) {
                         rc.expose(robot.location);
                     }

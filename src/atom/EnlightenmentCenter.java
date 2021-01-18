@@ -53,7 +53,7 @@ public class EnlightenmentCenter {
                     int relx = robotLocation.x % 128;
                     int rely = robotLocation.y % 128;
                     int flag = Communication.coordEncoder("WARN", relx, rely);
-                    if (rc.canSetFlag(flag)) {
+                    if (rc.canSetFlag(flag) && Integer.toString(rc.getFlag(rc.getID())).charAt(0) != '5') {
                         rc.setFlag(flag);
                     }
                 }
@@ -106,9 +106,9 @@ public class EnlightenmentCenter {
         System.out.println("INFGAIN:" + lastInfluenceGain);
         Object[] neutralBaseKeys = neutralBases.keySet().toArray();
         for (Object key : neutralBaseKeys) {
-            if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 50) {
-                spawnTakeoverPolitician(rc, neutralBases.get(key) + 11, (MapLocation) key);
-                //System.out.println("BIG BOI SPAWNED FOR" + key.toString());
+            if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 75) {
+                spawnTakeoverPolitician(rc, neutralBases.get(key) + 12, (MapLocation) key);
+                System.out.println("BIG BOI SPAWNED FOR" + key.toString());
             }
         }
 
@@ -141,7 +141,7 @@ public class EnlightenmentCenter {
                     influence = lastInfluenceGain / 2;
                 }
                 if (rc.getRoundNum() > 500) {
-                    int randNum = (int) (Math.random() * 2);
+                    int randNum = (int) (Math.random() * 5);
                     if (randNum == 0) {
                         spawnTargetedPolitician(rc, influence);
                     } else {
@@ -292,22 +292,22 @@ public class EnlightenmentCenter {
             wonLastRound = true;
         }
         System.out.println("Won Last Round:" + wonLastRound);
-        if (round > 200 && round < 500) {
-            if (rc.canBid(3)) {
-                rc.bid(3);
-                System.out.println("Bid default");
-            }
-        } else if (round >= 500) {
+        // if (round > 200 && round < 500) {
+        //     if (rc.canBid(3)) {
+        //         rc.bid(3);
+        //         System.out.println("Bid default");
+        //     }
+        // } else if (round >= 500) {
+        if (round >= 300)
             if (wonLastRound == false) {
                 if (rc.canBid((int) (lastInfluenceGain))) {
                     rc.bid((int) (lastInfluenceGain));
                     //System.out.println("Bid:" + (int) (lastInfluenceGain));
                 }
             }
-            if (rc.canBid(lastInfluenceGain / 3)) {
-                rc.bid(lastInfluenceGain / 3);
-                //System.out.println("Bid:" + lastInfluenceGain / 3);
-            }
+        if (rc.canBid(lastInfluenceGain / 3)) {
+            rc.bid(lastInfluenceGain / 3);
+            //System.out.println("Bid:" + lastInfluenceGain / 3);
         }
     }
 
@@ -561,5 +561,7 @@ public class EnlightenmentCenter {
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.SLANDERER);
+
+        //spawnOrder.add(RobotType.MUCKRAKER);
     }
 }

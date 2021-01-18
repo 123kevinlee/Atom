@@ -9,11 +9,14 @@ public class Politician {
     public static MapLocation originPoint;
     public static int boundary = 25;
 
+    public static boolean wasNearWall = false;
+    public static Direction staticToBase = Direction.CENTER;
+
     public static void run(RobotController rc) throws GameActionException {
         int baseFlag = -1;
         if (rc.canGetFlag(Data.baseId)) {
             baseFlag = rc.getFlag(Data.baseId);
-            if (Integer.toString(baseFlag).charAt(0) == '7') {
+            if (role.length() > 0 && role.charAt(0) != '5' && Integer.toString(baseFlag).charAt(0) == '7') {
                 //rc.setFlag(baseFlag);
                 role = Integer.toString(baseFlag);
             }
@@ -97,7 +100,8 @@ public class Politician {
 
             //logic for politicians that just converted from enemy politician or a slanderer
             if (!Data.wasAlly || Data.wasSlanderer) {
-                isConvertedEnemy(rc);
+                logic(rc);
+                //isConvertedEnemy(rc);
             } else if (role.length() == 7 && role.charAt(0) == '2') {
                 toTarget(rc);
             } else if (role.length() == 7 && role.charAt(0) == '7') {
@@ -115,6 +119,10 @@ public class Politician {
         int nearbyAllies = 0;
 
         MapLocation thisLocation = rc.getLocation();
+        if (!rc.onTheMap(thisLocation.translate(1, 0)) || !rc.onTheMap(thisLocation.translate(-1, 0))
+                || !rc.onTheMap(thisLocation.translate(0, 1)) || !rc.onTheMap(thisLocation.translate(0, -1))) {
+            wasNearWall = true;
+        }
 
         if (rc.canSenseRadiusSquared(-1)) {
             RobotInfo[] robots = rc.senseNearbyRobots(-1);
@@ -131,6 +139,11 @@ public class Politician {
                     Direction dir = rc.getLocation().directionTo(robot.getLocation());
                     if (rc.canMove(dir)) {
                         rc.move(dir);
+                    }
+                } else if (robot.getTeam().equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)
+                        && rc.getInfluence() < robot.getInfluence() + 10) {
+                    if (rc.canMove(rc.getLocation().directionTo(robot.getLocation()).opposite())) {
+                        rc.move(rc.getLocation().directionTo(robot.getLocation()).opposite());
                     }
                 }
                 if (robot.getTeam().equals(rc.getTeam())) {
@@ -154,6 +167,13 @@ public class Politician {
 
         if (thisLocation.distanceSquaredTo(Data.originPoint) < boundary) {
             //System.out.println("MOVING TO BOUNDARY");
+            if (wasNearWall) {
+                if (staticToBase.equals(Direction.CENTER)) {
+                    staticToBase = thisLocation.directionTo(Data.originPoint);
+                } else if (rc.canMove(staticToBase)) {
+                    rc.move(staticToBase);
+                }
+            }
             if (rc.canMove(thisLocation.directionTo(Data.originPoint).opposite())) {
                 rc.move(thisLocation.directionTo(Data.originPoint).opposite());
             }
