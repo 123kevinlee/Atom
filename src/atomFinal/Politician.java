@@ -6,6 +6,7 @@ public class Politician {
     public static String role = "";
     public static MapLocation originPoint;
     public static int boundary = 25;
+    public static boolean adjusted = false;
 
     public static boolean wasNearWall = false;
     public static Direction determinedDirection = Direction.CENTER;
@@ -14,10 +15,10 @@ public class Politician {
         // if (rc.canGetFlag(Data.baseId)) {
         //     int baseFlag = rc.getFlag(Data.baseId);
         //     String baseFlagS = Integer.toString(baseFlag);
-        //     if (baseFlagS.charAt(0) == '7' && role.charAt(0) != '7') {
+        //     if (baseFlagS.charAt(0) == '7' && adjusted == false && role.charAt(0) != 7) {
         //         role = baseFlagS;
         //     }
-        //     //System.out.println(role);
+        //     System.out.println(role);
         // }
 
         if (role.length() > 0 && role.charAt(0) == '5') {
@@ -38,14 +39,21 @@ public class Politician {
         MapLocation thisLocation = rc.getLocation();
         int thisInfluence = rc.getInfluence();
 
-        // if (role.charAt(0) == '7') {
+        // if (role.length() > 0 && role.charAt(0) == '7') {
         //     int[] coords = Communication.relCoordDecoder(role);
         //     int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
         //     MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
-        //     if (thisLocation.distanceSquaredTo(target) <= 6) {
+        //     System.out.println(target);
+
+        //     if (thisLocation.distanceSquaredTo(target) <= 4
+        //             || (thisLocation.distanceSquaredTo(Data.originPoint) >= 4 && thisLocation
+        //                     .directionTo(Data.originPoint).equals(thisLocation.directionTo(target).opposite()))) {
         //         role = "";
+        //         adjusted = true;
         //     } else {
-        //         Direction nextDir = Pathfinding.basicBug(rc, target);
+        //         Direction nextDir = Pathfinding.basicBug(rc,
+        //                 thisLocation.add(thisLocation.directionTo(target)).add(thisLocation.directionTo(target)));
+        //         System.out.println(nextDir);
         //         if (rc.canMove(nextDir)) {
         //             rc.move(nextDir);
         //         }
@@ -54,6 +62,7 @@ public class Politician {
 
         if (rc.canSenseRadiusSquared(25)) {
             RobotInfo[] robots = rc.senseNearbyRobots(25);
+
             boolean explode = false;
             boolean hasEnemy = false;
             for (RobotInfo robot : robots) {
@@ -103,8 +112,9 @@ public class Politician {
                         rc.empower(9);
                     }
                 }
+
                 if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)
-                        && thisInfluence < robot.getInfluence() + 10) {
+                        && thisInfluence < robot.getInfluence() - 10) {
                     if (rc.canMove(rc.getLocation().directionTo(robot.getLocation()).opposite())) {
                         rc.move(rc.getLocation().directionTo(robot.getLocation()).opposite());
                     }
@@ -136,7 +146,7 @@ public class Politician {
                 }
                 if (robotTeam.equals(rc.getTeam())) {
                     nearbyAllies++;
-                    if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 4)) {
+                    if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 2)) {
                         if (rc.canMove(rc.getLocation().directionTo(robot.getLocation()).opposite())) {
                             rc.move(rc.getLocation().directionTo(robot.getLocation()).opposite());
                         }
@@ -154,7 +164,7 @@ public class Politician {
         }
 
         if (!rc.onTheMap(thisLocation.translate(1, 0))) {
-            System.out.println(thisLocation.translate(1, 0));
+            // System.out.println(thisLocation.translate(1, 0));
             //System.out.println("FOUND WALL EAST");
             determinedDirection = Direction.WEST;
         } else if (!rc.onTheMap(thisLocation.translate(-1, 0))) {
@@ -180,6 +190,7 @@ public class Politician {
             if (rc.canMove(thisLocation.directionTo(Data.originPoint).opposite())) {
                 rc.move(thisLocation.directionTo(Data.originPoint).opposite());
             }
+
         } else if (thisLocation.distanceSquaredTo(Data.originPoint) >= boundary) {
             // if (rc.canMove(thisLocation.directionTo(Data.originPoint).rotateRight())) {
             //     //System.out.println("MOVING TO DIAGONAL");
@@ -237,10 +248,10 @@ public class Politician {
             }
         }
         int[] coords = Communication.relCoordDecoder(role);
-        System.out.println(role);
+        //System.out.println(role);
         int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
         MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
-        System.out.println(target.toString());
+        //System.out.println(target.toString());
         Direction nextDir = Pathfinding.basicBug(rc, target);
         if (rc.canMove(nextDir)) {
             rc.move(nextDir);
@@ -266,8 +277,8 @@ public class Politician {
                         }
                         if (neededInf < thisInfluence) {
                             maxRadius = i;
-                            System.out.println("NEWRADIUS" + maxRadius);
-                            System.out.println("NEEDEDINF" + neededInf);
+                            //System.out.println("NEWRADIUS" + maxRadius);
+                            //System.out.println("NEEDEDINF" + neededInf);
                         } else {
                             break;
                         }

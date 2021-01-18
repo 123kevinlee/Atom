@@ -8,14 +8,14 @@ public class Slanderer {
     public static int boundary = 16;
 
     public static void run(RobotController rc) throws GameActionException {
-        System.out.println("HERE");
+        //System.out.println("HERE");
         logic(rc);
     }
 
     public static void logic(RobotController rc) throws GameActionException {
         Direction randomDir = Data.directions[(int) (Math.random() * 8)];
         int boundary = 16;
-        System.out.println("HERE");
+        //System.out.println("HERE");
         if (rc.getInfluence() == 130 && rc.getRoundNum() - Data.initRound < 5) {
             if (rc.canMove(Direction.SOUTH)) {
                 rc.move(Direction.SOUTH);
@@ -51,7 +51,7 @@ public class Slanderer {
         // }
 
         if (thisLocation.distanceSquaredTo(Data.originPoint) < 6) {
-            System.out.println("AWAY");
+            //System.out.println("AWAY");
             Direction nextDir = Pathfinding.basicBug(rc,
                     thisLocation.add(thisLocation.directionTo(Data.originPoint).opposite()));
             if (rc.canMove(nextDir)) {

@@ -39,6 +39,16 @@ public class EnlightenmentCenter {
     public static LinkedHashSet<MapLocation> alliedBases = new LinkedHashSet<MapLocation>();
 
     public static void run(RobotController rc) throws GameActionException {
+
+        if (scoutIds.size() > 0) {
+            listenForScoutMessages(rc);
+        }
+
+        calculateInfluenceGain(rc); // calculates the influence gain between last round and this round
+        if (rc.getTeamVotes() < 751) {
+            calculateBid(rc); //calculates the amount to bid
+        }
+
         if (rc.canSenseRadiusSquared(40)) {
             RobotInfo[] robots = rc.senseNearbyRobots();
             for (RobotInfo robot : robots) {
@@ -56,24 +66,15 @@ public class EnlightenmentCenter {
                 //     int flag = Communication.coordEncoder("WARN", relx, rely);
                 //     if (rc.canSetFlag(flag)) {
                 //         rc.setFlag(flag);
-                //         int influence = 1;
-                //         if (lastInfluenceGain / 2 > 14) {
-                //             influence = lastInfluenceGain / 2;
+                //         int influence = 14;
+                //         if (lastInfluenceGain > 14) {
+                //             influence = lastInfluenceGain;
                 //         }
-                //         spawnTargetedMuckraker(rc, influence);
+                //         spawnPolitician(rc, influence);
                 //         Clock.yield();
                 //     }
                 // }
             }
-        }
-
-        calculateInfluenceGain(rc); // calculates the influence gain between last round and this round
-        if (rc.getTeamVotes() < 751) {
-            calculateBid(rc); //calculates the amount to bid
-        }
-
-        if (scoutIds.size() > 0) {
-            listenForScoutMessages(rc);
         }
 
         if (rc.getRoundNum() < 5) {
@@ -110,7 +111,7 @@ public class EnlightenmentCenter {
             //}
         }
 
-        System.out.println("INFGAIN:" + lastInfluenceGain);
+        //System.out.println("INFGAIN:" + lastInfluenceGain);
         Object[] neutralBaseKeys = neutralBases.keySet().toArray();
         for (Object key : neutralBaseKeys) {
             if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 75) {
@@ -121,32 +122,33 @@ public class EnlightenmentCenter {
 
         RobotType spawn = spawnOrder.get(spawnOrderCounter % spawnOrder.size());
         Direction spawnDir = openSpawnLocation(rc, RobotType.SLANDERER);
-        if (enemyBases.size() > 0 || possibleEnemyBases.size() > 0) {
-            System.out.println("HERE");
-            ArrayList<Direction> directions = new ArrayList<Direction>();
-            if (enemyBases.size() > 0) {
-                Direction towards = rc.getLocation().directionTo(enemyBases.iterator().next());
-                directions.add(towards);
-                directions.add(towards.rotateLeft());
-                directions.add(towards.rotateRight());
-                directions.add(towards.rotateLeft().rotateLeft());
-                directions.add(towards.rotateRight().rotateRight());
-                directions.add(towards.opposite().rotateLeft());
-                directions.add(towards.opposite().rotateRight());
-                directions.add(towards.opposite());
-            } else if (possibleEnemyBases.size() > 0) {
-                Direction towards = rc.getLocation().directionTo(possibleEnemyBases.iterator().next());
-                directions.add(towards);
-                directions.add(towards.rotateLeft());
-                directions.add(towards.rotateRight());
-                directions.add(towards.rotateLeft().rotateLeft());
-                directions.add(towards.rotateRight().rotateRight());
-                directions.add(towards.opposite().rotateLeft());
-                directions.add(towards.opposite().rotateRight());
-                directions.add(towards.opposite());
-            }
-            spawnDir = openSpawnLocation(rc, RobotType.SLANDERER, directions);
-        }
+        // System.out.println(enemyBases.size() + ":" + possibleEnemyBases.size());
+        // if (enemyBases.size() > 0 || possibleEnemyBases.size() > 0) {
+        //     ArrayList<Direction> directions = new ArrayList<Direction>();
+        //     if (enemyBases.size() > 0) {
+        //         Direction towards = rc.getLocation().directionTo(enemyBases.iterator().next());
+        //         directions.add(towards);
+        //         directions.add(towards.rotateLeft());
+        //         directions.add(towards.rotateRight());
+        //         directions.add(towards.rotateLeft().rotateLeft());
+        //         directions.add(towards.rotateRight().rotateRight());
+        //         directions.add(towards.opposite().rotateLeft());
+        //         directions.add(towards.opposite().rotateRight());
+        //         directions.add(towards.opposite());
+        //     } else if (possibleEnemyBases.size() > 0) {
+        //         Direction towards = rc.getLocation().directionTo(possibleEnemyBases.iterator().next());
+        //         directions.add(towards);
+        //         directions.add(towards.rotateLeft());
+        //         directions.add(towards.rotateRight());
+        //         directions.add(towards.rotateLeft().rotateLeft());
+        //         directions.add(towards.rotateRight().rotateRight());
+        //         directions.add(towards.opposite().rotateLeft());
+        //         directions.add(towards.opposite().rotateRight());
+        //         directions.add(towards.opposite());
+        //     }
+        //     System.out.println(directions);
+        //     spawnDir = openSpawnLocation(rc, RobotType.SLANDERER, directions);
+        // }
         switch (spawn) {
             case SLANDERER:
                 int influence = 1;
@@ -242,7 +244,31 @@ public class EnlightenmentCenter {
     public static void spawnPolitician(RobotController rc, int influence) throws GameActionException {
         Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
         if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)) {
+            // MapLocation targetLocation = Data.originPoint;
+            // System.out.println(enemyBases.size() + ":" + possibleEnemyBases.size());
+            // if (enemyBases.size() > 0) {
+            //     targetLocation = enemyBases.iterator().next();
+            // } else if (possibleEnemyBases.size() > 0) {
+            //     targetLocation = possibleEnemyBases.iterator().next();
+            // } else if (enemyCoords.size() > 0) {
+            //     Object[] baseKeys = enemyCoords.keySet().toArray();
+            //     targetLocation = enemyCoords.get(baseKeys[0]);
+            // }
+            // int relx = targetLocation.x % 128;
+            // int rely = targetLocation.y % 128;
+            // int flag = Communication.coordEncoder("WARN", relx, rely);
+            // System.out.println("WARN FLAG:" + flag);
+            // if (rc.canSetFlag(flag) && !targetLocation.equals(Data.originPoint)) {
+            //     //System.out.println("SETWARN");
+            //     rc.setFlag(flag);
+            // } else {
+            //     if (rc.canSetFlag(0)) {
+            //         //System.out.println("SET0");
+            //         rc.setFlag(0);
+            //     }
+            // }
             if (rc.canSetFlag(0)) {
+                //System.out.println("SET0");
                 rc.setFlag(0);
             }
             rc.buildRobot(RobotType.POLITICIAN, spawnDir, influence);
@@ -255,7 +281,7 @@ public class EnlightenmentCenter {
         if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, 1)) {
             if (rc.canSetFlag(100)) {
                 rc.setFlag(100);
-                System.out.println("SETFLAG100");
+                //System.out.println("SETFLAG100");
             }
             rc.buildRobot(RobotType.MUCKRAKER, dir, 1);
             if (rc.canSenseRadiusSquared(2)) {
@@ -345,7 +371,7 @@ public class EnlightenmentCenter {
                             int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
                             MapLocation neutralBase = Data.originPoint.translate(distance[0], distance[1]);
                             neutralBases.put(neutralBase, influence);
-                            System.out.println("NEUTRAL BASES:" + neutralBases.toString());
+                            //System.out.println("NEUTRAL BASES:" + neutralBases.toString());
                         }
                     }
                     int[] coords = Communication.relCoordDecoder(msg);
@@ -494,7 +520,8 @@ public class EnlightenmentCenter {
                                         default:
                                             break;
                                     }
-                                    // System.out.println("Possible Enemy Base:" + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
+                                    System.out.println("Possible Enemy Base:"
+                                            + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
                                 }
                             }
                         }
@@ -534,12 +561,12 @@ public class EnlightenmentCenter {
                             default:
                                 break;
                         }
-                        //System.out.println("Possible Enemy Bases:" + possibleEnemyBases.toString());
+                        System.out.println("Possible Enemy Bases:" + possibleEnemyBases.toString());
                     } else {
                         if (!waller.contains(key)) {
                             enemyCoords.put(scoutIds.get(key), new MapLocation(enemyPosition.x, enemyPosition.y));
                         }
-                        //System.out.println("ENEMY COORDS: " + enemyCoords.toString());
+                        System.out.println("ENEMY COORDS: " + enemyCoords.toString());
                     }
                 }
                 removeId = key;
@@ -556,6 +583,7 @@ public class EnlightenmentCenter {
     public static Direction openSpawnLocation(RobotController rc, RobotType type) throws GameActionException {
         Direction[] directions = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST,
                 Direction.NORTHEAST, Direction.SOUTHWEST, Direction.SOUTHEAST, Direction.NORTHWEST };
+
         for (int i = 0; i < directions.length; i++) {
             if (rc.canBuildRobot(type, directions[i], 1)) {
                 return directions[i];

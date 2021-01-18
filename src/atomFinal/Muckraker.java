@@ -9,15 +9,15 @@ public class Muckraker {
     public static String role = "";
 
     public static void run(RobotController rc) throws GameActionException {
-        System.out.println("HERE");
+        //System.out.println("HERE");
         Team enemy = rc.getTeam().opponent();
         MapLocation thisLocation = rc.getLocation();
         if (rc.canDetectRadiusSquared(30)) {
             for (RobotInfo robot : rc.senseNearbyRobots(30, enemy)) {
-                System.out.println("FOUND ROBOT");
+                //System.out.println("FOUND ROBOT");
                 if (robot.getType().canBeExposed()) {
                     if (rc.canExpose(robot.location)) {
-                        System.out.println("EXPOSING");
+                        //System.out.println("EXPOSING");
                         rc.expose(robot.location);
                     } else {
                         if (rc.canMove(thisLocation.directionTo(robot.getLocation()))) {
@@ -38,15 +38,15 @@ public class Muckraker {
     }
 
     public static void logic(RobotController rc) throws GameActionException {
-        System.out.println("HERE");
+        //System.out.println("HERE");
         Direction[] directions = Data.directions;
         if (scoutDirection == null) {
             scoutDirection = directions[(int) (Math.random() * 8)];
-            System.out.println("SCOUTDIRECTION:" + scoutDirection);
+            //System.out.println("SCOUTDIRECTION:" + scoutDirection);
         } else {
             if (rc.canMove(scoutDirection)) {
                 rc.move(scoutDirection);
-                System.out.println("MOVED SCOUTDIRECTION:" + scoutDirection);
+                //System.out.println("MOVED SCOUTDIRECTION:" + scoutDirection);
             } else {
                 for (Direction dir : directions) {
                     if (rc.canMove(dir)) {
@@ -114,22 +114,23 @@ public class Muckraker {
                     if (rc.canSetFlag(outMsg)) {
                         rc.setFlag(outMsg);
                     }
-                } else if (robot.getTeam().equals(rc.getTeam().opponent())
-                        && Integer.toString(rc.getFlag(rc.getID())).charAt(0) != '2') {
-                    MapLocation robotLocation = robot.getLocation();
-                    int relx = robotLocation.x % 128;
-                    int rely = robotLocation.y % 128;
-                    int outMsg = Communication.coordEncoder("WARN", relx, rely);
-                    if (rc.canSetFlag(outMsg)) {
-                        rc.setFlag(outMsg);
-                    }
                 }
+                // else if (robot.getTeam().equals(rc.getTeam().opponent())
+                //         && Integer.toString(rc.getFlag(rc.getID())).charAt(0) != '2') {
+                //     MapLocation robotLocation = robot.getLocation();
+                //     int relx = robotLocation.x % 128;
+                //     int rely = robotLocation.y % 128;
+                //     int outMsg = Communication.coordEncoder("WARN", relx, rely);
+                //     if (rc.canSetFlag(outMsg)) {
+                //         rc.setFlag(outMsg);
+                //     }
+                // }
             }
         }
     }
 
     public static void attackMode(RobotController rc) throws GameActionException {
-        System.out.println("HERE");
+        //System.out.println("HERE");
         if (rc.canSenseRadiusSquared(30)) {
             RobotInfo[] robots = rc.senseNearbyRobots(30);
             for (RobotInfo robot : robots) {
