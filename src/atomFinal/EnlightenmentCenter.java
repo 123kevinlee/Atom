@@ -96,12 +96,15 @@ public class EnlightenmentCenter {
 
         }
 
+        boolean save = false;
         //System.out.println("INFGAIN:" + lastInfluenceGain);
         Object[] neutralBaseKeys = neutralBases.keySet().toArray();
         for (Object key : neutralBaseKeys) {
             if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 25) {
                 spawnTakeoverPolitician(rc, neutralBases.get(key) + 12, (MapLocation) key);
                 System.out.println("BIG BOI SPAWNED FOR" + key.toString());
+            } else if (neutralBases.get(key) != 1000) {
+                save = true;
             }
         }
 
@@ -130,7 +133,7 @@ public class EnlightenmentCenter {
                 break;
             case POLITICIAN:
                 influence = 14;
-                if (lastInfluenceGain > 14) {
+                if (lastInfluenceGain > 14 && save == false) {
                     influence = lastInfluenceGain;
                 }
                 spawnPolitician(rc, influence);
@@ -254,6 +257,7 @@ public class EnlightenmentCenter {
                 optimalInfluence = optimalFarmingInfluence[i];
             }
         }
+
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, optimalInfluence)) {
             if (rc.canSetFlag(0)) {
                 rc.setFlag(0);
