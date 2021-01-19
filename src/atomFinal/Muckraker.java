@@ -18,6 +18,10 @@ public class Muckraker {
                 int maxInf = 0;
                 MapLocation max = null;
                 for (RobotInfo robot : closeRobots) {
+                    if (robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)
+                            && rc.getLocation().isAdjacentTo(robot.getLocation())) {
+                        return;
+                    }
                     //System.out.println("FOUND ROBOT");
                     if (robot.getType().canBeExposed() && robot.getInfluence() >= maxInf) {
                         max = robot.location;
@@ -94,7 +98,7 @@ public class Muckraker {
                     if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
                             && robot.getTeam() == rc.getTeam().opponent()) {
                         Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                        if (rc.canMove(nextDir) && rc.getLocation().distanceSquaredTo(robot.getLocation()) > 2) {
+                        if (rc.canMove(nextDir) && !rc.getLocation().isAdjacentTo(robot.getLocation())) {
                             rc.move(nextDir);
                         }
 
