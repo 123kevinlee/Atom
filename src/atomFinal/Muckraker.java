@@ -13,20 +13,51 @@ public class Muckraker {
         Team enemy = rc.getTeam().opponent();
         MapLocation thisLocation = rc.getLocation();
         if (rc.canDetectRadiusSquared(30)) {
-            for (RobotInfo robot : rc.senseNearbyRobots(30, enemy)) {
-                //System.out.println("FOUND ROBOT");
-                if (robot.getType().canBeExposed()) {
-                    if (rc.canExpose(robot.location)) {
-                        //System.out.println("EXPOSING");
-                        rc.expose(robot.location);
-                    } else {
-                        Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                        if (rc.canMove(nextDir)) {
-                            rc.move(nextDir);
-                        }
+            RobotInfo[] closeRobots = rc.senseNearbyRobots(12, enemy);
+            if (closeRobots.length > 0) {
+                int maxInf = 0;
+                MapLocation max = null;
+                for (RobotInfo robot : closeRobots) {
+                    //System.out.println("FOUND ROBOT");
+                    if (robot.getType().canBeExposed() && robot.getInfluence() >= maxInf) {
+                        max = robot.location;
                     }
                 }
+                if (max != null && rc.canExpose(max)) {
+                    rc.expose(max);
+                }
             }
+            RobotInfo[] robots = rc.senseNearbyRobots(30, enemy);
+            MapLocation max = null;
+            int maxInf = 0;
+            for (RobotInfo robot : robots) {
+                if (robot.getType().canBeExposed() && robot.getInfluence() >= maxInf) {
+                    max = robot.location;
+                }
+            }
+            if (max != null) {
+                Direction nextDir = Pathfinding.basicBug(rc, max);
+                if (rc.canMove(nextDir)) {
+                    rc.move(nextDir);
+                }
+            }
+
+            // RobotInfo[] robots = rc.senseNearbyRobots(30, enemy);
+            // MapLocation max;
+            // for (RobotInfo robot : robots) {
+            //     //System.out.println("FOUND ROBOT");
+            //     if (robot.getType().canBeExposed()) {
+            //         if (rc.canExpose(robot.location)) {
+            //             //System.out.println("EXPOSING");
+            //             rc.expose(robot.location);
+            //         } else {
+            //             Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
+            //             if (rc.canMove(nextDir)) {
+            //                 rc.move(nextDir);
+            //             }
+            //         }
+            //     }
+            // }
         }
 
         if (role.equals("100")) { // scout
@@ -39,6 +70,18 @@ public class Muckraker {
     }
 
     public static void logic(RobotController rc) throws GameActionException {
+        if (rc.canSenseRadiusSquared(25)) {
+            RobotInfo[] robots = rc.senseNearbyRobots(25, rc.getTeam().opponent());
+            if (robots.length > 0 && (rc.getFlag(rc.getID()) == 0 || rc.getFlag(rc.getID()) == 666)) {
+                if (rc.canSetFlag(666)) {
+                    rc.setFlag(666);
+                }
+            } else {
+                if (rc.canSetFlag(0)) {
+                    rc.setFlag(0);
+                }
+            }
+        }
         //System.out.println("HERE");
         Direction[] directions = Data.directions;
         if (scoutDirection == null) {

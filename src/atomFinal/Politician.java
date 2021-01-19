@@ -12,6 +12,19 @@ public class Politician {
     public static Direction determinedDirection = Direction.CENTER;
 
     public static void run(RobotController rc) throws GameActionException {
+        if (rc.canSenseRadiusSquared(25)) {
+            RobotInfo[] robots = rc.senseNearbyRobots(25, rc.getTeam().opponent());
+            if (robots.length > 0 && (rc.getFlag(rc.getID()) == 0 || rc.getFlag(rc.getID()) == 666)) {
+                if (rc.canSetFlag(666)) {
+                    rc.setFlag(666);
+                }
+            } else {
+                if (rc.canSetFlag(0)) {
+                    rc.setFlag(0);
+                }
+            }
+        }
+
         if (role.length() > 0 && role.charAt(0) == '5') {
             takeoverLogic(rc);
         } else if (role.length() == 7 && role.charAt(0) == '2') {
@@ -72,12 +85,19 @@ public class Politician {
                         }
                     }
                 }
-                if (robotTeam.equals(enemy) && thisLocation.distanceSquaredTo(robot.getLocation()) < 2
-                        && rc.getRobotCount() > 200) {
-                    if (rc.canEmpower(1)) {
-                        rc.empower(1);
+                if (robotTeam.equals(enemy) && rc.getRobotCount() > 300) {
+                    if (thisLocation.distanceSquaredTo(robot.getLocation()) < 2) {
+                        if (rc.canEmpower(1)) {
+                            rc.empower(1);
+                        }
+                    } else {
+                        Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
+                        if (rc.canMove(nextDir)) {
+                            rc.move(nextDir);
+                        }
                     }
-                } else if (robotTeam.equals(enemy) && thisLocation.distanceSquaredTo(robot.getLocation()) < 2
+
+                } else if (robotTeam.equals(enemy) && thisLocation.distanceSquaredTo(robot.getLocation()) <= 9
                         && rc.getRobotCount() > 500) {
                     if (rc.canEmpower(9)) {
                         rc.empower(9);

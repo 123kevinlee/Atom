@@ -121,15 +121,8 @@ public class EnlightenmentCenter {
                 spawnTargetedMuckraker(rc, influence / 2);
                 break;
             case MUCKRAKER:
-                influence = 1;
-                if (lastInfluenceGain / 2 > 14) {
-                    influence = lastInfluenceGain / 2;
-                }
-                if (enemyBases.size() > 0 || possibleEnemyBases.size() > 0) {
-                    //spawnTargetedMuckraker(rc, influence);
-                    spawnMuckraker(rc);
-                }
-                spawnMuckraker(rc);
+                influence = lastInfluenceGain / 5;
+                spawnMuckraker(rc, influence);
                 break;
             case POLITICIAN:
                 influence = 14;
@@ -217,6 +210,17 @@ public class EnlightenmentCenter {
         }
     }
 
+    public static void spawnMuckraker(RobotController rc, int influence) throws GameActionException {
+        Direction spawnDir = openSpawnLocation(rc, RobotType.MUCKRAKER);
+        int unitInfluence = influence;
+        if (rc.canBuildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence)) {
+            if (rc.canSetFlag(0)) {
+                rc.setFlag(0);
+            }
+            rc.buildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence);
+        }
+    }
+
     public static void spawnPolitician(RobotController rc, int influence) throws GameActionException {
         Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
         if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)) {
@@ -262,6 +266,34 @@ public class EnlightenmentCenter {
             if (rc.canSetFlag(0)) {
                 rc.setFlag(0);
             }
+            Object[] keyset = enemyCoords.keySet().toArray();
+            if (keyset.length > 0) {
+                MapLocation warnLocation = enemyCoords.get(keyset[0]);
+                int relx = warnLocation.x % 128;
+                int rely = warnLocation.y % 128;
+                int flag = Communication.coordEncoder("WARN", relx, rely);
+                if (rc.canSetFlag(flag)) {
+                    rc.setFlag(flag);
+                }
+            }
+            if (possibleEnemyBases.size() > 0) {
+                MapLocation warnLocation = possibleEnemyBases.iterator().next();
+                int relx = warnLocation.x % 128;
+                int rely = warnLocation.y % 128;
+                int flag = Communication.coordEncoder("WARN", relx, rely);
+                if (rc.canSetFlag(flag)) {
+                    rc.setFlag(flag);
+                }
+            }
+            if (enemyBases.size() > 0) {
+                MapLocation warnLocation = enemyBases.iterator().next();
+                int relx = warnLocation.x % 128;
+                int rely = warnLocation.y % 128;
+                int flag = Communication.coordEncoder("WARN", relx, rely);
+                if (rc.canSetFlag(flag)) {
+                    rc.setFlag(flag);
+                }
+            }
             rc.buildRobot(RobotType.SLANDERER, dir, optimalInfluence);
         }
     }
@@ -288,7 +320,7 @@ public class EnlightenmentCenter {
             wonLastRound = true;
         }
         if (round >= 300) {
-            if (rc.getInfluence() > 2500) {
+            if (rc.getInfluence() > 2000) {
                 if (rc.canBid(lastInfluenceGain + rc.getInfluence() / 100)) {
                     rc.bid(lastInfluenceGain + rc.getInfluence() / 100);
                     //System.out.println("Bid:" + (int) (lastInfluenceGain));
@@ -366,29 +398,26 @@ public class EnlightenmentCenter {
                     else if (msg.charAt(0) == '4' && !waller.contains(key)) {
                         int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
                         MapLocation wall = Data.originPoint.translate(distance[0], distance[1]);
+                        waller.add((int) key);
                         switch (scoutIds.get(key)) {
                             case NORTH:
                                 if (mapBorders[0] == 0) {
                                     mapBorders[0] = wall.y;
-                                    waller.add((int) key);
                                 }
                                 break;
                             case EAST:
                                 if (mapBorders[1] == 0) {
                                     mapBorders[1] = wall.x;
-                                    waller.add((int) key);
                                 }
                                 break;
                             case SOUTH:
                                 if (mapBorders[2] == 0) {
                                     mapBorders[2] = wall.y;
-                                    waller.add((int) key);
                                 }
                                 break;
                             case WEST:
                                 if (mapBorders[3] == 0) {
                                     mapBorders[3] = wall.x;
-                                    waller.add((int) key);
                                 }
                                 break;
                             default:
