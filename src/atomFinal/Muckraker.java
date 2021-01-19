@@ -44,7 +44,9 @@ public class Muckraker {
             scoutDirection = directions[(int) (Math.random() * 8)];
             //System.out.println("SCOUTDIRECTION:" + scoutDirection);
         } else {
-            if (rc.canMove(scoutDirection)) {
+            if (!rc.onTheMap(rc.getLocation().add(scoutDirection))) {
+                scoutDirection = scoutDirection.opposite().rotateRight();
+            } else if (rc.canMove(scoutDirection)) {
                 rc.move(scoutDirection);
                 //System.out.println("MOVED SCOUTDIRECTION:" + scoutDirection);
             } else {
@@ -136,7 +138,7 @@ public class Muckraker {
             for (RobotInfo robot : robots) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER && robot.getTeam() == rc.getTeam().opponent()) {
                     Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                    if (rc.canMove(nextDir)) {
+                    if (rc.canMove(nextDir) && rc.getLocation().distanceSquaredTo(robot.getLocation()) > 2) {
                         rc.move(nextDir);
                     }
 
@@ -157,6 +159,13 @@ public class Muckraker {
         int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
         MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
         Direction nextDir = Pathfinding.basicBug(rc, target);
+        if (rc.canSenseLocation(target)) {
+            RobotInfo robot = rc.senseRobotAtLocation(target);
+            if (robot.getTeam().equals(rc.getTeam())) {
+                role = "";
+            }
+
+        }
         if (rc.canMove(nextDir)) {
             rc.move(nextDir);
         }
