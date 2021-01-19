@@ -12,15 +12,6 @@ public class Politician {
     public static Direction determinedDirection = Direction.CENTER;
 
     public static void run(RobotController rc) throws GameActionException {
-        // if (rc.canGetFlag(Data.baseId)) {
-        //     int baseFlag = rc.getFlag(Data.baseId);
-        //     String baseFlagS = Integer.toString(baseFlag);
-        //     if (baseFlagS.charAt(0) == '7' && adjusted == false && role.charAt(0) != 7) {
-        //         role = baseFlagS;
-        //     }
-        //     System.out.println(role);
-        // }
-
         if (role.length() > 0 && role.charAt(0) == '5') {
             takeoverLogic(rc);
         } else if (role.length() == 7 && role.charAt(0) == '2') {
@@ -87,11 +78,11 @@ public class Politician {
                         rc.empower(1);
                     }
                 } else if (robotTeam.equals(enemy) && thisLocation.distanceSquaredTo(robot.getLocation()) < 2
-                        && rc.getRobotCount() > 300) {
+                        && rc.getRobotCount() > 500) {
                     if (rc.canEmpower(9)) {
                         rc.empower(9);
                     }
-                } else if (thisLocation.distanceSquaredTo(robot.getLocation()) <= 9 && rc.getRobotCount() > 500) {
+                } else if (thisLocation.distanceSquaredTo(robot.getLocation()) <= 9 && rc.getRobotCount() > 1000) {
                     if (rc.canEmpower(9)) {
                         rc.empower(9);
                     }
@@ -119,7 +110,7 @@ public class Politician {
                     }
                 }
                 if (robot.getTeam().equals(Team.NEUTRAL)) {
-                    if (thisInfluence - 10 > robot.getInfluence() / 10) {
+                    if (thisInfluence - 10 > robot.getInfluence() / 10 || robot.getInfluence() <= 100) {
                         if (thisLocation.isAdjacentTo(robot.getLocation())) {
                             if (rc.canEmpower(1)) {
                                 rc.empower(1);

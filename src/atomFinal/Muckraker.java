@@ -45,15 +45,45 @@ public class Muckraker {
             scoutDirection = directions[(int) (Math.random() * 8)];
             //System.out.println("SCOUTDIRECTION:" + scoutDirection);
         } else {
-            if (!rc.onTheMap(rc.getLocation().add(scoutDirection))) {
-                scoutDirection = scoutDirection.opposite().rotateRight();
-            } else if (rc.canMove(scoutDirection)) {
-                rc.move(scoutDirection);
-                //System.out.println("MOVED SCOUTDIRECTION:" + scoutDirection);
-            } else {
-                for (Direction dir : directions) {
-                    if (rc.canMove(dir)) {
-                        rc.move(dir);
+            if (rc.canSenseRadiusSquared(30)) {
+                RobotInfo[] robots = rc.senseNearbyRobots(30);
+                for (RobotInfo robot : robots) {
+                    if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
+                            && robot.getTeam() == rc.getTeam().opponent()) {
+                        Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
+                        if (rc.canMove(nextDir) && rc.getLocation().distanceSquaredTo(robot.getLocation()) > 2) {
+                            rc.move(nextDir);
+                        }
+
+                        //mostly for when mucks are going to possible coords
+                        //and they are wrong, so they switch targets
+                        //System.out.println("NEW TARGET");
+                        int relx = robot.getLocation().x % 128;
+                        int rely = robot.getLocation().y % 128;
+                        int newFlag = Communication.coordEncoder("ENEMY", relx, rely);
+                        if (rc.canSetFlag(newFlag)) {
+                            rc.setFlag(newFlag);
+                            role = Integer.toString(newFlag);
+                        }
+                    } else if (robot.getTeam().equals(rc.getTeam())
+                            && rc.getLocation().distanceSquaredTo(robot.getLocation()) < 4) {
+                        Direction nextDir = Pathfinding.basicBug(rc,
+                                rc.getLocation().directionTo(robot.getLocation()).opposite());
+                        if (rc.canMove(nextDir)) {
+                            rc.move(nextDir);
+                        }
+                    }
+                }
+                if (!rc.onTheMap(rc.getLocation().add(scoutDirection))) {
+                    scoutDirection = scoutDirection.opposite().rotateRight();
+                } else if (rc.canMove(scoutDirection)) {
+                    rc.move(scoutDirection);
+                    //System.out.println("MOVED SCOUTDIRECTION:" + scoutDirection);
+                } else {
+                    for (Direction dir : directions) {
+                        if (rc.canMove(dir)) {
+                            rc.move(dir);
+                        }
                     }
                 }
             }
@@ -76,7 +106,7 @@ public class Muckraker {
             }
         }
 
-        Direction nextDir = Pathfinding.basicBug(rc, scoutDirection);
+        Direction nextDir = Pathfinding.scoutBug(rc, scoutDirection);
         if (rc.canMove(nextDir)) {
             rc.move(nextDir);
             MapLocation currentLocation = rc.getLocation();

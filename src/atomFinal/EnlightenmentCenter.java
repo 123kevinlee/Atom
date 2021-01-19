@@ -99,7 +99,7 @@ public class EnlightenmentCenter {
         //System.out.println("INFGAIN:" + lastInfluenceGain);
         Object[] neutralBaseKeys = neutralBases.keySet().toArray();
         for (Object key : neutralBaseKeys) {
-            if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 75) {
+            if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 25) {
                 spawnTakeoverPolitician(rc, neutralBases.get(key) + 12, (MapLocation) key);
                 System.out.println("BIG BOI SPAWNED FOR" + key.toString());
             }
@@ -113,7 +113,7 @@ public class EnlightenmentCenter {
                 if (lastInfluenceGain / 2 > 14) {
                     influence = lastInfluenceGain / 2;
                 }
-                if (lastInfluenceGain <= 250)
+                if (lastInfluenceGain <= 500)
                     spawnFarmer(rc, spawnDir);
                 spawnTargetedMuckraker(rc, influence / 2);
                 break;
@@ -123,7 +123,8 @@ public class EnlightenmentCenter {
                     influence = lastInfluenceGain / 2;
                 }
                 if (enemyBases.size() > 0 || possibleEnemyBases.size() > 0) {
-                    spawnTargetedMuckraker(rc, influence);
+                    //spawnTargetedMuckraker(rc, influence);
+                    spawnMuckraker(rc);
                 }
                 spawnMuckraker(rc);
                 break;
@@ -216,29 +217,6 @@ public class EnlightenmentCenter {
     public static void spawnPolitician(RobotController rc, int influence) throws GameActionException {
         Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
         if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)) {
-            // MapLocation targetLocation = Data.originPoint;
-            // System.out.println(enemyBases.size() + ":" + possibleEnemyBases.size());
-            // if (enemyBases.size() > 0) {
-            //     targetLocation = enemyBases.iterator().next();
-            // } else if (possibleEnemyBases.size() > 0) {
-            //     targetLocation = possibleEnemyBases.iterator().next();
-            // } else if (enemyCoords.size() > 0) {
-            //     Object[] baseKeys = enemyCoords.keySet().toArray();
-            //     targetLocation = enemyCoords.get(baseKeys[0]);
-            // }
-            // int relx = targetLocation.x % 128;
-            // int rely = targetLocation.y % 128;
-            // int flag = Communication.coordEncoder("WARN", relx, rely);
-            // System.out.println("WARN FLAG:" + flag);
-            // if (rc.canSetFlag(flag) && !targetLocation.equals(Data.originPoint)) {
-            //     //System.out.println("SETWARN");
-            //     rc.setFlag(flag);
-            // } else {
-            //     if (rc.canSetFlag(0)) {
-            //         //System.out.println("SET0");
-            //         rc.setFlag(0);
-            //     }
-            // }
             if (rc.canSetFlag(0)) {
                 //System.out.println("SET0");
                 rc.setFlag(0);
@@ -305,22 +283,23 @@ public class EnlightenmentCenter {
             lastVotes++;
             wonLastRound = true;
         }
-        if (round >= 300)
-            if (wonLastRound == false) {
-                if (rc.getInfluence() > 2500) {
-                    if (rc.canBid(lastInfluenceGain + rc.getInfluence() / 50)) {
-                        rc.bid(lastInfluenceGain + rc.getInfluence() / 50);
-                        //System.out.println("Bid:" + (int) (lastInfluenceGain));
-                    }
+        if (round >= 300) {
+            if (rc.getInfluence() > 2500) {
+                if (rc.canBid(lastInfluenceGain + rc.getInfluence() / 100)) {
+                    rc.bid(lastInfluenceGain + rc.getInfluence() / 100);
+                    //System.out.println("Bid:" + (int) (lastInfluenceGain));
                 }
+            }
+            if (wonLastRound == false) {
                 if (rc.canBid(lastInfluenceGain)) {
                     rc.bid(lastInfluenceGain);
                     //System.out.println("Bid:" + (int) (lastInfluenceGain));
                 }
             }
-        if (rc.canBid(lastInfluenceGain / 3)) {
-            rc.bid(lastInfluenceGain / 3);
-            //System.out.println("Bid:" + lastInfluenceGain / 3);
+            if (rc.canBid(lastInfluenceGain / 3)) {
+                rc.bid(lastInfluenceGain / 3);
+                //System.out.println("Bid:" + lastInfluenceGain / 3);
+            }
         }
     }
 
@@ -342,7 +321,7 @@ public class EnlightenmentCenter {
                             int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
                             MapLocation neutralBase = Data.originPoint.translate(distance[0], distance[1]);
                             neutralBases.put(neutralBase, influence);
-                            //System.out.println("NEUTRAL BASES:" + neutralBases.toString());
+                            System.out.println("NEUTRAL BASES:" + neutralBases.toString());
                         }
                     }
                     int[] coords = Communication.relCoordDecoder(msg);
