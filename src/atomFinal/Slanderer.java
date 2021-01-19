@@ -34,6 +34,16 @@ public class Slanderer {
             }
         }
 
+        if (rc.canGetFlag(Data.baseId)) {
+            int flag = rc.getFlag(Data.baseId);
+            String flagS = Integer.toString(flag);
+            if (flagS.length() > 0 && flagS.charAt(0) == '7' && rc.getFlag(rc.getID()) != flag) {
+                if (rc.canSetFlag(flag)) {
+                    rc.setFlag(flag);
+                }
+            }
+        }
+
         logic(rc);
     }
 
@@ -70,7 +80,7 @@ public class Slanderer {
             int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
             MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
             //System.out.println("ESCAPING FROM" + target.toString());
-            Direction nextDir = Pathfinding.basicBug(rc, rc.getLocation().directionTo(target).opposite());
+            Direction nextDir = Pathfinding.farmerBug(rc, rc.getLocation().directionTo(target).opposite());
             if (rc.canMove(nextDir)) {
                 rc.move(nextDir);
                 return;

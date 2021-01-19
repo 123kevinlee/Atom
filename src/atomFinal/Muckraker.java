@@ -98,7 +98,7 @@ public class Muckraker {
                     if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
                             && robot.getTeam() == rc.getTeam().opponent()) {
                         Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                        if (rc.canMove(nextDir) && !rc.getLocation().isAdjacentTo(robot.getLocation())) {
+                        if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
                         }
 
@@ -113,7 +113,7 @@ public class Muckraker {
                             role = Integer.toString(newFlag);
                         }
                     } else if (robot.getTeam().equals(rc.getTeam())
-                            && rc.getLocation().distanceSquaredTo(robot.getLocation()) < 4) {
+                            && rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 4) {
                         Direction nextDir = Pathfinding.basicBug(rc,
                                 rc.getLocation().directionTo(robot.getLocation()).opposite());
                         if (rc.canMove(nextDir)) {
@@ -216,7 +216,7 @@ public class Muckraker {
             for (RobotInfo robot : robots) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER && robot.getTeam() == rc.getTeam().opponent()) {
                     Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                    if (rc.canMove(nextDir) && rc.getLocation().distanceSquaredTo(robot.getLocation()) > 2) {
+                    if (rc.canMove(nextDir) && rc.getLocation().distanceSquaredTo(robot.getLocation()) > 4) {
                         rc.move(nextDir);
                     }
 
