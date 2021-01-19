@@ -307,8 +307,14 @@ public class EnlightenmentCenter {
         }
         if (round >= 300)
             if (wonLastRound == false) {
-                if (rc.canBid((int) (lastInfluenceGain))) {
-                    rc.bid((int) (lastInfluenceGain));
+                if (rc.getInfluence() > 2500) {
+                    if (rc.canBid(lastInfluenceGain + rc.getInfluence() / 50)) {
+                        rc.bid(lastInfluenceGain + rc.getInfluence() / 50);
+                        //System.out.println("Bid:" + (int) (lastInfluenceGain));
+                    }
+                }
+                if (rc.canBid(lastInfluenceGain)) {
+                    rc.bid(lastInfluenceGain);
                     //System.out.println("Bid:" + (int) (lastInfluenceGain));
                 }
             }
@@ -580,6 +586,7 @@ public class EnlightenmentCenter {
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.SLANDERER);
+        spawnOrder.add(RobotType.MUCKRAKER);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.SLANDERER);

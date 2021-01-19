@@ -38,18 +38,6 @@ public class Slanderer {
             }
         }
 
-        // if (role.charAt(0) == '7') {
-        //     int[] coords = Communication.relCoordDecoder(role);
-        //     int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
-        //     MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
-        //     Direction nextDir = Pathfinding.basicBug(rc, target).opposite();
-        //     nextDir = Pathfinding.basicBug(rc,
-        //             target.subtract(nextDir).subtract(nextDir).subtract(nextDir).subtract(nextDir));
-        //     if (rc.canMove(nextDir)) {
-        //         rc.move(nextDir);
-        //     }
-        // }
-
         if (thisLocation.distanceSquaredTo(Data.originPoint) < 6) {
             //System.out.println("AWAY");
             Direction nextDir = Pathfinding.basicBug(rc,

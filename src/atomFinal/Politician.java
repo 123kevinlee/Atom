@@ -39,27 +39,6 @@ public class Politician {
         MapLocation thisLocation = rc.getLocation();
         int thisInfluence = rc.getInfluence();
 
-        // if (role.length() > 0 && role.charAt(0) == '7') {
-        //     int[] coords = Communication.relCoordDecoder(role);
-        //     int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
-        //     MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
-        //     System.out.println(target);
-
-        //     if (thisLocation.distanceSquaredTo(target) <= 4
-        //             || (thisLocation.distanceSquaredTo(Data.originPoint) >= 4 && thisLocation
-        //                     .directionTo(Data.originPoint).equals(thisLocation.directionTo(target).opposite()))) {
-        //         role = "";
-        //         adjusted = true;
-        //     } else {
-        //         Direction nextDir = Pathfinding.basicBug(rc,
-        //                 thisLocation.add(thisLocation.directionTo(target)).add(thisLocation.directionTo(target)));
-        //         System.out.println(nextDir);
-        //         if (rc.canMove(nextDir)) {
-        //             rc.move(nextDir);
-        //         }
-        //     }
-        // }
-
         if (rc.canSenseRadiusSquared(25)) {
             RobotInfo[] robots = rc.senseNearbyRobots(25);
 
@@ -74,12 +53,10 @@ public class Politician {
 
                         boolean hasEnemy = false;
                         RobotInfo[] radius = rc.senseNearbyRobots(i);
-                        //int neededInf = 10;
                         int maxInf = 0;
                         int numOfUnits = radius.length;
                         for (RobotInfo rbt : radius) {
                             int rbtInfluence = rbt.getInfluence();
-                            //neededInf += rbtInfluence + 1;
                             if (rbt.getTeam().equals(enemy)) {
                                 hasEnemy = true;
                                 System.out.println(rbt.ID + ":" + rbtInfluence);
@@ -88,32 +65,19 @@ public class Politician {
                                     System.out.println(maxInf);
                                 }
                             }
-                            //System.out.println("INLOOP:" + maxInf);
                         }
-                        // if (neededInf < thisInfluence && numOfUnits != 0) {
-                        //     maxRadius = i;
-                        //     explode = true;
-                        //     //System.out.println("NEWRADIUS" + maxRadius);
-                        //     //System.out.println("NEEDEDINF" + neededInf);
-                        //     break;
-                        // }
-                        //System.out.println("BEFOREIF" + maxInf);
                         if (numOfUnits != 0 && hasEnemy == true && maxInf < (thisInfluence - 11) / numOfUnits) {
                             maxRadius = i;
                             explode = true;
-                            //System.out.println("RADIUS:" + maxRadius);
-                            //System.out.println("MAXINF:" + maxInf);
                             break;
                         }
                     }
                     if (rc.canEmpower(maxRadius) && explode == true) {
-                        //System.out.println("MAXRADIUS:" + maxRadius);
                         rc.empower(maxRadius);
                     } else if (thisInfluence > robot.getInfluence() + 10) {
-                        Direction dir = thisLocation.directionTo(robot.getLocation());
-                        if (rc.canMove(dir)) {
-                            rc.move(dir);
-                            //System.out.println("CHASING:" + dir);
+                        Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
+                        if (rc.canMove(nextDir)) {
+                            rc.move(nextDir);
                         }
                     }
                 }
@@ -135,9 +99,10 @@ public class Politician {
 
                 if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)
                         && thisInfluence < robot.getInfluence() - 10) {
-                    Direction dir = rc.getLocation().directionTo(robot.getLocation()).opposite();
-                    if (rc.canMove(dir)) {
-                        rc.move(dir);
+                    Direction nextDir = Pathfinding.basicBug(rc,
+                            rc.getLocation().directionTo(robot.getLocation()).opposite());
+                    if (rc.canMove(nextDir)) {
+                        rc.move(nextDir);
                         //System.out.println("RUNNING FROM ENEMY:" + dir);
                     }
                 } else if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)) {
@@ -146,7 +111,7 @@ public class Politician {
                             rc.empower(1);
                         }
                     } else {
-                        Direction dir = thisLocation.directionTo(robot.getLocation());
+                        Direction dir = Pathfinding.basicBug(rc, robot.getLocation());
                         if (rc.canMove(dir)) {
                             rc.move(dir);
                             //System.out.println("CHASING:" + dir);
@@ -160,7 +125,7 @@ public class Politician {
                                 rc.empower(1);
                             }
                         } else {
-                            Direction dir = thisLocation.directionTo(robot.getLocation());
+                            Direction dir = Pathfinding.basicBug(rc, robot.getLocation());
                             if (rc.canMove(dir)) {
                                 rc.move(dir);
                                 //System.out.println("CHASING:" + dir);
@@ -173,9 +138,10 @@ public class Politician {
                     if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 2)
                             && thisLocation.distanceSquaredTo(Data.originPoint) >= boundary - 4) {
                         // if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 2)) {
-                        Direction dir = rc.getLocation().directionTo(robot.getLocation()).opposite();
-                        if (rc.canMove(dir)) {
-                            rc.move(dir);
+                        Direction nextDir = Pathfinding.basicBug(rc,
+                                rc.getLocation().directionTo(robot.getLocation()).opposite());
+                        if (rc.canMove(nextDir)) {
+                            rc.move(nextDir);
                             //System.out.println("RUNNING FROM TEAMMATE:" + dir);
                         }
                     }
@@ -320,7 +286,7 @@ public class Politician {
                 } else if (robot.getTeam().equals(enemy)
                         && robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 25)
                         && rc.getInfluence() + 11 > robot.getInfluence()) {
-                    Direction dir = rc.getLocation().directionTo(robot.getLocation());
+                    Direction dir = Pathfinding.basicBug(rc, robot.getLocation());
                     if (rc.canMove(dir)) {
                         rc.move(dir);
                     }

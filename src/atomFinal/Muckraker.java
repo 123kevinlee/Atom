@@ -20,8 +20,9 @@ public class Muckraker {
                         //System.out.println("EXPOSING");
                         rc.expose(robot.location);
                     } else {
-                        if (rc.canMove(thisLocation.directionTo(robot.getLocation()))) {
-                            rc.move(thisLocation.directionTo(robot.getLocation()));
+                        Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
+                        if (rc.canMove(nextDir)) {
+                            rc.move(nextDir);
                         }
                     }
                 }
@@ -69,13 +70,13 @@ public class Muckraker {
                 rc.setFlag(outMsg);
             }
             scoutDirection = scoutDirection.opposite();
-            Direction nextDir = Pathfinding.basicBug(rc, rc.getLocation().add(scoutDirection).add(scoutDirection));
+            Direction nextDir = Pathfinding.basicBug(rc, scoutDirection);
             if (rc.canMove(nextDir)) {
                 rc.move(nextDir);
             }
         }
 
-        Direction nextDir = Pathfinding.basicBug(rc, rc.getLocation().add(scoutDirection).add(scoutDirection));
+        Direction nextDir = Pathfinding.basicBug(rc, scoutDirection);
         if (rc.canMove(nextDir)) {
             rc.move(nextDir);
             MapLocation currentLocation = rc.getLocation();
