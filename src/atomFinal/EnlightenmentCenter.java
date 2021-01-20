@@ -5,6 +5,8 @@ import battlecode.schema.SpawnedBodyTable;
 
 import java.util.*;
 
+import org.objenesis.strategy.BaseInstantiatorStrategy;
+
 public class EnlightenmentCenter {
 
     /*To Do 
@@ -17,6 +19,7 @@ public class EnlightenmentCenter {
     public static ArrayList<RobotType> spawnOrder = new ArrayList<RobotType>();
     public static int spawnOrderCounter = 0;
     public static int initialSetupCount = 0;
+    public static boolean addedMucks = false;
 
     public static Map<Integer, Direction> scoutIds = new HashMap<Integer, Direction>();
     public static Set<Integer> waller = new HashSet<Integer>(); // fricking waller direction is annoying so they can
@@ -33,6 +36,7 @@ public class EnlightenmentCenter {
     public static MapLocation danger = null;
 
     public static LinkedHashSet<MapLocation> enemyBases = new LinkedHashSet<MapLocation>();
+    public static ArrayList<Boolean> triedAttackingEnemy = new ArrayList<Boolean>();
     public static Map<Direction, MapLocation> enemyCoords = new TreeMap<Direction, MapLocation>();
     public static LinkedHashSet<MapLocation> possibleEnemyBases = new LinkedHashSet<MapLocation>();
     public static LinkedHashMap<MapLocation, Integer> neutralBases = new LinkedHashMap<MapLocation, Integer>();
@@ -95,6 +99,12 @@ public class EnlightenmentCenter {
 
         }
 
+        if (rc.getRoundNum() > 150 && addedMucks == false) {
+            spawnOrder.add(7, RobotType.MUCKRAKER);
+            spawnOrder.add(15, RobotType.MUCKRAKER);
+            addedMucks = true;
+        }
+
         boolean save = false;
         //System.out.println("INFGAIN:" + lastInfluenceGain);
         Object[] neutralBaseKeys = neutralBases.keySet().toArray();
@@ -104,6 +114,25 @@ public class EnlightenmentCenter {
                 System.out.println("BIG BOI SPAWNED FOR" + key.toString());
             } else if (neutralBases.get(key) != 1000) {
                 save = true;
+            }
+        }
+        for (int i = 0; i < triedAttackingEnemy.size(); i++) {
+            if (triedAttackingEnemy.get(i) == false && rc.getInfluence() > 500) {
+                //Iterator<MapLocation> it = enemyBases.iterator();
+                int n = i;
+                int index = 0;
+                MapLocation target = null;
+                for (MapLocation element : enemyBases) {
+                    if (index == n) {
+                        target = element;
+                    }
+                    index++;
+                }
+                if (target != null) {
+                    spawnTakeoverPolitician(rc, 400, target);
+                    System.out.println("BIG BOI SPAWNED FOR" + target.toString());
+                    triedAttackingEnemy.set(i, true);
+                }
             }
         }
 
@@ -120,7 +149,10 @@ public class EnlightenmentCenter {
                 spawnTargetedMuckraker(rc, influence / 2);
                 break;
             case MUCKRAKER:
-                influence = lastInfluenceGain / 5;
+                influence = 1;
+                if (lastInfluenceGain / 5 > 1) {
+                    influence = lastInfluenceGain / 5;
+                }
                 if (rc.getInfluence() > 100000) {
                     influence = rc.getInfluence() / 25;
                 }
@@ -271,34 +303,34 @@ public class EnlightenmentCenter {
             if (rc.canSetFlag(0)) {
                 rc.setFlag(0);
             }
-            Object[] keyset = enemyCoords.keySet().toArray();
-            if (keyset.length > 0) {
-                MapLocation warnLocation = enemyCoords.get(keyset[0]);
-                int relx = warnLocation.x % 128;
-                int rely = warnLocation.y % 128;
-                int flag = Communication.coordEncoder("WARN", relx, rely);
-                if (rc.canSetFlag(flag)) {
-                    rc.setFlag(flag);
-                }
-            }
-            if (possibleEnemyBases.size() > 0) {
-                MapLocation warnLocation = possibleEnemyBases.iterator().next();
-                int relx = warnLocation.x % 128;
-                int rely = warnLocation.y % 128;
-                int flag = Communication.coordEncoder("WARN", relx, rely);
-                if (rc.canSetFlag(flag)) {
-                    rc.setFlag(flag);
-                }
-            }
-            if (enemyBases.size() > 0) {
-                MapLocation warnLocation = enemyBases.iterator().next();
-                int relx = warnLocation.x % 128;
-                int rely = warnLocation.y % 128;
-                int flag = Communication.coordEncoder("WARN", relx, rely);
-                if (rc.canSetFlag(flag)) {
-                    rc.setFlag(flag);
-                }
-            }
+            // Object[] keyset = enemyCoords.keySet().toArray();
+            // if (keyset.length > 0) {
+            //     MapLocation warnLocation = enemyCoords.get(keyset[0]);
+            //     int relx = warnLocation.x % 128;
+            //     int rely = warnLocation.y % 128;
+            //     int flag = Communication.coordEncoder("WARN", relx, rely);
+            //     if (rc.canSetFlag(flag)) {
+            //         rc.setFlag(flag);
+            //     }
+            // }
+            // if (possibleEnemyBases.size() > 0) {
+            //     MapLocation warnLocation = possibleEnemyBases.iterator().next();
+            //     int relx = warnLocation.x % 128;
+            //     int rely = warnLocation.y % 128;
+            //     int flag = Communication.coordEncoder("WARN", relx, rely);
+            //     if (rc.canSetFlag(flag)) {
+            //         rc.setFlag(flag);
+            //     }
+            // }
+            // if (enemyBases.size() > 0) {
+            //     MapLocation warnLocation = enemyBases.iterator().next();
+            //     int relx = warnLocation.x % 128;
+            //     int rely = warnLocation.y % 128;
+            //     int flag = Communication.coordEncoder("WARN", relx, rely);
+            //     if (rc.canSetFlag(flag)) {
+            //         rc.setFlag(flag);
+            //     }
+            // }
             rc.buildRobot(RobotType.SLANDERER, dir, optimalInfluence);
         }
     }
@@ -316,30 +348,61 @@ public class EnlightenmentCenter {
     //logic for bidding:
     //currently bids 3 between rounds 150 and 1000
     //after round 1000, the ec will bid 1/5 of its influence gain
+    public static int baseVote = 0;
+    public static int winsInARow = 0;
+
     public static void calculateBid(RobotController rc) throws GameActionException {
+        //legacy voting system
+        // int round = rc.getRoundNum();
+        // boolean wonLastRound = false;
+        // //System.out.println(rc.getTeamVotes());
+        // if (rc.getTeamVotes() > lastVotes) {
+        //     lastVotes++;
+        //     wonLastRound = true;
+        // }
+        // if (round >= 300) {
+        //     if (rc.getInfluence() > 2000) {
+        //         if (rc.canBid(lastInfluenceGain + rc.getInfluence() / 100)) {
+        //             rc.bid(lastInfluenceGain + rc.getInfluence() / 100);
+        //             //System.out.println("Bid:" + (int) (lastInfluenceGain));
+        //         }
+        //     }
+        //     if (wonLastRound == false) {
+        //         if (rc.canBid(lastInfluenceGain)) {
+        //             rc.bid(lastInfluenceGain);
+        //             //System.out.println("Bid:" + (int) (lastInfluenceGain));
+        //         }
+        //     }
+        //     if (rc.canBid(lastInfluenceGain / 3)) {
+        //         rc.bid(lastInfluenceGain / 3);
+        //         //System.out.println("Bid:" + lastInfluenceGain / 3);
+        //     }
+        // }
         int round = rc.getRoundNum();
         boolean wonLastRound = false;
-        //System.out.println(rc.getTeamVotes());
         if (rc.getTeamVotes() > lastVotes) {
             lastVotes++;
             wonLastRound = true;
+            winsInARow++;
         }
         if (round >= 300) {
-            if (rc.getInfluence() > 2000) {
-                if (rc.canBid(lastInfluenceGain + rc.getInfluence() / 100)) {
-                    rc.bid(lastInfluenceGain + rc.getInfluence() / 100);
-                    //System.out.println("Bid:" + (int) (lastInfluenceGain));
-                }
+            if (baseVote == 0) {
+                baseVote = lastInfluenceGain;
             }
             if (wonLastRound == false) {
-                if (rc.canBid(lastInfluenceGain)) {
-                    rc.bid(lastInfluenceGain);
-                    //System.out.println("Bid:" + (int) (lastInfluenceGain));
+                baseVote += 5;
+                winsInARow = 0;
+            } else if (winsInARow > 10) {
+                if (rc.canBid(baseVote)) {
+                    rc.bid(baseVote);
                 }
+            } else if (winsInARow > 50) {
+                winsInARow -= 2;
             }
-            if (rc.canBid(lastInfluenceGain / 3)) {
-                rc.bid(lastInfluenceGain / 3);
-                //System.out.println("Bid:" + lastInfluenceGain / 3);
+
+            if (rc.canBid(baseVote)) {
+                rc.bid(baseVote);
+                System.out.println("BID:" + baseVote);
             }
         }
     }
@@ -372,7 +435,7 @@ public class EnlightenmentCenter {
                         int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
                         MapLocation enemyBase = Data.originPoint.translate(distance[0], distance[1]);
                         enemyBases.add(enemyBase);
-
+                        triedAttackingEnemy.add(false);
                         //System.out.println("ENEMY BASES:" + enemyBases.toString());
                     }
                     //recieved neutral base coords
@@ -598,25 +661,27 @@ public class EnlightenmentCenter {
         Data.relOriginPoint[1] = Data.originPoint.y % 128;
 
         //Poli Spawns
-        // spawnOrder.add(RobotType.POLITICIAN);
-        // spawnOrder.add(RobotType.POLITICIAN);
-        // spawnOrder.add(RobotType.SLANDERER);
-        // spawnOrder.add(RobotType.POLITICIAN);
-        // spawnOrder.add(RobotType.POLITICIAN);
-        // spawnOrder.add(RobotType.SLANDERER);
-        // spawnOrder.add(RobotType.MUCKRAKER);
-        // spawnOrder.add(RobotType.POLITICIAN);
-        // spawnOrder.add(RobotType.POLITICIAN);
-        // spawnOrder.add(RobotType.SLANDERER);
-        // spawnOrder.add(RobotType.POLITICIAN);
-        // spawnOrder.add(RobotType.POLITICIAN);
-        // spawnOrder.add(RobotType.SLANDERER);
-        // spawnOrder.add(RobotType.MUCKRAKER);
-
-        //more mucks
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.SLANDERER);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.SLANDERER);
         spawnOrder.add(RobotType.MUCKRAKER);
+        //spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.SLANDERER);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.SLANDERER);
+        // spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.MUCKRAKER);
+
+        //more mucks
+        //spawnOrder.add(RobotType.POLITICIAN);
+        //spawnOrder.add(RobotType.POLITICIAN);
+        //spawnOrder.add(RobotType.SLANDERER);
+        //spawnOrder.add(RobotType.MUCKRAKER);
     }
 }

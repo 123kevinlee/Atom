@@ -22,27 +22,27 @@ public class Slanderer {
                             //System.out.println("HUH");
                         }
                     }
-                    if (rc.getFlag(rc.getID()) == 0) {
-                        String flagS = Integer.toString(flag);
-                        if (flagS.length() > 0 && flagS.charAt(0) == '7') {
-                            if (rc.canSetFlag(flag)) {
-                                rc.setFlag(flag);
-                            }
-                        }
-                    }
+                    // if (rc.getFlag(rc.getID()) == 0) {
+                    //     String flagS = Integer.toString(flag);
+                    //     if (flagS.length() > 0 && flagS.charAt(0) == '7') {
+                    //         if (rc.canSetFlag(flag)) {
+                    //             rc.setFlag(flag);
+                    //         }
+                    //     }
+                    // }
                 }
             }
         }
 
-        if (rc.canGetFlag(Data.baseId)) {
-            int flag = rc.getFlag(Data.baseId);
-            String flagS = Integer.toString(flag);
-            if (flagS.length() > 0 && flagS.charAt(0) == '7' && rc.getFlag(rc.getID()) != flag) {
-                if (rc.canSetFlag(flag)) {
-                    rc.setFlag(flag);
-                }
-            }
-        }
+        // if (rc.canGetFlag(Data.baseId)) {
+        //     int flag = rc.getFlag(Data.baseId);
+        //     String flagS = Integer.toString(flag);
+        //     if (flagS.length() > 0 && flagS.charAt(0) == '7' && rc.getFlag(rc.getID()) != flag) {
+        //         if (rc.canSetFlag(flag)) {
+        //             rc.setFlag(flag);
+        //         }
+        //     }
+        // }
 
         logic(rc);
     }
@@ -74,18 +74,19 @@ public class Slanderer {
             }
         }
 
-        int flag = rc.getFlag(rc.getID());
-        if (thisLocation.distanceSquaredTo(Data.originPoint) < 49 && flag != 0) {
-            int[] coords = Communication.relCoordDecoder(Integer.toString(flag));
-            int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
-            MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
-            //System.out.println("ESCAPING FROM" + target.toString());
-            Direction nextDir = Pathfinding.farmerBug(rc, rc.getLocation().directionTo(target).opposite());
-            if (rc.canMove(nextDir)) {
-                rc.move(nextDir);
-                return;
-            }
-        } else if (thisLocation.distanceSquaredTo(Data.originPoint) < 6) {
+        // int flag = rc.getFlag(rc.getID());
+        // if (thisLocation.distanceSquaredTo(Data.originPoint) < 49 && flag != 0) {
+        //     int[] coords = Communication.relCoordDecoder(Integer.toString(flag));
+        //     int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+        //     MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
+        //     //System.out.println("ESCAPING FROM" + target.toString());
+        //     Direction nextDir = Pathfinding.farmerBug(rc, rc.getLocation().directionTo(target).opposite());
+        //     if (rc.canMove(nextDir)) {
+        //         rc.move(nextDir);
+        //         return;
+        //     }
+        // } else 
+        if (thisLocation.distanceSquaredTo(Data.originPoint) < 6) {
             Direction nextDir = Pathfinding.basicBug(rc,
                     thisLocation.add(thisLocation.directionTo(Data.originPoint).opposite()));
             if (rc.canMove(nextDir)) {
