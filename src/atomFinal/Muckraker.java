@@ -4,7 +4,7 @@ import battlecode.common.*;
 
 public class Muckraker {
 
-    public static Direction scoutDirection;
+    public static Direction scoutDirection = null;
     public static boolean end = false;
     public static String role = "";
 
@@ -112,26 +112,22 @@ public class Muckraker {
                             rc.setFlag(newFlag);
                             role = Integer.toString(newFlag);
                         }
-                    } else if (robot.getTeam().equals(rc.getTeam())
-                            && rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 4) {
-                        Direction nextDir = Pathfinding.basicBug(rc,
-                                rc.getLocation().directionTo(robot.getLocation()).opposite());
-                        if (rc.canMove(nextDir)) {
-                            rc.move(nextDir);
-                        }
                     }
+                    // else if (robot.getTeam().equals(rc.getTeam())
+                    //         && rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 4) {
+                    //     Direction nextDir = Pathfinding.basicBug(rc,
+                    //             rc.getLocation().directionTo(robot.getLocation()).opposite());
+                    //     if (rc.canMove(nextDir)) {
+                    //         rc.move(nextDir);
+                    //     }
+                    // }
                 }
+                Direction nextDir = Pathfinding.scoutBug(rc, scoutDirection);
                 if (!rc.onTheMap(rc.getLocation().add(scoutDirection))) {
                     scoutDirection = scoutDirection.opposite().rotateRight();
-                } else if (rc.canMove(scoutDirection)) {
-                    rc.move(scoutDirection);
+                } else if (rc.canMove(nextDir)) {
+                    rc.move(nextDir);
                     //System.out.println("MOVED SCOUTDIRECTION:" + scoutDirection);
-                } else {
-                    for (Direction dir : directions) {
-                        if (rc.canMove(dir)) {
-                            rc.move(dir);
-                        }
-                    }
                 }
             }
         }

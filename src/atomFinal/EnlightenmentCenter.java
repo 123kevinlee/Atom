@@ -5,6 +5,7 @@ import battlecode.schema.SpawnedBodyTable;
 
 import java.util.*;
 
+import org.hamcrest.generator.qdox.directorywalker.DirectoryScanner;
 import org.objenesis.strategy.BaseInstantiatorStrategy;
 
 public class EnlightenmentCenter {
@@ -359,39 +360,10 @@ public class EnlightenmentCenter {
         }
     }
 
-    //logic for bidding:
-    //currently bids 3 between rounds 150 and 1000
-    //after round 1000, the ec will bid 1/5 of its influence gain
     public static int baseVote = 0;
     public static int winsInARow = 0;
 
     public static void calculateBid(RobotController rc) throws GameActionException {
-        //legacy voting system
-        // int round = rc.getRoundNum();
-        // boolean wonLastRound = false;
-        // //System.out.println(rc.getTeamVotes());
-        // if (rc.getTeamVotes() > lastVotes) {
-        //     lastVotes++;
-        //     wonLastRound = true;
-        // }
-        // if (round >= 300) {
-        //     if (rc.getInfluence() > 2000) {
-        //         if (rc.canBid(lastInfluenceGain + rc.getInfluence() / 100)) {
-        //             rc.bid(lastInfluenceGain + rc.getInfluence() / 100);
-        //             //System.out.println("Bid:" + (int) (lastInfluenceGain));
-        //         }
-        //     }
-        //     if (wonLastRound == false) {
-        //         if (rc.canBid(lastInfluenceGain)) {
-        //             rc.bid(lastInfluenceGain);
-        //             //System.out.println("Bid:" + (int) (lastInfluenceGain));
-        //         }
-        //     }
-        //     if (rc.canBid(lastInfluenceGain / 3)) {
-        //         rc.bid(lastInfluenceGain / 3);
-        //         //System.out.println("Bid:" + lastInfluenceGain / 3);
-        //     }
-        // }
         int round = rc.getRoundNum();
         boolean wonLastRound = false;
         if (rc.getTeamVotes() > lastVotes) {
@@ -399,14 +371,14 @@ public class EnlightenmentCenter {
             wonLastRound = true;
             winsInARow++;
         }
-        if (round >= 450) {
+        if (round >= 450 && rc.getInfluence() - baseVote > 100) {
             if (baseVote == 0) {
                 baseVote = lastInfluenceGain;
             }
             if (wonLastRound == false) {
                 baseVote += 5;
                 winsInARow = 0;
-            } else if (winsInARow > 50) {
+            } else if (winsInARow > 20) {
                 winsInARow -= 2;
             }
 
@@ -642,8 +614,45 @@ public class EnlightenmentCenter {
 
     //returns an open spawn location around the ec
     public static Direction openSpawnLocation(RobotController rc, RobotType type) throws GameActionException {
-        Direction[] directions = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST,
+
+        Direction enemyBase = Direction.EAST;
+        if (enemyBases.size() > 0) {
+            MapLocation base = enemyBases.iterator().next();
+            enemyBase = rc.getLocation().directionTo(base);
+        } else if (possibleEnemyBases.size() > 0) {
+            MapLocation base = enemyBases.iterator().next();
+            enemyBase = rc.getLocation().directionTo(base);
+        } else if (enemyCoords.size() > 0) {
+            Object[] keys = enemyCoords.keySet().toArray();
+            MapLocation coords = enemyCoords.get(keys[0]);
+            enemyBase = rc.getLocation().directionTo(coords);
+        }
+
+        Direction[] directionsEast = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST,
                 Direction.NORTHEAST, Direction.SOUTHWEST, Direction.SOUTHEAST, Direction.NORTHWEST };
+
+        Direction[] directionsWest = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.WEST,
+                Direction.NORTHWEST, Direction.SOUTHWEST, Direction.SOUTHEAST, Direction.NORTHEAST, Direction.EAST };
+
+        Direction[] other = new Direction[] { enemyBase, enemyBase.rotateRight(), enemyBase.rotateLeft(),
+                enemyBase.rotateRight().rotateRight(), enemyBase.rotateLeft().rotateLeft(),
+                enemyBase.opposite().rotateRight(), enemyBase.opposite().rotateLeft(), enemyBase.opposite() };
+
+        Direction[] directions = directionsEast;
+        switch (enemyBase) {
+            case EAST:
+                directions = directionsEast;
+                //System.out.println("SEAST");
+                break;
+            case WEST:
+                directions = directionsWest;
+                //System.out.println("SWEST");
+                break;
+            default:
+                directions = other;
+                //System.out.println("OTHER:" + enemyBase);
+                break;
+        }
 
         for (int i = 0; i < directions.length; i++) {
             if (rc.canBuildRobot(type, directions[i], 1)) {

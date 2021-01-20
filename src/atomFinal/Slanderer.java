@@ -15,8 +15,8 @@ public class Slanderer {
                 if (rc.canGetFlag(robot.getID())) {
                     int flag = rc.getFlag(robot.getID());
                     if (flag == 666) {
-                        Direction nextDir = Pathfinding.basicBug(rc,
-                                rc.getLocation().directionTo(robot.getLocation()).opposite());
+                        Direction robotToBase = robot.getLocation().directionTo(Data.originPoint);
+                        Direction nextDir = Pathfinding.basicBug(rc, robotToBase);
                         if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
                             //System.out.println("HUH");

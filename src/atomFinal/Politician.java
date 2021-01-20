@@ -7,6 +7,7 @@ public class Politician {
     public static MapLocation originPoint;
     public static int boundary = 25;
     public static boolean adjusted = false;
+    public static int followID = 0;
 
     public static boolean wasNearWall = false;
     public static Direction determinedDirection = Direction.CENTER;
@@ -27,9 +28,8 @@ public class Politician {
                 if (robot.getTeam().equals(rc.getTeam()) && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)
                         && rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 2) {
                     double empowerFactor = rc.getEmpowerFactor(rc.getTeam(), 0);
-                    if (empowerFactor > 10) {
-                        int random = (int) (Math.random() * 4);
-                        if (rc.canEmpower(2) && random == 0) {
+                    if (empowerFactor > 250) {
+                        if (rc.canEmpower(2)) {
                             rc.empower(2);
                             //System.out.println("SELFEMPOWER");
                         }
@@ -39,8 +39,9 @@ public class Politician {
                             rc.empower(2);
                             //System.out.println("SELFEMPOWER");
                         }
-                    } else if (empowerFactor > 250) {
-                        if (rc.canEmpower(2)) {
+                    } else if (empowerFactor > 10) {
+                        int random = (int) (Math.random() * 4);
+                        if (rc.canEmpower(2) && random == 0) {
                             rc.empower(2);
                             //System.out.println("SELFEMPOWER");
                         }
@@ -155,7 +156,8 @@ public class Politician {
                         rc.move(nextDir);
                         //System.out.println("RUNNING FROM ENEMY:" + dir);
                     }
-                } else if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)) {
+                } else if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)
+                        && thisInfluence * currentEmpowerFactor - 10 > robot.getInfluence()) {
                     if (thisLocation.isAdjacentTo(robot.getLocation())) {
                         if (rc.canEmpower(1)) {
                             rc.empower(1);
@@ -186,7 +188,7 @@ public class Politician {
                 }
                 if (robotTeam.equals(rc.getTeam())) {
                     nearbyAllies++;
-                    if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 4)
+                    if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 10)
                             && thisLocation.distanceSquaredTo(Data.originPoint) >= boundary - 4) {
                         // if (robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 2)) {
                         Direction nextDir = Pathfinding.basicBug(rc,
@@ -202,7 +204,7 @@ public class Politician {
 
         //System.out.println("NEARBY ALLIES:" + nearbyAllies);
         //System.out.println("BOUNDARY: " + boundary);
-        if (nearbyAllies > 8) {
+        if (nearbyAllies > 4) {
             boundary += 4;
         } else if (nearbyAllies < 6 && boundary >= 27) {
             boundary -= 4;
