@@ -23,6 +23,21 @@ public class Politician {
                     rc.setFlag(0);
                 }
             }
+            for (RobotInfo robot : robots) {
+                if (robot.getTeam().equals(rc.getTeam()) && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)
+                        && rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 2) {
+                    double empowerFactor = rc.getEmpowerFactor(rc.getTeam(), 0);
+                    if (empowerFactor > 10) {
+                        int randNum = (int) (Math.random() * 4);
+                        if (randNum == 0) {
+                            if (rc.canEmpower(2)) {
+                                rc.empower(2);
+                                System.out.println("SELFEMPOWER");
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         if (role.length() > 0 && role.charAt(0) == '5') {

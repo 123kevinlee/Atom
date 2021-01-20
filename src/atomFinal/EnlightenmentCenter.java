@@ -39,7 +39,6 @@ public class EnlightenmentCenter {
     public static LinkedHashSet<MapLocation> alliedBases = new LinkedHashSet<MapLocation>();
 
     public static void run(RobotController rc) throws GameActionException {
-
         if (scoutIds.size() > 0) {
             listenForScoutMessages(rc);
         }
@@ -598,21 +597,7 @@ public class EnlightenmentCenter {
         Data.relOriginPoint[0] = Data.originPoint.x % 128;
         Data.relOriginPoint[1] = Data.originPoint.y % 128;
 
-        spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.SLANDERER);
-        spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.SLANDERER);
-        spawnOrder.add(RobotType.MUCKRAKER);
-        spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.SLANDERER);
-        spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.SLANDERER);
-        spawnOrder.add(RobotType.MUCKRAKER);
-
+        //Poli Spawns
         // spawnOrder.add(RobotType.POLITICIAN);
         // spawnOrder.add(RobotType.POLITICIAN);
         // spawnOrder.add(RobotType.SLANDERER);
@@ -620,5 +605,18 @@ public class EnlightenmentCenter {
         // spawnOrder.add(RobotType.POLITICIAN);
         // spawnOrder.add(RobotType.SLANDERER);
         // spawnOrder.add(RobotType.MUCKRAKER);
+        // spawnOrder.add(RobotType.POLITICIAN);
+        // spawnOrder.add(RobotType.POLITICIAN);
+        // spawnOrder.add(RobotType.SLANDERER);
+        // spawnOrder.add(RobotType.POLITICIAN);
+        // spawnOrder.add(RobotType.POLITICIAN);
+        // spawnOrder.add(RobotType.SLANDERER);
+        // spawnOrder.add(RobotType.MUCKRAKER);
+
+        //more mucks
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.SLANDERER);
+        spawnOrder.add(RobotType.MUCKRAKER);
     }
 }
