@@ -384,7 +384,7 @@ public class EnlightenmentCenter {
 
             if (rc.canBid(baseVote)) {
                 rc.bid(baseVote);
-                System.out.println("BID:" + baseVote);
+                //System.out.println("BID:" + baseVote);
             }
         }
     }
@@ -407,7 +407,7 @@ public class EnlightenmentCenter {
                             int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
                             MapLocation neutralBase = Data.originPoint.translate(distance[0], distance[1]);
                             neutralBases.put(neutralBase, influence);
-                            System.out.println("NEUTRAL BASES:" + neutralBases.toString());
+                            //System.out.println("NEUTRAL BASES:" + neutralBases.toString());
                         }
                     }
                     int[] coords = Communication.relCoordDecoder(msg);
@@ -482,7 +482,7 @@ public class EnlightenmentCenter {
                             }
                         }
                         if (zeroCount == 1 && !mapComplete) {
-                            System.out.println("Calculating World Map...");
+                            //System.out.println("Calculating World Map...");
                             int missingIndex = 0;
                             for (int i = 0; i < mapBorders.length; i++) {
                                 if (mapBorders[i] == 0) {
@@ -553,8 +553,8 @@ public class EnlightenmentCenter {
                                         default:
                                             break;
                                     }
-                                    System.out.println("Possible Enemy Base:"
-                                            + possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
+                                    //System.out.println("Possible Enemy Base:"
+                                    //+ possibleEnemyBases.toArray()[possibleEnemyBases.size() - 1].toString());
                                 }
                             }
                         }
@@ -594,12 +594,12 @@ public class EnlightenmentCenter {
                             default:
                                 break;
                         }
-                        System.out.println("Possible Enemy Bases:" + possibleEnemyBases.toString());
+                        //System.out.println("Possible Enemy Bases:" + possibleEnemyBases.toString());
                     } else {
                         if (!waller.contains(key)) {
                             enemyCoords.put(scoutIds.get(key), new MapLocation(enemyPosition.x, enemyPosition.y));
                         }
-                        System.out.println("ENEMY COORDS: " + enemyCoords.toString());
+                        //System.out.println("ENEMY COORDS: " + enemyCoords.toString());
                     }
                 }
                 removeId = key;
