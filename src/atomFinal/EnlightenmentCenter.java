@@ -116,18 +116,24 @@ public class EnlightenmentCenter {
                 if (lastInfluenceGain / 2 > 14) {
                     influence = lastInfluenceGain / 2;
                 }
-                if (lastInfluenceGain <= 500)
+                if (lastInfluenceGain <= 1000)
                     spawnFarmer(rc, spawnDir);
                 spawnTargetedMuckraker(rc, influence / 2);
                 break;
             case MUCKRAKER:
                 influence = lastInfluenceGain / 5;
+                if (rc.getInfluence() > 100000) {
+                    influence = rc.getInfluence() / 25;
+                }
                 spawnMuckraker(rc, influence);
                 break;
             case POLITICIAN:
                 influence = 14;
                 if (lastInfluenceGain > 14 && save == false) {
                     influence = lastInfluenceGain;
+                }
+                if (rc.getInfluence() > 100000) {
+                    influence = rc.getInfluence() / 25;
                 }
                 spawnPolitician(rc, influence);
                 break;

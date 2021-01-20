@@ -112,10 +112,6 @@ public class Politician {
                     if (rc.canEmpower(9)) {
                         rc.empower(9);
                     }
-                } else if (thisLocation.distanceSquaredTo(robot.getLocation()) <= 9 && rc.getRobotCount() > 1500) {
-                    if (rc.canEmpower(9)) {
-                        rc.empower(9);
-                    }
                 }
 
                 if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)
