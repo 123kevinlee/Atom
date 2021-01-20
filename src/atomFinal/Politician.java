@@ -31,18 +31,18 @@ public class Politician {
                         int random = (int) (Math.random() * 4);
                         if (rc.canEmpower(2) && random == 0) {
                             rc.empower(2);
-                            System.out.println("SELFEMPOWER");
+                            //System.out.println("SELFEMPOWER");
                         }
                     } else if (empowerFactor > 100) {
                         int random = (int) (Math.random() * 2);
                         if (rc.canEmpower(2) && random == 0) {
                             rc.empower(2);
-                            System.out.println("SELFEMPOWER");
+                            //System.out.println("SELFEMPOWER");
                         }
                     } else if (empowerFactor > 250) {
                         if (rc.canEmpower(2)) {
                             rc.empower(2);
-                            System.out.println("SELFEMPOWER");
+                            //System.out.println("SELFEMPOWER");
                         }
                     }
                 }
@@ -90,10 +90,10 @@ public class Politician {
                                     hasPoly = true;
                                 }
                                 hasEnemy = true;
-                                System.out.println(rbt.ID + ":" + rbtInfluence);
+                                //System.out.println(rbt.ID + ":" + rbtInfluence);
                                 if (rbtInfluence > maxInf) {
                                     maxInf = rbtInfluence;
-                                    System.out.println(maxInf);
+                                    //System.out.println(maxInf);
                                 }
                             }
                         }
@@ -310,10 +310,10 @@ public class Politician {
                         for (RobotInfo rbt : radius) {
                             int rbtInfluence = rbt.getInfluence();
                             if (rbt.getTeam().equals(enemy)) {
-                                System.out.println(rbt.ID + ":" + rbtInfluence);
+                                //System.out.println(rbt.ID + ":" + rbtInfluence);
                                 if (rbtInfluence > maxInf) {
                                     maxInf = rbtInfluence;
-                                    System.out.println(maxInf);
+                                    //System.out.println(maxInf);
                                 }
                                 if (rbt.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
                                     hasEnemyEC = true;

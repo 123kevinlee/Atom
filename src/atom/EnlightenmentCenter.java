@@ -291,7 +291,7 @@ public class EnlightenmentCenter {
             lastVotes++;
             wonLastRound = true;
         }
-        System.out.println("Won Last Round:" + wonLastRound);
+        //System.out.println("Won Last Round:" + wonLastRound);
         // if (round > 200 && round < 500) {
         //     if (rc.canBid(3)) {
         //         rc.bid(3);

@@ -399,17 +399,13 @@ public class EnlightenmentCenter {
             wonLastRound = true;
             winsInARow++;
         }
-        if (round >= 300) {
+        if (round >= 450) {
             if (baseVote == 0) {
                 baseVote = lastInfluenceGain;
             }
             if (wonLastRound == false) {
                 baseVote += 5;
                 winsInARow = 0;
-            } else if (winsInARow > 10) {
-                if (rc.canBid(baseVote)) {
-                    rc.bid(baseVote);
-                }
             } else if (winsInARow > 50) {
                 winsInARow -= 2;
             }

@@ -67,7 +67,7 @@ public class Slanderer {
                             thisLocation.add(thisLocation.directionTo(robot.getLocation()).opposite()));
                     if (rc.canMove(nextDir)) {
                         rc.move(nextDir);
-                        System.out.println("RUN");
+                        //System.out.println("RUN");
                         return;
                     }
                 }
