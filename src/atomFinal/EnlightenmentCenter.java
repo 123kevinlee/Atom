@@ -17,9 +17,13 @@ public class EnlightenmentCenter {
     public static int lastVotes = 0;
 
     public static ArrayList<RobotType> spawnOrder = new ArrayList<RobotType>();
+    public static ArrayList<RobotType> antiMuckSpawnOrder = new ArrayList<RobotType>();
     public static int spawnOrderCounter = 0;
     public static int initialSetupCount = 0;
     public static boolean addedMucks = false;
+
+    public static boolean probablyMuckRush = false;
+    public static boolean isMuckRush = false;
 
     public static Map<Integer, Direction> scoutIds = new HashMap<Integer, Direction>();
     public static Set<Integer> waller = new HashSet<Integer>(); // fricking waller direction is annoying so they can
@@ -52,17 +56,27 @@ public class EnlightenmentCenter {
             calculateBid(rc); //calculates the amount to bid
         }
 
+        int enemyMucks = 0;
+        Team enemy = rc.getTeam().opponent();
         if (rc.canSenseRadiusSquared(40)) {
             RobotInfo[] robots = rc.senseNearbyRobots();
             for (RobotInfo robot : robots) {
-                if (robot.getTeam().equals(rc.getTeam().opponent())
-                        && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
+                if (robot.getTeam().equals(enemy) && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
                     enemyBases.add(robot.getLocation());
                     spawnTakeoverPolitician(rc, 150, enemyBases.iterator().next());
                 } else if (robot.getTeam().equals(Team.NEUTRAL)) {
                     neutralBases.put(robot.getLocation(), robot.getInfluence());
+                } else if (robot.getTeam().equals(enemy) && robot.getType().equals(RobotType.MUCKRAKER)) {
+                    enemyMucks++;
                 }
             }
+        }
+        if (enemyMucks > 3) {
+            probablyMuckRush = true;
+        }
+        if (enemyMucks > 5) {
+            isMuckRush = true;
+            spawnOrder = new ArrayList<RobotType>(antiMuckSpawnOrder);
         }
 
         if (rc.getRoundNum() < 5) {
@@ -99,7 +113,7 @@ public class EnlightenmentCenter {
 
         }
 
-        if (rc.getRoundNum() > 150 && addedMucks == false) {
+        if (rc.getRoundNum() > 200 && addedMucks == false && probablyMuckRush == false) {
             spawnOrder.add(7, RobotType.MUCKRAKER);
             spawnOrder.add(15, RobotType.MUCKRAKER);
             addedMucks = true;
@@ -683,5 +697,11 @@ public class EnlightenmentCenter {
         //spawnOrder.add(RobotType.POLITICIAN);
         //spawnOrder.add(RobotType.SLANDERER);
         //spawnOrder.add(RobotType.MUCKRAKER);
+        antiMuckSpawnOrder.add(RobotType.POLITICIAN);
+        antiMuckSpawnOrder.add(RobotType.POLITICIAN);
+        antiMuckSpawnOrder.add(RobotType.SLANDERER);
+        antiMuckSpawnOrder.add(RobotType.POLITICIAN);
+        antiMuckSpawnOrder.add(RobotType.POLITICIAN);
+        antiMuckSpawnOrder.add(RobotType.SLANDERER);
     }
 }

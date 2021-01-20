@@ -70,7 +70,6 @@ public class Politician {
 
         if (rc.canSenseRadiusSquared(25)) {
             RobotInfo[] robots = rc.senseNearbyRobots(25);
-
             for (RobotInfo robot : robots) {
                 Team robotTeam = robot.getTeam();
                 boolean explode = false;
@@ -79,14 +78,17 @@ public class Politician {
                         || robotTeam.equals(Team.NEUTRAL))) {
                     int maxRadius = 0;
                     for (int i = 9; i > 0; i--) {
-
                         boolean hasEnemy = false;
+                        boolean hasPoly = false;
                         RobotInfo[] radius = rc.senseNearbyRobots(i);
                         int maxInf = 0;
                         int numOfUnits = radius.length;
                         for (RobotInfo rbt : radius) {
                             int rbtInfluence = rbt.getInfluence();
                             if (rbt.getTeam().equals(enemy)) {
+                                if (rbt.getType().equals(RobotType.POLITICIAN)) {
+                                    hasPoly = true;
+                                }
                                 hasEnemy = true;
                                 System.out.println(rbt.ID + ":" + rbtInfluence);
                                 if (rbtInfluence > maxInf) {
@@ -97,9 +99,12 @@ public class Politician {
                         }
                         if (numOfUnits != 0 && hasEnemy == true
                                 && maxInf < (thisInfluence * currentEmpowerFactor - 11) / numOfUnits) {
-                            maxRadius = i;
-                            explode = true;
-                            break;
+                            if (((thisInfluence * currentEmpowerFactor - 11) / numOfUnits) - maxInf < 10
+                                    || numOfUnits > 2 || hasPoly) {
+                                maxRadius = i;
+                                explode = true;
+                                break;
+                            }
                         }
                     }
                     if (rc.canEmpower(maxRadius) && explode == true) {
