@@ -309,7 +309,7 @@ public class EnlightenmentCenter {
     public static void spawnFarmer(RobotController rc, Direction dir) throws GameActionException {
         int optimalInfluence = 21;
         for (int i = 0; i < optimalFarmingInfluence.length; i++) {
-            if (optimalFarmingInfluence[i] * 3 < rc.getInfluence()) {
+            if (optimalFarmingInfluence[i] * (3 / 2) < rc.getInfluence()) {
                 optimalInfluence = optimalFarmingInfluence[i];
             }
         }
@@ -364,6 +364,30 @@ public class EnlightenmentCenter {
     public static int winsInARow = 0;
 
     public static void calculateBid(RobotController rc) throws GameActionException {
+        // int round = rc.getRoundNum();
+        // boolean wonLastRound = false;
+        // //System.out.println(rc.getTeamVotes());
+        // if (rc.getTeamVotes() > lastVotes) {
+        //     lastVotes++;
+        //     wonLastRound = true;
+        // }
+        // if (round >= 300) {
+        //     if (rc.getInfluence() > 2000) {
+        //         if (rc.canBid(lastInfluenceGain + rc.getInfluence() / 100)) {
+        //             rc.bid(lastInfluenceGain + rc.getInfluence() / 100);
+        //             //System.out.println("Bid:" + (int) (lastInfluenceGain));
+        //         }
+        //     }
+        //     if (wonLastRound == false) {
+        //         if (rc.canBid(lastInfluenceGain)) {
+        //             rc.bid(lastInfluenceGain);
+        //             //System.out.println("Bid:" + (int) (lastInfluenceGain));
+        //         }
+        //     } else if (rc.canBid(lastInfluenceGain / 3)) {
+        //         rc.bid(lastInfluenceGain / 3);
+        //         //System.out.println("Bid:" + lastInfluenceGain / 3);
+        //     }
+        // }
         int round = rc.getRoundNum();
         boolean wonLastRound = false;
         if (rc.getTeamVotes() > lastVotes) {
@@ -371,17 +395,18 @@ public class EnlightenmentCenter {
             wonLastRound = true;
             winsInARow++;
         }
-        if (round >= 450 && rc.getInfluence() - baseVote > 100) {
+        if (round >= 300 && rc.getInfluence() - baseVote > 100) {
             if (baseVote == 0) {
                 baseVote = 30;
             }
             if (wonLastRound == false) {
                 baseVote += 5;
                 winsInARow = 0;
-            } else if (winsInARow > 20) {
-                winsInARow -= 2;
+            } else if (winsInARow > 5) {
+                winsInARow -= 3;
+            } else if (baseVote > rc.getInfluence() / 5) {
+                baseVote = rc.getInfluence() / 5;
             }
-
             if (rc.canBid(baseVote)) {
                 rc.bid(baseVote);
                 //System.out.println("BID:" + baseVote);
@@ -620,7 +645,7 @@ public class EnlightenmentCenter {
             MapLocation base = enemyBases.iterator().next();
             enemyBase = rc.getLocation().directionTo(base);
         } else if (possibleEnemyBases.size() > 0) {
-            MapLocation base = enemyBases.iterator().next();
+            MapLocation base = possibleEnemyBases.iterator().next();
             enemyBase = rc.getLocation().directionTo(base);
         } else if (enemyCoords.size() > 0) {
             Object[] keys = enemyCoords.keySet().toArray();
