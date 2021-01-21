@@ -62,7 +62,7 @@ public class Slanderer {
         if (rc.canSenseRadiusSquared(20)) {
             RobotInfo[] robots = rc.senseNearbyRobots(20, rc.getTeam().opponent());
             for (RobotInfo robot : robots) {
-                if (robot.getType().equals(RobotType.MUCKRAKER)) {
+                if (robot.getTeam().equals(rc.getTeam().opponent())) {
                     Direction nextDir = Pathfinding.basicBug(rc,
                             thisLocation.add(thisLocation.directionTo(robot.getLocation()).opposite()));
                     if (rc.canMove(nextDir)) {

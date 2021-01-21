@@ -373,7 +373,7 @@ public class EnlightenmentCenter {
         }
         if (round >= 450 && rc.getInfluence() - baseVote > 100) {
             if (baseVote == 0) {
-                baseVote = lastInfluenceGain;
+                baseVote = 30;
             }
             if (wonLastRound == false) {
                 baseVote += 5;
