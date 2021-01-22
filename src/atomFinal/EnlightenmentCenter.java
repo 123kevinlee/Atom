@@ -1,18 +1,9 @@
 package atomFinal;
 
 import battlecode.common.*;
-import battlecode.schema.SpawnedBodyTable;
-
 import java.util.*;
 
-import org.hamcrest.generator.qdox.directorywalker.DirectoryScanner;
-import org.objenesis.strategy.BaseInstantiatorStrategy;
-
 public class EnlightenmentCenter {
-
-    /*To Do 
-        Send for neutral bases, send poli to attack bases, send mucks, bidding, make slanderers escape
-    */
     public static int lastInfluenceAmount = 0;
     public static int lastInfluenceGain = 0;
     public static int lastVotes = 0;
