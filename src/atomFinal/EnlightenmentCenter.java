@@ -180,7 +180,6 @@ public class EnlightenmentCenter {
                 int determinant = (int) (Math.random() * 3);
                 if (currentRound > 250 && determinant == 0 && hasCoords) {
                     spawnTargetedMuckraker(rc, influence);
-                    System.out.println("TACK");
                 } else {
                     spawnMuckraker(rc, influence);
                 }
@@ -195,8 +194,6 @@ public class EnlightenmentCenter {
                 }
                 determinant = (int) (Math.random() * 3);
                 if (currentRound > 250 && determinant == 0 & hasCoords) {
-                    spawnTargetedPolitician(rc, influence);
-                    System.out.println("TACK");
                 } else {
                     spawnPolitician(rc, influence);
                 }

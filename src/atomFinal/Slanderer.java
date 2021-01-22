@@ -5,7 +5,7 @@ import battlecode.common.*;
 public class Slanderer {
     public static Direction safeDirection = Direction.CENTER;
     public static String role = "";
-    public static int boundary = 14;
+    public static int boundary = 16;
 
     public static void run(RobotController rc) throws GameActionException {
         logic(rc);
