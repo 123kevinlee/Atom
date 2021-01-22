@@ -13,6 +13,7 @@ public class Politician {
     public static Direction determinedDirection = Direction.CENTER;
 
     public static void run(RobotController rc) throws GameActionException {
+        //System.out.println(role);
         if (rc.canSenseRadiusSquared(25)) {
             RobotInfo[] robots = rc.senseNearbyRobots(25, rc.getTeam().opponent());
             if (robots.length > 0 && (rc.getFlag(rc.getID()) == 0 || rc.getFlag(rc.getID()) == 666)) {
@@ -81,6 +82,7 @@ public class Politician {
                     for (int i = 9; i > 0; i--) {
                         boolean hasEnemy = false;
                         boolean hasPoly = false;
+                        boolean nearFarmer = false;
                         RobotInfo[] radius = rc.senseNearbyRobots(i);
                         int maxInf = 0;
                         int numOfUnits = radius.length;
@@ -89,6 +91,9 @@ public class Politician {
                             if (rbt.getTeam().equals(enemy)) {
                                 if (rbt.getType().equals(RobotType.POLITICIAN)) {
                                     hasPoly = true;
+                                } else if (rbt.getType().equals(RobotType.SLANDERER)
+                                        && rbt.getTeam().equals(rc.getTeam())) {
+                                    nearFarmer = true;
                                 }
                                 hasEnemy = true;
                                 //System.out.println(rbt.ID + ":" + rbtInfluence);
@@ -101,7 +106,7 @@ public class Politician {
                         if (numOfUnits != 0 && hasEnemy == true
                                 && maxInf < (thisInfluence * currentEmpowerFactor - 11) / numOfUnits) {
                             if (((thisInfluence * currentEmpowerFactor - 11) / numOfUnits) - maxInf < 10
-                                    || numOfUnits > 2 || hasPoly) {
+                                    || numOfUnits > 2 || hasPoly || nearFarmer) {
                                 maxRadius = i;
                                 explode = true;
                                 break;

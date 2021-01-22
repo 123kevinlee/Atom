@@ -153,6 +153,12 @@ public class EnlightenmentCenter {
 
         RobotType spawn = spawnOrder.get(spawnOrderCounter % spawnOrder.size());
         Direction spawnDir = openSpawnLocation(rc, RobotType.SLANDERER);
+        int currentRound = rc.getRoundNum();
+        boolean hasCoords = false;
+        if (enemyBases.size() > 0 || possibleEnemyBases.size() > 0 || enemyCoords.size() > 0) {
+            hasCoords = true;
+        }
+
         switch (spawn) {
             case SLANDERER:
                 int influence = 1;
@@ -171,7 +177,13 @@ public class EnlightenmentCenter {
                 if (rc.getInfluence() > 100000) {
                     influence = rc.getInfluence() / 25;
                 }
-                spawnMuckraker(rc, influence);
+                int determinant = (int) (Math.random() * 3);
+                if (currentRound > 250 && determinant == 0 && hasCoords) {
+                    spawnTargetedMuckraker(rc, influence);
+                    System.out.println("TACK");
+                } else {
+                    spawnMuckraker(rc, influence);
+                }
                 break;
             case POLITICIAN:
                 influence = 14;
@@ -181,7 +193,13 @@ public class EnlightenmentCenter {
                 if (rc.getInfluence() > 100000) {
                     influence = rc.getInfluence() / 25;
                 }
-                spawnPolitician(rc, influence);
+                determinant = (int) (Math.random() * 3);
+                if (currentRound > 250 && determinant == 0 & hasCoords) {
+                    spawnTargetedPolitician(rc, influence);
+                    System.out.println("TACK");
+                } else {
+                    spawnPolitician(rc, influence);
+                }
                 break;
             default:
                 break;

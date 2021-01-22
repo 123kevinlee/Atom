@@ -60,7 +60,7 @@ public class Pathfinding {
         } else if (rc.canMove(dir)) {
             return dir;
         } else {
-            Direction attemptDir = Direction.CENTER;
+            Direction attemptDir = dir;
             Direction returnDirection = Direction.CENTER;
             for (int i = 1; i < 8; i++) {
                 switch (i) {
@@ -112,7 +112,7 @@ public class Pathfinding {
         } else if (rc.canMove(dir)) {
             return dir;
         } else {
-            Direction attemptDir = Direction.CENTER;
+            Direction attemptDir = dir;
             Direction returnDirection = Direction.CENTER;
             for (int i = 1; i < 8; i++) {
                 switch (i) {
@@ -149,15 +149,11 @@ public class Pathfinding {
     }
 
     public static Direction farmerBug(RobotController rc, Direction targetDirection) throws GameActionException {
-        MapLocation target = rc.getLocation().add(targetDirection).add(targetDirection);
-        Direction dir = rc.getLocation().directionTo(target);
-
-        if (dir == null) {
-            return Direction.CENTER;
-        } else if (rc.canMove(dir)) {
+        Direction dir = targetDirection;
+        if (rc.canMove(dir)) {
             return dir;
         } else {
-            Direction attemptDir = Direction.CENTER;
+            Direction attemptDir = dir;
             Direction returnDirection = Direction.CENTER;
             for (int i = 1; i < 5; i++) {
                 switch (i) {
@@ -174,6 +170,7 @@ public class Pathfinding {
                         attemptDir = dir.rotateLeft().rotateLeft();
                         break;
                 }
+                //System.out.println("ATTEMPT:" + attemptDir);
                 if (rc.canMove(attemptDir)) {
                     returnDirection = attemptDir;
                 }
