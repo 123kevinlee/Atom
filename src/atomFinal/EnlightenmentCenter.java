@@ -444,6 +444,10 @@ public class EnlightenmentCenter {
                 rc.bid(baseVote);
                 //System.out.println("BID:" + baseVote);
             }
+        } else {
+            if (rc.canBid(2)) {
+                rc.bid(2);
+            }
         }
     }
 
