@@ -29,19 +29,14 @@ public class Politician {
                 if (robot.getTeam().equals(rc.getTeam()) && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)
                         && rc.getLocation().distanceSquaredTo(robot.getLocation()) <= 2) {
                     double empowerFactor = rc.getEmpowerFactor(rc.getTeam(), 0);
-                    if (empowerFactor > 250) {
-                        if (rc.canEmpower(2)) {
-                            rc.empower(2);
-                            //System.out.println("SELFEMPOWER");
-                        }
-                    } else if (empowerFactor > 100) {
-                        int random = (int) (Math.random() * 2);
+                    if (empowerFactor > 100) {
+                        int random = (int) (Math.random() * 4);
                         if (rc.canEmpower(2) && random == 0) {
                             rc.empower(2);
                             //System.out.println("SELFEMPOWER");
                         }
                     } else if (empowerFactor > 10) {
-                        int random = (int) (Math.random() * 4);
+                        int random = (int) (Math.random() * 8);
                         if (rc.canEmpower(2) && random == 0) {
                             rc.empower(2);
                             //System.out.println("SELFEMPOWER");
@@ -273,25 +268,24 @@ public class Politician {
         double empowerFactor = rc.getEmpowerFactor(rc.getTeam(), 0);
         MapLocation thisLocation = rc.getLocation();
         int thisInfluence = rc.getInfluence();
-        double currentEmpowerFactor = rc.getEmpowerFactor(ally, 0);
 
-        if (rc.canSenseRadiusSquared(25)) {
-            RobotInfo[] robots = rc.senseNearbyRobots(25);
+        if (rc.canSenseRadiusSquared(9)) {
+            RobotInfo[] robots = rc.senseNearbyRobots(2);
             // System.out.println(robots.toString());
             for (RobotInfo robot : robots) {
                 if (robot.getTeam().equals(Team.NEUTRAL)) {
                     int totalRobotsAround = 0;
-                    if (rc.canSenseRadiusSquared(1)) {
-                        RobotInfo[] robotS = rc.senseNearbyRobots(1);
+                    if (rc.canSenseRadiusSquared(2)) {
+                        RobotInfo[] robotS = rc.senseNearbyRobots(2);
                         totalRobotsAround = robotS.length;
                     }
                     if (totalRobotsAround > 0 && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)
                             && (rc.getInfluence() * empowerFactor - 10) / totalRobotsAround > robot.getInfluence()) {
-                        if (rc.getLocation().distanceSquaredTo(robot.getLocation()) == 1) {
-                            if (rc.canEmpower(1)) {
-                                rc.empower(1);
-                            }
+                        //if (rc.getLocation().distanceSquaredTo(robot.getLocation()) == 1) {
+                        if (rc.canEmpower(2)) {
+                            rc.empower(2);
                         }
+                        //}
                         Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
                         if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
@@ -328,7 +322,7 @@ public class Politician {
                             }
                         }
                         if (numOfUnits != 0 && hasEnemyEC == true
-                                && maxInf < (thisInfluence * currentEmpowerFactor - 11) / numOfUnits) {
+                                && maxInf < (thisInfluence * empowerFactor - 11) / numOfUnits) {
                             maxRadius = i;
                             explode = true;
                             break;

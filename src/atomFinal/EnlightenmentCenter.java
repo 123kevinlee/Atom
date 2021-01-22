@@ -10,6 +10,7 @@ public class EnlightenmentCenter {
 
     public static ArrayList<RobotType> spawnOrder = new ArrayList<RobotType>();
     public static ArrayList<RobotType> antiMuckSpawnOrder = new ArrayList<RobotType>();
+    public static ArrayList<Direction> scoutDirections = new ArrayList<Direction>();
     public static int spawnOrderCounter = 0;
     public static int initialSetupCount = 0;
     public static boolean addedMucks = false;
@@ -75,35 +76,48 @@ public class EnlightenmentCenter {
             if (rc.canBuildRobot(RobotType.SLANDERER, Direction.SOUTH, 130)) {
                 rc.buildRobot(RobotType.SLANDERER, Direction.SOUTH, 130);
             }
+            Direction[] directions = new Direction[] { Direction.NORTH, Direction.EAST, Direction.WEST, Direction.SOUTH,
+                    Direction.NORTHEAST, Direction.SOUTHWEST, Direction.NORTHWEST, Direction.SOUTHEAST };
+            if (scoutDirections.size() == 0) {
+                for (int i = 0; i < directions.length; i++) {
+                    if (rc.onTheMap(rc.getLocation().add(directions[i]))) {
+                        scoutDirections.add(directions[i]);
+                    }
+                }
+            }
         }
 
-        switch (initialSetupCount) {
-            case 0:
-                spawnScout(rc, Direction.NORTH);
-                break;
-            case 1:
-                spawnScout(rc, Direction.EAST);
-                break;
-            case 2:
-                spawnScout(rc, Direction.WEST);
-                break;
-            case 3:
-                spawnScout(rc, Direction.SOUTH);
-                break;
-            case 4:
-                spawnScout(rc, Direction.NORTHEAST);
-                break;
-            case 5:
-                spawnScout(rc, Direction.SOUTHWEST);
-                break;
-            case 6:
-                spawnScout(rc, Direction.NORTHWEST);
-                break;
-            case 7:
-                spawnScout(rc, Direction.SOUTHEAST);
-                break;
-
+        if (initialSetupCount < scoutDirections.size()) {
+            spawnScout(rc, scoutDirections.get(initialSetupCount));
         }
+
+        // switch (initialSetupCount) {
+        //     case 0:
+        //         spawnScout(rc, Direction.NORTH);
+        //         break;
+        //     case 1:
+        //         spawnScout(rc, Direction.EAST);
+        //         break;
+        //     case 2:
+        //         spawnScout(rc, Direction.WEST);
+        //         break;
+        //     case 3:
+        //         spawnScout(rc, Direction.SOUTH);
+        //         break;
+        //     case 4:
+        //         spawnScout(rc, Direction.NORTHEAST);
+        //         break;
+        //     case 5:
+        //         spawnScout(rc, Direction.SOUTHWEST);
+        //         break;
+        //     case 6:
+        //         spawnScout(rc, Direction.NORTHWEST);
+        //         break;
+        //     case 7:
+        //         spawnScout(rc, Direction.SOUTHEAST);
+        //         break;
+
+        // }
 
         if (rc.getRoundNum() > 200 && addedMucks == false && probablyMuckRush == false) {
             spawnOrder.add(7, RobotType.MUCKRAKER);
@@ -168,7 +182,7 @@ public class EnlightenmentCenter {
                 if (rc.getInfluence() > 100000) {
                     influence = rc.getInfluence() / 25;
                 }
-                int determinant = (int) (Math.random() * 3);
+                int determinant = (int) (Math.random() * 2);
                 if (currentRound > 250 && determinant == 0 && hasCoords) {
                     spawnTargetedMuckraker(rc, influence);
                 } else {
@@ -184,7 +198,8 @@ public class EnlightenmentCenter {
                     influence = rc.getInfluence() / 25;
                 }
                 determinant = (int) (Math.random() * 3);
-                if (currentRound > 250 && determinant == 0 & hasCoords) {
+                if (currentRound > 500 && determinant == 0 & hasCoords) {
+                    spawnTargetedPolitician(rc, influence);
                 } else {
                     spawnPolitician(rc, influence);
                 }
@@ -196,21 +211,33 @@ public class EnlightenmentCenter {
     }
 
     public static void spawnTargetedPolitician(RobotController rc, int influence) throws GameActionException {
+        MapLocation thisLocation = rc.getLocation();
         Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
         if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)) {
             MapLocation targetLocation = Data.originPoint;
-            if (enemyBases.size() > 0) {
+            if (enemyBases.size() > 0 && possibleEnemyBases.size() > 0) {
+                targetLocation = enemyBases.iterator().next();
+                if (thisLocation.distanceSquaredTo(targetLocation) > thisLocation
+                        .distanceSquaredTo(possibleEnemyBases.iterator().next())) {
+                    targetLocation = possibleEnemyBases.iterator().next();
+                }
+            } else if (enemyBases.size() > 0) {
                 targetLocation = enemyBases.iterator().next();
             } else if (possibleEnemyBases.size() > 0) {
                 targetLocation = possibleEnemyBases.iterator().next();
             }
-            int relx = targetLocation.x % 128;
-            int rely = targetLocation.y % 128;
-            int flag = Communication.coordEncoder("ENEMY", relx, rely);
-            if (rc.canSetFlag(flag)) {
-                rc.setFlag(flag);
+            if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)
+                    && !targetLocation.equals(Data.originPoint)) {
+                int relx = targetLocation.x % 128;
+                int rely = targetLocation.y % 128;
+                int flag = Communication.coordEncoder("ENEMY", relx, rely);
+                if (rc.canSetFlag(flag)) {
+                    rc.setFlag(flag);
+                }
+                rc.buildRobot(RobotType.POLITICIAN, spawnDir, influence);
+            } else {
+                spawnPolitician(rc, influence);
             }
-            rc.buildRobot(RobotType.POLITICIAN, spawnDir, influence);
         }
     }
 
@@ -254,6 +281,8 @@ public class EnlightenmentCenter {
                 rc.setFlag(flag);
             }
             rc.buildRobot(RobotType.MUCKRAKER, spawnDir, unitInfluence);
+        } else {
+            spawnMuckraker(rc);
         }
     }
 
@@ -306,9 +335,7 @@ public class EnlightenmentCenter {
                     }
                 }
             }
-            if (initialSetupCount < 8) {
-                initialSetupCount++;
-            }
+            initialSetupCount++;
         }
     }
 

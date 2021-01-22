@@ -100,7 +100,7 @@ public class Pathfinding {
         MapLocation target = rc.getLocation().add(targetDirection).add(targetDirection);
         Direction dir = rc.getLocation().directionTo(target);
 
-        int random = (int) (Math.random() * 5);
+        int random = (int) (Math.random() * 8);
         if (random == 0) {
             return dir.rotateRight().rotateRight();
         } else if (random == 1) {
