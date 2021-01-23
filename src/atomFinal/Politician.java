@@ -205,9 +205,9 @@ public class Politician {
         //System.out.println("NEARBY ALLIES:" + nearbyAllies);
         //System.out.println("BOUNDARY: " + boundary);
         if (nearbyAllies > 4) {
-            boundary += 4;
+            boundary += 6;
         } else if (nearbyAllies < 6 && boundary >= 27) {
-            boundary -= 4;
+            boundary -= 9;
         }
 
         if (!rc.onTheMap(thisLocation.translate(1, 0))) {

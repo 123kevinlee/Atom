@@ -93,14 +93,13 @@ public class EnlightenmentCenter {
 
         if (rc.getRoundNum() > 200 && addedMucks == false && probablyMuckRush == false) {
             spawnOrder.add(7, RobotType.MUCKRAKER);
-            spawnOrder.add(15, RobotType.MUCKRAKER);
             addedMucks = true;
         }
 
         //System.out.println("INFGAIN:" + lastInfluenceGain);
         Object[] neutralBaseKeys = neutralBases.keySet().toArray();
         for (Object key : neutralBaseKeys) {
-            if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 100) {
+            if (enemyMucks == 0 && neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 25) {
                 spawnTakeoverPolitician(rc, neutralBases.get(key) + 12, (MapLocation) key);
                 System.out.println("BIG BOI SPAWNED FOR" + key.toString());
             }
@@ -162,7 +161,11 @@ public class EnlightenmentCenter {
                 if (hasCoords) {
                     spawnTargetedMuckraker(rc, influence);
                 } else {
-                    spawnMuckraker(rc);
+                    influence = 14;
+                    if (lastInfluenceGain > 14) {
+                        influence = lastInfluenceGain + rc.getInfluence() / 15;
+                    }
+                    spawnPolitician(rc, influence);
                 }
                 //} else {
                 // spawnMuckraker(rc, influence);
@@ -171,13 +174,13 @@ public class EnlightenmentCenter {
             case POLITICIAN:
                 influence = 14;
                 if (lastInfluenceGain > 14) {
-                    influence = lastInfluenceGain;
+                    influence = lastInfluenceGain + rc.getInfluence() / 15;
                 }
                 if (rc.getInfluence() > 100000) {
                     influence = rc.getInfluence() / 25;
                 }
                 int determinant = (int) (Math.random() * 3);
-                if (currentRound > 250 && determinant == 0 & hasCoords) {
+                if (currentRound > 250 && determinant != 0 & hasCoords) {
                     spawnTargetedPolitician(rc, influence);
                 } else {
                     spawnPolitician(rc, influence);
@@ -204,6 +207,10 @@ public class EnlightenmentCenter {
                 targetLocation = enemyBases.iterator().next();
             } else if (possibleEnemyBases.size() > 0) {
                 targetLocation = possibleEnemyBases.iterator().next();
+            } else if (enemyCoords.size() > 0) {
+                Object[] keys = enemyCoords.keySet().toArray();
+                MapLocation coords = enemyCoords.get(keys[0]);
+                targetLocation = coords;
             }
             if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)
                     && !targetLocation.equals(Data.originPoint)) {
@@ -727,8 +734,6 @@ public class EnlightenmentCenter {
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.SLANDERER);
-        spawnOrder.add(RobotType.MUCKRAKER);
-        //spawnOrder.add(RobotType.MUCKRAKER);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.SLANDERER);
@@ -737,6 +742,7 @@ public class EnlightenmentCenter {
         spawnOrder.add(RobotType.SLANDERER);
         // spawnOrder.add(RobotType.MUCKRAKER);
         spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.SLANDERER);
 
         //more mucks
         //spawnOrder.add(RobotType.POLITICIAN);
