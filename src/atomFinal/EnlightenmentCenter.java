@@ -139,9 +139,15 @@ public class EnlightenmentCenter {
                 if (lastInfluenceGain / 2 > 14) {
                     influence = lastInfluenceGain / 2;
                 }
-                if (lastInfluenceGain <= 1000)
+                if (lastInfluenceGain <= 1000 && enemyMucks == 0) {
                     spawnFarmer(rc, spawnDir);
-                spawnTargetedMuckraker(rc, influence / 2);
+                } else if (enemyMucks > 0) {
+                    spawnPolitician(rc, lastInfluenceGain);
+                } else if (hasCoords) {
+                    spawnTargetedMuckraker(rc, influence / 2);
+                } else {
+                    spawnMuckraker(rc);
+                }
                 break;
             case MUCKRAKER:
                 influence = 1;
@@ -153,7 +159,11 @@ public class EnlightenmentCenter {
                 }
                 //int determinant = (int) (Math.random() * 2);
                 //if (currentRound > 250 && determinant == 0 && hasCoords) {
-                spawnTargetedMuckraker(rc, influence);
+                if (hasCoords) {
+                    spawnTargetedMuckraker(rc, influence);
+                } else {
+                    spawnMuckraker(rc);
+                }
                 //} else {
                 // spawnMuckraker(rc, influence);
                 //}
