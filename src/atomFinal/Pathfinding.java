@@ -179,6 +179,101 @@ public class Pathfinding {
         }
     }
 
+    public static int tries = 0;
+    public static int antiTries = 0;
+
+    public static Direction smartNav(RobotController rc, MapLocation target) throws GameActionException {
+        MapLocation beginning = rc.getLocation();
+        Direction dir = beginning.directionTo(target);
+
+        if (dir == null || dir == Direction.CENTER) {
+            return Direction.CENTER;
+        }
+
+        Direction fastestDir = dir;
+        double highestPass = 0;
+
+        if (rc.onTheMap(beginning.add(dir))) {
+            highestPass = rc.sensePassability(beginning.add(dir));
+            highestPass *= highestPass;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            dir = dir.rotateRight();
+            if (rc.canMove(dir)) {
+                double pass = rc.sensePassability(beginning.add(dir));
+                pass *= 100;
+                if (Math.ceil(pass) > Math.ceil(highestPass)) {
+                    System.out.println(dir);
+                    fastestDir = dir;
+                    highestPass = pass;
+                }
+            }
+        }
+
+        if (!fastestDir.equals(beginning.directionTo(target))) {
+            tries++;
+        }
+
+        if (tries > 3 || antiTries > 0) {
+            tries = 0;
+            antiTries += 1;
+            if (antiTries > 3) {
+                antiTries = 0;
+            }
+            return basicBug(rc, target);
+        }
+
+        return fastestDir;
+    }
+
+    public static Direction smartNav(RobotController rc, Direction targetDir) throws GameActionException {
+        MapLocation beginning = rc.getLocation();
+        MapLocation target = beginning.add(targetDir).add(targetDir).add(targetDir);
+        Direction dir = beginning.directionTo(target);
+
+        if (dir == null || dir == Direction.CENTER) {
+            return Direction.CENTER;
+        }
+
+        Direction fastestDir = dir;
+        double highestPass = 0;
+
+        if (rc.onTheMap(beginning.add(dir))) {
+            highestPass = rc.sensePassability(beginning.add(dir));
+            highestPass *= highestPass;
+        }
+
+        System.out.println("BEGDIR:" + dir + "PASS:" + Math.ceil(highestPass));
+        for (int i = 0; i < 8; i++) {
+            dir = dir.rotateRight();
+            if (rc.canMove(dir)) {
+                double pass = rc.sensePassability(beginning.add(dir));
+                pass *= 100;
+                if (Math.ceil(pass) > Math.ceil(highestPass)) {
+                    System.out.println(dir);
+                    fastestDir = dir;
+                    highestPass = pass;
+                }
+            }
+        }
+
+        if (!fastestDir.equals(beginning.directionTo(target))) {
+            tries++;
+        }
+
+        if (tries > 3 || antiTries > 0) {
+            tries = 0;
+            antiTries += 1;
+            if (antiTries > 3) {
+                antiTries = 0;
+            }
+            return basicBug(rc, target);
+        }
+
+        return fastestDir;
+    }
+
     public static int[] getDistance(int[] ref, int[] target) {
         int[] temp = new int[2];
 
