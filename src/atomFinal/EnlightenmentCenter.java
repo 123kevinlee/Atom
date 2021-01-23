@@ -91,49 +91,18 @@ public class EnlightenmentCenter {
             spawnScout(rc, scoutDirections.get(initialSetupCount));
         }
 
-        // switch (initialSetupCount) {
-        //     case 0:
-        //         spawnScout(rc, Direction.NORTH);
-        //         break;
-        //     case 1:
-        //         spawnScout(rc, Direction.EAST);
-        //         break;
-        //     case 2:
-        //         spawnScout(rc, Direction.WEST);
-        //         break;
-        //     case 3:
-        //         spawnScout(rc, Direction.SOUTH);
-        //         break;
-        //     case 4:
-        //         spawnScout(rc, Direction.NORTHEAST);
-        //         break;
-        //     case 5:
-        //         spawnScout(rc, Direction.SOUTHWEST);
-        //         break;
-        //     case 6:
-        //         spawnScout(rc, Direction.NORTHWEST);
-        //         break;
-        //     case 7:
-        //         spawnScout(rc, Direction.SOUTHEAST);
-        //         break;
-
-        // }
-
         if (rc.getRoundNum() > 200 && addedMucks == false && probablyMuckRush == false) {
             spawnOrder.add(7, RobotType.MUCKRAKER);
             spawnOrder.add(15, RobotType.MUCKRAKER);
             addedMucks = true;
         }
 
-        boolean save = false;
         //System.out.println("INFGAIN:" + lastInfluenceGain);
         Object[] neutralBaseKeys = neutralBases.keySet().toArray();
         for (Object key : neutralBaseKeys) {
-            if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 25) {
+            if (neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 100) {
                 spawnTakeoverPolitician(rc, neutralBases.get(key) + 12, (MapLocation) key);
                 System.out.println("BIG BOI SPAWNED FOR" + key.toString());
-            } else if (neutralBases.get(key) != 1000) {
-                save = true;
             }
         }
         for (int i = 0; i < triedAttackingEnemy.size(); i++) {
@@ -176,29 +145,29 @@ public class EnlightenmentCenter {
                 break;
             case MUCKRAKER:
                 influence = 1;
-                if (lastInfluenceGain / 5 > 1) {
-                    influence = lastInfluenceGain / 5;
+                if (lastInfluenceGain / 3 > 1) {
+                    influence = lastInfluenceGain / 3;
                 }
                 if (rc.getInfluence() > 100000) {
                     influence = rc.getInfluence() / 25;
                 }
-                int determinant = (int) (Math.random() * 2);
-                if (currentRound > 250 && determinant == 0 && hasCoords) {
-                    spawnTargetedMuckraker(rc, influence);
-                } else {
-                    spawnMuckraker(rc, influence);
-                }
+                //int determinant = (int) (Math.random() * 2);
+                //if (currentRound > 250 && determinant == 0 && hasCoords) {
+                spawnTargetedMuckraker(rc, influence);
+                //} else {
+                // spawnMuckraker(rc, influence);
+                //}
                 break;
             case POLITICIAN:
                 influence = 14;
-                if (lastInfluenceGain > 14 && save == false) {
+                if (lastInfluenceGain > 14) {
                     influence = lastInfluenceGain;
                 }
                 if (rc.getInfluence() > 100000) {
                     influence = rc.getInfluence() / 25;
                 }
-                determinant = (int) (Math.random() * 3);
-                if (currentRound > 500 && determinant == 0 & hasCoords) {
+                int determinant = (int) (Math.random() * 3);
+                if (currentRound > 250 && determinant == 0 & hasCoords) {
                     spawnTargetedPolitician(rc, influence);
                 } else {
                     spawnPolitician(rc, influence);
@@ -445,8 +414,8 @@ public class EnlightenmentCenter {
                 //System.out.println("BID:" + baseVote);
             }
         } else {
-            if (rc.canBid(2)) {
-                rc.bid(2);
+            if (rc.canBid(1)) {
+                rc.bid(1);
             }
         }
     }
