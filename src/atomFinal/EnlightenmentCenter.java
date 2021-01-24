@@ -150,8 +150,8 @@ public class EnlightenmentCenter {
                 break;
             case MUCKRAKER:
                 influence = 1;
-                if (lastInfluenceGain / 3 > 1) {
-                    influence = lastInfluenceGain / 3;
+                if (lastInfluenceGain / 2 > 1) {
+                    influence = lastInfluenceGain / 2;
                 }
                 if (rc.getInfluence() > 100000) {
                     influence = rc.getInfluence() / 25;
@@ -161,11 +161,9 @@ public class EnlightenmentCenter {
                 if (hasCoords) {
                     spawnTargetedMuckraker(rc, influence);
                 } else {
-                    influence = 14;
-                    if (lastInfluenceGain > 14) {
-                        influence = lastInfluenceGain + rc.getInfluence() / 15;
-                    }
-                    spawnPolitician(rc, influence);
+                    Direction[] directions = Data.directions;
+                    Direction scoutDirection = directions[(int) (Math.random() * 8)];
+                    spawnScout(rc, scoutDirection);
                 }
                 //} else {
                 // spawnMuckraker(rc, influence);
@@ -179,7 +177,7 @@ public class EnlightenmentCenter {
                 if (rc.getInfluence() > 100000) {
                     influence = rc.getInfluence() / 25;
                 }
-                int determinant = (int) (Math.random() * 3);
+                int determinant = (int) (Math.random() * 5);
                 if (currentRound > 250 && determinant != 0 & hasCoords) {
                     spawnTargetedPolitician(rc, influence);
                 } else {
@@ -732,7 +730,7 @@ public class EnlightenmentCenter {
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.SLANDERER);
         spawnOrder.add(RobotType.POLITICIAN);
-        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.SLANDERER);
         spawnOrder.add(RobotType.SLANDERER);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.POLITICIAN);
@@ -740,7 +738,7 @@ public class EnlightenmentCenter {
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.POLITICIAN);
         spawnOrder.add(RobotType.SLANDERER);
-        // spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.MUCKRAKER);
         spawnOrder.add(RobotType.MUCKRAKER);
         spawnOrder.add(RobotType.SLANDERER);
 
