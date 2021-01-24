@@ -12,16 +12,47 @@ public class Politician {
     public static boolean wasNearWall = false;
     public static Direction determinedDirection = Direction.CENTER;
 
+    public static Direction weightedDirection = Direction.CENTER;
+
     public static void run(RobotController rc) throws GameActionException {
-        //System.out.println(role);
+        System.out.println(role);
+        System.out.println(weightedDirection);
+        int flag = -1;
+        if (rc.canGetFlag(rc.getID())) {
+            flag = rc.getFlag(rc.getID());
+        }
+        if (role.length() > 0 && role.charAt(0) == '4' && flag == 0) {
+            if (rc.canSetFlag(Integer.parseInt(role))) {
+                rc.setFlag(Integer.parseInt(role));
+            }
+        }
+
         if (rc.canSenseRadiusSquared(25)) {
             RobotInfo[] robots = rc.senseNearbyRobots(25, rc.getTeam().opponent());
-            if (robots.length > 0 && (rc.getFlag(rc.getID()) == 0 || rc.getFlag(rc.getID()) == 666)) {
+            if (robots.length > 0) {
                 if (rc.canSetFlag(666)) {
                     rc.setFlag(666);
                 }
             } else {
-                if (rc.canSetFlag(0)) {
+                if (role.equals("0") || role.equals("")) {
+                    RobotInfo[] team = rc.senseNearbyRobots(25, rc.getTeam());
+                    for (RobotInfo robot : team) {
+                        if (robot.getType().equals(RobotType.POLITICIAN)) {
+                            if (rc.canGetFlag(robot.getID())) {
+                                int flagT = rc.getFlag(robot.getID());
+                                String flagTS = Integer.toString(flagT);
+                                if (flagTS.length() > 0 && flagTS.charAt(0) == '4') {
+                                    role = flagTS;
+                                }
+                            }
+                        }
+                    }
+                }
+                if (role.length() > 0 && role.charAt(0) == '4') {
+                    if (rc.canSetFlag(Integer.parseInt(role))) {
+                        rc.setFlag(Integer.parseInt(role));
+                    }
+                } else if (rc.canSetFlag(0)) {
                     rc.setFlag(0);
                 }
             }
@@ -224,17 +255,35 @@ public class Politician {
                 rc.move(determinedDirection);
             }
         } else if (thisLocation.distanceSquaredTo(Data.originPoint) < boundary) {
-            //System.out.println("MOVING TO BOUNDARY");
+            //System.out.println("MOVING TO BOUNDARY");\
+            if (role.length() > 0 && role.charAt(0) == '4' && weightedDirection.equals(Direction.CENTER)) {
+                int[] coords = Communication.relCoordDecoder(role);
+                int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+                MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
+                System.out.println(target.toString());
+                Direction toTarget = thisLocation.directionTo(target);
+                System.out.println(toTarget);
+                Direction[] possibles = new Direction[5];
+                possibles[0] = toTarget;
+                possibles[1] = toTarget.rotateLeft();
+                possibles[2] = toTarget.rotateRight();
+                possibles[3] = toTarget.rotateLeft().rotateLeft();
+                possibles[4] = toTarget.rotateRight().rotateRight();
+                weightedDirection = possibles[(int) (Math.random() * 5)];
+            }
             Direction nextDir = Pathfinding.smartNav(rc, thisLocation.directionTo(Data.originPoint).opposite());
-            nextDir = Pathfinding.smartNav(rc, thisLocation.directionTo(Data.originPoint).opposite());
+            if (!weightedDirection.equals(Direction.CENTER)) {
+                nextDir = Pathfinding.smartNav(rc, weightedDirection);
+            }
+            //nextDir = Pathfinding.smartNav(rc, thisLocation.directionTo(Data.originPoint).opposite());
             if (rc.canMove(nextDir)) {
                 rc.move(nextDir);
             }
 
-            if (rc.canMove(thisLocation.directionTo(Data.originPoint).opposite())) {
-                rc.move(thisLocation.directionTo(Data.originPoint).opposite());
-                //System.out.println("MOVED TO BOUNDARY:" + thisLocation.directionTo(Data.originPoint).opposite());
-            }
+            // if (rc.canMove(thisLocation.directionTo(Data.originPoint).opposite())) {
+            //     rc.move(thisLocation.directionTo(Data.originPoint).opposite());
+            //     //System.out.println("MOVED TO BOUNDARY:" + thisLocation.directionTo(Data.originPoint).opposite());
+            // }
 
         } else if (thisLocation.distanceSquaredTo(Data.originPoint) >= boundary) {
             // if (rc.canMove(thisLocation.directionTo(Data.originPoint).rotateRight())) {
