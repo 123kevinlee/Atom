@@ -140,14 +140,10 @@ public class EnlightenmentCenter {
                 if (lastInfluenceGain / 2 > 14) {
                     influence = lastInfluenceGain / 2;
                 }
-                if (lastInfluenceGain <= 1000 && enemyMucks == 0) {
+                if (enemyMucks == 0) {
                     spawnFarmer(rc, spawnDir);
                 } else if (enemyMucks > 0) {
                     spawnPolitician(rc, lastInfluenceGain);
-                } else if (hasCoords) {
-                    spawnTargetedMuckraker(rc, influence / 2);
-                } else {
-                    spawnMuckraker(rc);
                 }
                 break;
             case MUCKRAKER:
@@ -462,20 +458,31 @@ public class EnlightenmentCenter {
                 baseVote = 30;
             }
             if (wonLastRound == false) {
-                baseVote += 5;
+                if (rc.getInfluence() > 1000) {
+                    baseVote += 20;
+                } else if (rc.getInfluence() > 750) {
+                    baseVote += 10;
+                } else {
+                    baseVote += 5;
+                }
                 winsInARow = 0;
-            } else if (winsInARow > 5) {
-                winsInARow -= 3;
-            } else if (baseVote > rc.getInfluence() / 5) {
-                baseVote = rc.getInfluence() / 5;
+            } else if (winsInARow > 10) {
+                winsInARow -= 10;
+            } else if (baseVote > rc.getInfluence() / 3) {
+                baseVote = rc.getInfluence() / 3;
             }
             if (rc.canBid(baseVote)) {
                 rc.bid(baseVote);
                 //System.out.println("BID:" + baseVote);
             }
         } else {
-            if (rc.canBid(1)) {
-                rc.bid(1);
+            if (rc.canBid(lastInfluenceGain)) {
+                rc.bid(lastInfluenceGain);
+                baseVote = lastInfluenceGain;
+            } else {
+                if (rc.canBid(1)) {
+                    rc.bid(1);
+                }
             }
         }
     }
@@ -791,7 +798,7 @@ public class EnlightenmentCenter {
         } else {
 
             //Poli Spawns
-            spawnOrder.add(RobotType.POLITICIAN);
+            spawnOrder.add(RobotType.SLANDERER);
             spawnOrder.add(RobotType.POLITICIAN);
             spawnOrder.add(RobotType.SLANDERER);
             spawnOrder.add(RobotType.POLITICIAN);

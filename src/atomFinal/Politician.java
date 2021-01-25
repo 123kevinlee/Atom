@@ -15,8 +15,14 @@ public class Politician {
     public static Direction weightedDirection = Direction.CENTER;
 
     public static void run(RobotController rc) throws GameActionException {
-        System.out.println(role);
-        System.out.println(weightedDirection);
+        if (rc.getRoundNum() >= 1490) {
+            if (rc.canEmpower(9)) {
+                rc.empower(9);
+            }
+        }
+
+        //System.out.println(role);
+        //System.out.println(weightedDirection);
         int flag = -1;
         if (rc.canGetFlag(rc.getID())) {
             flag = rc.getFlag(rc.getID());
