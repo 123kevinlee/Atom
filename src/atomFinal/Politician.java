@@ -47,7 +47,7 @@ public class Politician {
                             if (rc.canGetFlag(robot.getID())) {
                                 int flagT = rc.getFlag(robot.getID());
                                 String flagTS = Integer.toString(flagT);
-                                if (flagTS.length() > 0 && flagTS.charAt(0) == '4') {
+                                if (flagTS.length() > 0 && flagTS.charAt(0) == '4' && !flagTS.equals("444")) {
                                     role = flagTS;
                                 }
                             }
@@ -80,8 +80,9 @@ public class Politician {
         int nearbyAllies = 0;
 
         MapLocation thisLocation = rc.getLocation();
-        int thisInfluence = rc.getInfluence();
+        //int thisInfluence = rc.getInfluence();
         double currentEmpowerFactor = rc.getEmpowerFactor(ally, 0);
+        int thisConviction = rc.getConviction();
 
         if (rc.canSenseRadiusSquared(25)) {
             RobotInfo[] robots = rc.senseNearbyRobots(25);
@@ -97,10 +98,10 @@ public class Politician {
                         boolean hasPoly = false;
                         boolean nearFarmer = false;
                         RobotInfo[] radius = rc.senseNearbyRobots(i);
-                        int maxInf = 0;
+                        int maxConviction = 0;
                         int numOfUnits = radius.length;
                         for (RobotInfo rbt : radius) {
-                            int rbtInfluence = rbt.getInfluence();
+                            int rbtConviction = rbt.getConviction();
                             if (rbt.getTeam().equals(enemy)) {
                                 if (rbt.getType().equals(RobotType.POLITICIAN)) {
                                     hasPoly = true;
@@ -110,15 +111,15 @@ public class Politician {
                                 }
                                 hasEnemy = true;
                                 //System.out.println(rbt.ID + ":" + rbtInfluence);
-                                if (rbtInfluence > maxInf) {
-                                    maxInf = rbtInfluence;
+                                if (rbtConviction > maxConviction) {
+                                    maxConviction = rbtConviction;
                                     //System.out.println(maxInf);
                                 }
                             }
                         }
                         if (numOfUnits != 0 && hasEnemy == true
-                                && maxInf < ((thisInfluence - 10) * currentEmpowerFactor) / numOfUnits) {
-                            if (((thisInfluence * currentEmpowerFactor - 11) / numOfUnits) - maxInf < 10
+                                && maxConviction < ((thisConviction - 10) * currentEmpowerFactor) / numOfUnits) {
+                            if (((thisConviction * currentEmpowerFactor - 11) / numOfUnits) - maxConviction < 10
                                     || numOfUnits > 2 || hasPoly || nearFarmer) {
                                 maxRadius = i;
                                 explode = true;
@@ -128,7 +129,7 @@ public class Politician {
                     }
                     if (rc.canEmpower(maxRadius) && explode == true) {
                         rc.empower(maxRadius);
-                    } else if ((thisInfluence - 10) * currentEmpowerFactor > robot.getInfluence()) {
+                    } else if ((thisConviction - 10) * currentEmpowerFactor > robot.getConviction()) {
                         Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
                         nextDir = Pathfinding.smartNav(rc, robot.getLocation());
                         if (rc.canMove(nextDir)) {
@@ -170,7 +171,7 @@ public class Politician {
                 }
 
                 if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)
-                        && (thisInfluence - 10) * currentEmpowerFactor < robot.getInfluence()) {
+                        && (thisConviction - 10) * currentEmpowerFactor < robot.getConviction()) {
                     Direction nextDir = Pathfinding.basicBug(rc,
                             rc.getLocation().directionTo(robot.getLocation()).opposite());
                     nextDir = Pathfinding.smartNav(rc, rc.getLocation().directionTo(robot.getLocation()).opposite());
@@ -179,7 +180,7 @@ public class Politician {
                         //System.out.println("RUNNING FROM ENEMY:" + dir);
                     }
                 } else if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)
-                        && (thisInfluence - 10) * currentEmpowerFactor > robot.getInfluence()) {
+                        && (thisConviction - 10) * currentEmpowerFactor > robot.getConviction()) {
                     if (thisLocation.isAdjacentTo(robot.getLocation())) {
                         if (rc.canEmpower(1)) {
                             rc.empower(1);
@@ -194,8 +195,8 @@ public class Politician {
                     }
                 }
                 if (robot.getTeam().equals(Team.NEUTRAL)) {
-                    if (thisInfluence * currentEmpowerFactor - 10 > robot.getInfluence() / 10
-                            || robot.getInfluence() <= 100) {
+                    if (thisConviction * currentEmpowerFactor - 10 > robot.getConviction() / 10
+                            || robot.getConviction() <= 100) {
                         if (thisLocation.isAdjacentTo(robot.getLocation())) {
                             if (rc.canEmpower(1)) {
                                 rc.empower(1);
@@ -262,7 +263,8 @@ public class Politician {
             }
         } else if (thisLocation.distanceSquaredTo(Data.originPoint) < boundary) {
             //System.out.println("MOVING TO BOUNDARY");\
-            if (role.length() > 0 && role.charAt(0) == '4' && weightedDirection.equals(Direction.CENTER)) {
+            if (role.length() > 0 && role.charAt(0) == '4' && !role.equals("444")
+                    && weightedDirection.equals(Direction.CENTER)) {
                 int[] coords = Communication.relCoordDecoder(role);
                 int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
                 MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
@@ -324,7 +326,8 @@ public class Politician {
         Team enemy = rc.getTeam().opponent();
         double empowerFactor = rc.getEmpowerFactor(rc.getTeam(), 0);
         MapLocation thisLocation = rc.getLocation();
-        int thisInfluence = rc.getInfluence();
+        //int thisInfluence = rc.getInfluence();
+        int thisConviction = rc.getConviction();
 
         if (rc.canSenseRadiusSquared(9)) {
             RobotInfo[] robots = rc.senseNearbyRobots(2);
@@ -337,7 +340,7 @@ public class Politician {
                         totalRobotsAround = robotS.length;
                     }
                     if (totalRobotsAround > 0 && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)
-                            && ((rc.getInfluence() - 10) * empowerFactor) / totalRobotsAround > robot.getInfluence()) {
+                            && ((thisConviction - 10) * empowerFactor) / totalRobotsAround > robot.getConviction()) {
                         //if (rc.getLocation().distanceSquaredTo(robot.getLocation()) == 1) {
                         if (rc.canEmpower(2)) {
                             rc.empower(2);
@@ -364,14 +367,14 @@ public class Politician {
                     for (int i = 9; i > 0; i--) {
                         boolean hasEnemyEC = false;
                         RobotInfo[] radius = rc.senseNearbyRobots(i);
-                        int maxInf = 0;
+                        int maxConviction = 0;
                         int numOfUnits = radius.length;
                         for (RobotInfo rbt : radius) {
-                            int rbtInfluence = rbt.getInfluence();
+                            int rbtConviction = rbt.getConviction();
                             if (rbt.getTeam().equals(enemy)) {
                                 //System.out.println(rbt.ID + ":" + rbtInfluence);
-                                if (rbtInfluence > maxInf) {
-                                    maxInf = rbtInfluence;
+                                if (rbtConviction > maxConviction) {
+                                    maxConviction = rbtConviction;
                                     //System.out.println(maxInf);
                                 }
                                 if (rbt.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
@@ -380,7 +383,7 @@ public class Politician {
                             }
                         }
                         if (numOfUnits != 0 && hasEnemyEC == true
-                                && maxInf < ((thisInfluence - 10) * empowerFactor) / numOfUnits) {
+                                && maxConviction < ((thisConviction - 10) * empowerFactor) / numOfUnits) {
                             maxRadius = i;
                             explode = true;
                             break;
@@ -407,7 +410,8 @@ public class Politician {
     public static void toTarget(RobotController rc) throws GameActionException {
         Team ally = rc.getTeam();
         Team enemy = ally.opponent();
-        int thisInfluence = rc.getInfluence();
+        //int thisInfluence = rc.getInfluence();
+        int thisConviction = rc.getConviction();
         double currentEmpowerFactor = rc.getEmpowerFactor(ally, 0);
 
         if (rc.canSenseRadiusSquared(25)) {
@@ -417,12 +421,12 @@ public class Politician {
                 if ((robotTeam.equals(enemy) || robotTeam.equals(Team.NEUTRAL))) {
                     int maxRadius = 0;
                     for (int i = 0; i < 10; i++) {
-                        int neededInf = 10;
+                        int neededConviction = 0;
                         RobotInfo[] radius = rc.senseNearbyRobots(i);
                         for (RobotInfo rbt : radius) {
-                            neededInf += rbt.getInfluence() + 1;
+                            neededConviction += rbt.getConviction() + 1;
                         }
-                        if (neededInf < (thisInfluence - 10) * currentEmpowerFactor) {
+                        if (neededConviction < (thisConviction - 10) * currentEmpowerFactor) {
                             maxRadius = i;
                             //System.out.println("NEWRADIUS" + maxRadius);
                             //System.out.println("NEEDEDINF" + neededInf);
@@ -435,7 +439,7 @@ public class Politician {
                     }
                 } else if (robot.getTeam().equals(enemy)
                         && robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 25)
-                        && (thisInfluence - 10) * currentEmpowerFactor > robot.getInfluence()) {
+                        && (thisConviction - 10) * currentEmpowerFactor > robot.getConviction()) {
                     Direction dir = Pathfinding.basicBug(rc, robot.getLocation());
                     dir = Pathfinding.smartNav(rc, robot.getLocation());
                     if (rc.canMove(dir)) {

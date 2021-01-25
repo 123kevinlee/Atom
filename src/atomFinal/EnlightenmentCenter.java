@@ -157,10 +157,7 @@ public class EnlightenmentCenter {
                 //int determinant = (int) (Math.random() * 2);
                 //if (currentRound > 250 && determinant == 0 && hasCoords) {
                 if (hasCoords) {
-                    if (takenOver) {
-                        spawnMuckraker(rc);
-                    }
-                    int determinant = (int) (Math.random() * 3);
+                    int determinant = (int) (Math.random() * 2);
                     if (determinant == 0) {
                         spawnTargetedMuckraker(rc, influence);
                     }
@@ -177,16 +174,16 @@ public class EnlightenmentCenter {
                 //} 
                 break;
             case POLITICIAN:
-                influence = 14;
-                if (lastInfluenceGain > 14) {
+                influence = 16;
+                if (lastInfluenceGain > 16) {
                     influence = lastInfluenceGain + rc.getInfluence() / 15;
                 }
                 if (rc.getInfluence() > 100000) {
                     influence = rc.getInfluence() / 25;
                 }
-                int determinant = (int) (Math.random() * 3);
-                if (currentRound > 250 && determinant != 0 & hasCoords) {
-                    //spawnTargetedPolitician(rc, influence);
+                int determinant = (int) (Math.random() * 4);
+                if (determinant == 0) {
+                    influence = 16;
                     spawnPolitician(rc, influence);
                 } else {
                     spawnPolitician(rc, influence);
@@ -196,6 +193,22 @@ public class EnlightenmentCenter {
                 break;
         }
         spawnOrderCounter++;
+    }
+
+    public static void spawnDefender(RobotController rc, int influence) throws GameActionException {
+        //System.out.println(enemyBases.toString());
+        //System.out.println(possibleEnemyBases.toString());
+        //System.out.println(enemyCoords.toString());
+        Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
+        if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)) {
+            if (rc.canSetFlag(444)) {
+                //System.out.println("SET0");
+                rc.setFlag(444);
+            }
+            rc.buildRobot(RobotType.POLITICIAN, spawnDir, influence);
+        } else {
+            spawnTargetedMuckraker(rc, 1);
+        }
     }
 
     public static void spawnTargetedPolitician(RobotController rc, int influence) throws GameActionException {
@@ -422,30 +435,6 @@ public class EnlightenmentCenter {
     public static int winsInARow = 0;
 
     public static void calculateBid(RobotController rc) throws GameActionException {
-        // int round = rc.getRoundNum();
-        // boolean wonLastRound = false;
-        // //System.out.println(rc.getTeamVotes());
-        // if (rc.getTeamVotes() > lastVotes) {
-        //     lastVotes++;
-        //     wonLastRound = true;
-        // }
-        // if (round >= 300) {
-        //     if (rc.getInfluence() > 2000) {
-        //         if (rc.canBid(lastInfluenceGain + rc.getInfluence() / 100)) {
-        //             rc.bid(lastInfluenceGain + rc.getInfluence() / 100);
-        //             //System.out.println("Bid:" + (int) (lastInfluenceGain));
-        //         }
-        //     }
-        //     if (wonLastRound == false) {
-        //         if (rc.canBid(lastInfluenceGain)) {
-        //             rc.bid(lastInfluenceGain);
-        //             //System.out.println("Bid:" + (int) (lastInfluenceGain));
-        //         }
-        //     } else if (rc.canBid(lastInfluenceGain / 3)) {
-        //         rc.bid(lastInfluenceGain / 3);
-        //         //System.out.println("Bid:" + lastInfluenceGain / 3);
-        //     }
-        // }
         int round = rc.getRoundNum();
         boolean wonLastRound = false;
         if (rc.getTeamVotes() > lastVotes) {
@@ -474,15 +463,15 @@ public class EnlightenmentCenter {
             if (rc.canBid(baseVote)) {
                 rc.bid(baseVote);
                 //System.out.println("BID:" + baseVote);
+            } else {
+                if (rc.canBid(lastInfluenceGain)) {
+                    rc.bid(lastInfluenceGain);
+                    baseVote = lastInfluenceGain;
+                }
             }
         } else {
-            if (rc.canBid(lastInfluenceGain)) {
-                rc.bid(lastInfluenceGain);
-                baseVote = lastInfluenceGain;
-            } else {
-                if (rc.canBid(1)) {
-                    rc.bid(1);
-                }
+            if (rc.canBid(1)) {
+                rc.bid(1);
             }
         }
     }

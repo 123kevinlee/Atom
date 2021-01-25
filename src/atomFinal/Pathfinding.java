@@ -222,8 +222,8 @@ public class Pathfinding {
             }
             return basicBug(rc, target);
         }
-        return fastestDir;
-        //return basicBug(rc, target);
+        //return fastestDir;
+        return basicBug(rc, target);
     }
 
     public static Direction smartNav(RobotController rc, Direction targetDir) throws GameActionException {
@@ -269,8 +269,8 @@ public class Pathfinding {
             }
             return basicBug(rc, target);
         }
-        return fastestDir;
-        //return basicBug(rc, target);
+        //return fastestDir;
+        return basicBug(rc, target);
     }
 
     public static int[] getDistance(int[] ref, int[] target) {

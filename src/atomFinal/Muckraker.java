@@ -95,7 +95,7 @@ public class Muckraker {
                         }
                     }
                 }
-                Direction nextDir = Pathfinding.scoutBug(rc, scoutDirection);
+                Direction nextDir = Pathfinding.smartNav(rc, scoutDirection);
                 if (!rc.onTheMap(rc.getLocation().add(scoutDirection))) {
                     scoutDirection = scoutDirection.opposite().rotateRight();
                 } else if (rc.canMove(nextDir)) {
