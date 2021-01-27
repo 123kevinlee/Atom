@@ -39,7 +39,7 @@ public class Muckraker {
             }
             if (max != null) {
                 Direction nextDir = Pathfinding.basicBug(rc, max);
-                nextDir = Pathfinding.smartNav(rc, max);
+                //nextDir = Pathfinding.smartNav(rc, max);
                 if (rc.canMove(nextDir)) {
                     rc.move(nextDir);
                 }
@@ -78,7 +78,7 @@ public class Muckraker {
                     if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
                             && robot.getTeam() == rc.getTeam().opponent()) {
                         Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                        nextDir = Pathfinding.smartNav(rc, robot.getLocation());
+                        //nextDir = Pathfinding.smartNav(rc, robot.getLocation());
                         if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
                         }
@@ -184,7 +184,7 @@ public class Muckraker {
             for (RobotInfo robot : robots) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER && robot.getTeam() == rc.getTeam().opponent()) {
                     Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                    nextDir = Pathfinding.smartNav(rc, robot.getLocation());
+                    //nextDir = Pathfinding.smartNav(rc, robot.getLocation());
                     if (rc.canMove(nextDir) && rc.getLocation().distanceSquaredTo(robot.getLocation()) > 4) {
                         rc.move(nextDir);
                     }

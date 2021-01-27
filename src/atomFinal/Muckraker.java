@@ -39,7 +39,7 @@ public class Muckraker {
             }
             if (max != null) {
                 Direction nextDir = Pathfinding.basicBug(rc, max);
-                nextDir = Pathfinding.smartNav(rc, max);
+                //nextDir = Pathfinding.smartNav(rc, max);
                 if (rc.canMove(nextDir)) {
                     rc.move(nextDir);
                 }
@@ -78,7 +78,7 @@ public class Muckraker {
                     if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER
                             && robot.getTeam() == rc.getTeam().opponent()) {
                         Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                        nextDir = Pathfinding.smartNav(rc, robot.getLocation());
+                        //nextDir = Pathfinding.smartNav(rc, robot.getLocation());
                         if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
                         }
@@ -95,7 +95,7 @@ public class Muckraker {
                         }
                     }
                 }
-                Direction nextDir = Pathfinding.smartNav(rc, scoutDirection);
+                Direction nextDir = Pathfinding.basicBug(rc, scoutDirection);
                 if (!rc.onTheMap(rc.getLocation().add(scoutDirection))) {
                     scoutDirection = scoutDirection.opposite().rotateRight();
                 } else if (rc.canMove(nextDir)) {
@@ -184,7 +184,7 @@ public class Muckraker {
             for (RobotInfo robot : robots) {
                 if (robot.getType() == RobotType.ENLIGHTENMENT_CENTER && robot.getTeam() == rc.getTeam().opponent()) {
                     Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                    nextDir = Pathfinding.smartNav(rc, robot.getLocation());
+                    //nextDir = Pathfinding.smartNav(rc, robot.getLocation());
                     if (rc.canMove(nextDir) && rc.getLocation().distanceSquaredTo(robot.getLocation()) > 4) {
                         rc.move(nextDir);
                     }
@@ -206,13 +206,45 @@ public class Muckraker {
         int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
         MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
         Direction nextDir = Pathfinding.basicBug(rc, target);
-        nextDir = Pathfinding.smartNav(rc, target);
+        //nextDir = Pathfinding.smartNav(rc, target);
         if (rc.canSenseLocation(target)) {
             RobotInfo robot = rc.senseRobotAtLocation(target);
+            if (!robot.getTeam().equals(rc.getTeam())) {
+                RobotInfo[] robotsEE = rc.senseNearbyRobots(30);
+                for (RobotInfo robotEE : robotsEE) {
+                    if (robotEE.getType() == RobotType.ENLIGHTENMENT_CENTER
+                            && robotEE.getTeam() == rc.getTeam().opponent()) {
+                        robot = robotEE;
+                    }
+                }
+            }
             if (robot != null && robot.getTeam().equals(rc.getTeam())) {
                 role = "";
             }
-
+            Direction[] around = Data.directions;
+            Direction openSpot = null;
+            boolean surrounded = true;
+            for (Direction dir : around) {
+                RobotInfo robotE = rc.senseRobotAtLocation(target.add(dir));
+                if (robotE != null && !robotE.getTeam().equals(rc.getTeam())) {
+                    surrounded = false;
+                    openSpot = dir;
+                    break;
+                }
+            }
+            if (surrounded) {
+                role = "";
+            }
+            if (openSpot != null) {
+                MapLocation spot = target.add(openSpot);
+                int relx = spot.x % 128;
+                int rely = spot.y % 128;
+                int newFlag = Communication.coordEncoder("ENEMY", relx, rely);
+                if (rc.canSetFlag(newFlag)) {
+                    rc.setFlag(newFlag);
+                    role = Integer.toString(newFlag);
+                }
+            }
         }
         if (rc.canMove(nextDir)) {
             rc.move(nextDir);

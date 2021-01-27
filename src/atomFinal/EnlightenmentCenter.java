@@ -36,6 +36,7 @@ public class EnlightenmentCenter {
 
     public static LinkedHashSet<MapLocation> enemyBases = new LinkedHashSet<MapLocation>();
     public static ArrayList<Boolean> triedAttackingEnemy = new ArrayList<Boolean>();
+    public static ArrayList<Boolean> triedAttackingEnemyPos = new ArrayList<Boolean>();
     public static Map<Direction, MapLocation> enemyCoords = new TreeMap<Direction, MapLocation>();
     public static LinkedHashSet<MapLocation> possibleEnemyBases = new LinkedHashSet<MapLocation>();
     public static LinkedHashMap<MapLocation, Integer> neutralBases = new LinkedHashMap<MapLocation, Integer>();
@@ -58,7 +59,7 @@ public class EnlightenmentCenter {
             for (RobotInfo robot : robots) {
                 if (robot.getTeam().equals(enemy) && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
                     enemyBases.add(robot.getLocation());
-                    spawnTakeoverPolitician(rc, 150, enemyBases.iterator().next());
+                    spawnTakeoverPolitician(rc, 150, enemyBases.iterator().next(), false);
                 } else if (robot.getTeam().equals(Team.NEUTRAL)) {
                     neutralBases.put(robot.getLocation(), robot.getInfluence());
                 } else if (robot.getTeam().equals(enemy) && robot.getType().equals(RobotType.MUCKRAKER)) {
@@ -71,7 +72,7 @@ public class EnlightenmentCenter {
         }
         if (enemyMucks > 5) {
             isMuckRush = true;
-            spawnOrder = new ArrayList<RobotType>(antiMuckSpawnOrder);
+            //spawnOrder = new ArrayList<RobotType>(antiMuckSpawnOrder);
         }
 
         if (rc.getRoundNum() < 5) {
@@ -98,12 +99,15 @@ public class EnlightenmentCenter {
             addedMucks = true;
         }
 
+        boolean save = false;
         //System.out.println("INFGAIN:" + lastInfluenceGain);
         Object[] neutralBaseKeys = neutralBases.keySet().toArray();
         for (Object key : neutralBaseKeys) {
             if (enemyMucks == 0 && neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 25) {
-                spawnTakeoverPolitician(rc, neutralBases.get(key) + 12, (MapLocation) key);
+                spawnTakeoverPolitician(rc, neutralBases.get(key) + 12, (MapLocation) key, true);
                 System.out.println("BIG BOI SPAWNED FOR" + key.toString());
+            } else if (neutralBases.get(key) != 1000) {
+                save = true;
             }
         }
         for (int i = 0; i < triedAttackingEnemy.size(); i++) {
@@ -119,7 +123,7 @@ public class EnlightenmentCenter {
                     index++;
                 }
                 if (target != null) {
-                    spawnTakeoverPolitician(rc, 400, target);
+                    spawnTakeoverPolitician(rc, 400, target, false);
                     System.out.println("BIG BOI SPAWNED FOR" + target.toString());
                     triedAttackingEnemy.set(i, true);
                 }
@@ -136,29 +140,32 @@ public class EnlightenmentCenter {
 
         switch (spawn) {
             case SLANDERER:
-                int influence = 1;
-                if (lastInfluenceGain / 2 > 14) {
-                    influence = lastInfluenceGain / 2;
+                int influence = 16;
+                if (lastInfluenceGain > 16) {
+                    influence = lastInfluenceGain + rc.getInfluence() / 15;
                 }
-                if (enemyMucks == 0) {
+                if (enemyMucks == 0 && lastInfluenceGain < 1500) {
                     spawnFarmer(rc, spawnDir);
                 } else if (enemyMucks > 0) {
-                    spawnPolitician(rc, lastInfluenceGain);
+                    spawnPolitician(rc, influence);
                 }
                 break;
             case MUCKRAKER:
                 influence = 1;
-                if (lastInfluenceGain / 2 > 1) {
-                    influence = lastInfluenceGain / 2;
+                if (lastInfluenceGain > 1) {
+                    influence = lastInfluenceGain;
                 }
                 if (rc.getInfluence() > 100000) {
                     influence = rc.getInfluence() / 25;
                 }
+                if (save) {
+                    influence = 1;
+                }
                 //int determinant = (int) (Math.random() * 2);
                 //if (currentRound > 250 && determinant == 0 && hasCoords) {
                 if (hasCoords) {
-                    int determinant = (int) (Math.random() * 2);
-                    if (determinant == 0) {
+                    int determinant = (int) (Math.random() * 4);
+                    if (determinant != 0) {
                         spawnTargetedMuckraker(rc, influence);
                     }
                 } else {
@@ -175,17 +182,22 @@ public class EnlightenmentCenter {
                 break;
             case POLITICIAN:
                 influence = 16;
-                if (lastInfluenceGain > 16) {
-                    influence = lastInfluenceGain + rc.getInfluence() / 15;
+                if (lastInfluenceGain > 16 && rc.getRoundNum() < 250) {
+                    influence = lastInfluenceGain + rc.getInfluence() / 10;
+                } else if (lastInfluenceGain > 16) {
+                    influence = lastInfluenceGain + rc.getInfluence() / 5;
                 }
-                if (rc.getInfluence() > 100000) {
-                    influence = rc.getInfluence() / 25;
+                if (rc.getInfluence() > 15000) {
+                    influence = rc.getInfluence() / 10;
                 }
                 int determinant = (int) (Math.random() * 4);
                 if (determinant == 0) {
                     influence = 16;
                     spawnPolitician(rc, influence);
                 } else {
+                    if (save) {
+                        influence = 16;
+                    }
                     spawnPolitician(rc, influence);
                 }
                 break;
@@ -193,22 +205,6 @@ public class EnlightenmentCenter {
                 break;
         }
         spawnOrderCounter++;
-    }
-
-    public static void spawnDefender(RobotController rc, int influence) throws GameActionException {
-        //System.out.println(enemyBases.toString());
-        //System.out.println(possibleEnemyBases.toString());
-        //System.out.println(enemyCoords.toString());
-        Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
-        if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)) {
-            if (rc.canSetFlag(444)) {
-                //System.out.println("SET0");
-                rc.setFlag(444);
-            }
-            rc.buildRobot(RobotType.POLITICIAN, spawnDir, influence);
-        } else {
-            spawnTargetedMuckraker(rc, 1);
-        }
     }
 
     public static void spawnTargetedPolitician(RobotController rc, int influence) throws GameActionException {
@@ -246,7 +242,7 @@ public class EnlightenmentCenter {
         }
     }
 
-    public static void spawnTakeoverPolitician(RobotController rc, int influence, MapLocation target)
+    public static void spawnTakeoverPolitician(RobotController rc, int influence, MapLocation target, boolean isNeutral)
             throws GameActionException {
         Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
         if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)) {
@@ -257,7 +253,9 @@ public class EnlightenmentCenter {
                 rc.setFlag(flag);
             }
             rc.buildRobot(RobotType.POLITICIAN, spawnDir, influence);
-            neutralBases.put(target, 1000);
+            if (isNeutral) {
+                neutralBases.put(target, 1000);
+            }
         }
     }
 
@@ -766,53 +764,55 @@ public class EnlightenmentCenter {
         Data.relOriginPoint[0] = Data.originPoint.x % 128;
         Data.relOriginPoint[1] = Data.originPoint.y % 128;
 
-        if (Data.initRound > 10) {
-            takenOver = true;
+        // if (Data.initRound > 10) {
+        //     takenOver = true;
 
-            spawnOrder.add(RobotType.POLITICIAN);
-            spawnOrder.add(RobotType.SLANDERER);
-            spawnOrder.add(RobotType.MUCKRAKER);
-            spawnOrder.add(RobotType.MUCKRAKER);
-            spawnOrder.add(RobotType.SLANDERER);
-            spawnOrder.add(RobotType.MUCKRAKER);
-            spawnOrder.add(RobotType.MUCKRAKER);
-            spawnOrder.add(RobotType.POLITICIAN);
+        //     spawnOrder.add(RobotType.POLITICIAN);
+        //     spawnOrder.add(RobotType.MUCKRAKER);
+        //     spawnOrder.add(RobotType.POLITICIAN);
+        //     spawnOrder.add(RobotType.SLANDERER);
+        //     spawnOrder.add(RobotType.POLITICIAN);
+        //     spawnOrder.add(RobotType.SLANDERER);
+        //     spawnOrder.add(RobotType.MUCKRAKER);
+        //     spawnOrder.add(RobotType.SLANDERER);
+        //     spawnOrder.add(RobotType.MUCKRAKER);
 
-            antiMuckSpawnOrder.add(RobotType.MUCKRAKER);
-            antiMuckSpawnOrder.add(RobotType.MUCKRAKER);
-            antiMuckSpawnOrder.add(RobotType.SLANDERER);
-            antiMuckSpawnOrder.add(RobotType.MUCKRAKER);
-            antiMuckSpawnOrder.add(RobotType.MUCKRAKER);
-            antiMuckSpawnOrder.add(RobotType.POLITICIAN);
-        } else {
+        //     antiMuckSpawnOrder.add(RobotType.POLITICIAN);
+        //     antiMuckSpawnOrder.add(RobotType.POLITICIAN);
+        //     antiMuckSpawnOrder.add(RobotType.SLANDERER);
+        //     antiMuckSpawnOrder.add(RobotType.POLITICIAN);
+        //     antiMuckSpawnOrder.add(RobotType.POLITICIAN);
+        //     antiMuckSpawnOrder.add(RobotType.SLANDERER);
+        // } else {
 
-            //Poli Spawns
-            spawnOrder.add(RobotType.SLANDERER);
-            spawnOrder.add(RobotType.POLITICIAN);
-            spawnOrder.add(RobotType.SLANDERER);
-            spawnOrder.add(RobotType.POLITICIAN);
-            spawnOrder.add(RobotType.POLITICIAN);
-            spawnOrder.add(RobotType.SLANDERER);
-            spawnOrder.add(RobotType.POLITICIAN);
-            spawnOrder.add(RobotType.POLITICIAN);
-            spawnOrder.add(RobotType.SLANDERER);
-            spawnOrder.add(RobotType.POLITICIAN);
-            spawnOrder.add(RobotType.POLITICIAN);
-            spawnOrder.add(RobotType.SLANDERER);
-            spawnOrder.add(RobotType.MUCKRAKER);
-            spawnOrder.add(RobotType.SLANDERER);
+        //Poli Spawns
+        spawnOrder.add(RobotType.SLANDERER);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.SLANDERER);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.SLANDERER);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.SLANDERER);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.SLANDERER);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.POLITICIAN);
+        spawnOrder.add(RobotType.SLANDERER);
+        spawnOrder.add(RobotType.MUCKRAKER);
+        spawnOrder.add(RobotType.SLANDERER);
 
-            //more mucks
-            //spawnOrder.add(RobotType.POLITICIAN);
-            //spawnOrder.add(RobotType.POLITICIAN);
-            //spawnOrder.add(RobotType.SLANDERER);
-            //spawnOrder.add(RobotType.MUCKRAKER);
-            antiMuckSpawnOrder.add(RobotType.POLITICIAN);
-            antiMuckSpawnOrder.add(RobotType.POLITICIAN);
-            antiMuckSpawnOrder.add(RobotType.SLANDERER);
-            antiMuckSpawnOrder.add(RobotType.POLITICIAN);
-            antiMuckSpawnOrder.add(RobotType.POLITICIAN);
-            antiMuckSpawnOrder.add(RobotType.SLANDERER);
-        }
+        //more mucks
+        //spawnOrder.add(RobotType.POLITICIAN);
+        //spawnOrder.add(RobotType.POLITICIAN);
+        //spawnOrder.add(RobotType.SLANDERER);
+        //spawnOrder.add(RobotType.MUCKRAKER);
+        antiMuckSpawnOrder.add(RobotType.POLITICIAN);
+        antiMuckSpawnOrder.add(RobotType.POLITICIAN);
+        antiMuckSpawnOrder.add(RobotType.SLANDERER);
+        antiMuckSpawnOrder.add(RobotType.POLITICIAN);
+        antiMuckSpawnOrder.add(RobotType.POLITICIAN);
+        antiMuckSpawnOrder.add(RobotType.SLANDERER);
+        //}
     }
 }

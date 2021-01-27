@@ -27,7 +27,7 @@ public class Politician {
         if (rc.canGetFlag(rc.getID())) {
             flag = rc.getFlag(rc.getID());
         }
-        if (role.length() > 0 && role.charAt(0) == '4' && flag == 0) {
+        if (role.length() > 0 && (role.charAt(0) == '4' || role.charAt(0) == '2') && flag == 0) {
             if (rc.canSetFlag(Integer.parseInt(role))) {
                 rc.setFlag(Integer.parseInt(role));
             }
@@ -40,14 +40,16 @@ public class Politician {
                     rc.setFlag(666);
                 }
             } else {
-                if (role.equals("0") || role.equals("")) {
+                if (role.equals("0") || role.equals("") || role.charAt(0) == '4') {
                     RobotInfo[] team = rc.senseNearbyRobots(25, rc.getTeam());
                     for (RobotInfo robot : team) {
-                        if (robot.getType().equals(RobotType.POLITICIAN)) {
+                        if (robot.getType().equals(RobotType.POLITICIAN)
+                                || robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
                             if (rc.canGetFlag(robot.getID())) {
                                 int flagT = rc.getFlag(robot.getID());
                                 String flagTS = Integer.toString(flagT);
-                                if (flagTS.length() > 0 && flagTS.charAt(0) == '4' && !flagTS.equals("444")) {
+                                if (flagTS.length() > 0 && (flagTS.charAt(0) == '4' || flagTS.charAt(0) == '2')
+                                        && !flagTS.equals("444")) {
                                     role = flagTS;
                                 }
                             }
@@ -131,20 +133,28 @@ public class Politician {
                         rc.empower(maxRadius);
                     } else if ((thisConviction - 10) * currentEmpowerFactor > robot.getConviction()) {
                         Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                        nextDir = Pathfinding.smartNav(rc, robot.getLocation());
+                        //nextDir = Pathfinding.smartNav(rc, robot.getLocation());
                         if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
                         }
                     }
                 }
                 if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
-                    if (thisLocation.distanceSquaredTo(robot.getLocation()) < 10) {
-                        if (rc.canEmpower(9)) {
-                            rc.empower(9);
+                    if (thisLocation.distanceSquaredTo(robot.getLocation()) < 5) {
+                        if (rc.canEmpower(4)) {
+                            rc.empower(4);
                         }
                     } else {
+                        MapLocation robotLocation = robot.getLocation();
+                        int relx = robotLocation.x % 128;
+                        int rely = robotLocation.y % 128;
+                        int outMsg = Communication.coordEncoder("ENEMY", relx, rely);
+                        if (rc.canSetFlag(outMsg)) {
+                            rc.setFlag(outMsg);
+                        }
+
                         Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                        nextDir = Pathfinding.smartNav(rc, robot.getLocation());
+                        //nextDir = Pathfinding.smartNav(rc, robot.getLocation());
                         if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
                         }
@@ -157,7 +167,7 @@ public class Politician {
                         }
                     } else {
                         Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                        nextDir = Pathfinding.smartNav(rc, robot.getLocation());
+                        //nextDir = Pathfinding.smartNav(rc, robot.getLocation());
                         if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
                         }
@@ -172,22 +182,41 @@ public class Politician {
 
                 if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)
                         && (thisConviction - 10) * currentEmpowerFactor < robot.getConviction()) {
+
+                    RobotInfo[] searchingForEcs = rc.senseNearbyRobots(9, ally);
+                    for (RobotInfo robotS : searchingForEcs) {
+                        if (robotS.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
+                            if (thisLocation.distanceSquaredTo(robot.getLocation()) == 1) {
+                                if (rc.canEmpower(1)) {
+                                    rc.empower(1);
+                                }
+                            } else {
+                                Direction dir = Pathfinding.basicBug(rc, robot.getLocation());
+                                //dir = Pathfinding.smartNav(rc, robot.getLocation());
+                                if (rc.canMove(dir)) {
+                                    rc.move(dir);
+                                    //System.out.println("CHASING:" + dir);
+                                }
+                            }
+                        }
+                    }
+
                     Direction nextDir = Pathfinding.basicBug(rc,
                             rc.getLocation().directionTo(robot.getLocation()).opposite());
-                    nextDir = Pathfinding.smartNav(rc, rc.getLocation().directionTo(robot.getLocation()).opposite());
+                    //nextDir = Pathfinding.smartNav(rc, rc.getLocation().directionTo(robot.getLocation()).opposite());
                     if (rc.canMove(nextDir)) {
                         rc.move(nextDir);
                         //System.out.println("RUNNING FROM ENEMY:" + dir);
                     }
                 } else if (robotTeam.equals(enemy) && robot.getType().equals(RobotType.POLITICIAN)
                         && (thisConviction - 10) * currentEmpowerFactor > robot.getConviction()) {
-                    if (thisLocation.isAdjacentTo(robot.getLocation())) {
+                    if (thisLocation.distanceSquaredTo(robot.getLocation()) == 1) {
                         if (rc.canEmpower(1)) {
                             rc.empower(1);
                         }
                     } else {
                         Direction dir = Pathfinding.basicBug(rc, robot.getLocation());
-                        dir = Pathfinding.smartNav(rc, robot.getLocation());
+                        //dir = Pathfinding.smartNav(rc, robot.getLocation());
                         if (rc.canMove(dir)) {
                             rc.move(dir);
                             //System.out.println("CHASING:" + dir);
@@ -197,13 +226,13 @@ public class Politician {
                 if (robot.getTeam().equals(Team.NEUTRAL)) {
                     if (thisConviction * currentEmpowerFactor - 10 > robot.getConviction() / 10
                             || robot.getConviction() <= 100) {
-                        if (thisLocation.isAdjacentTo(robot.getLocation())) {
+                        if (thisLocation.distanceSquaredTo(robot.getLocation()) == 1) {
                             if (rc.canEmpower(1)) {
                                 rc.empower(1);
                             }
                         } else {
                             Direction dir = Pathfinding.basicBug(rc, robot.getLocation());
-                            dir = Pathfinding.smartNav(rc, robot.getLocation());
+                            //dir = Pathfinding.smartNav(rc, robot.getLocation());
                             if (rc.canMove(dir)) {
                                 rc.move(dir);
                                 //System.out.println("CHASING:" + dir);
@@ -219,8 +248,8 @@ public class Politician {
                         Direction nextDir = Pathfinding.basicBug(rc,
                                 rc.getLocation().directionTo(robot.getLocation()).opposite());
 
-                        nextDir = Pathfinding.smartNav(rc,
-                                rc.getLocation().directionTo(robot.getLocation()).opposite());
+                        //nextDir = Pathfinding.smartNav(rc,
+                        // rc.getLocation().directionTo(robot.getLocation()).opposite());
 
                         if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
@@ -322,6 +351,7 @@ public class Politician {
     }
 
     public static void takeoverLogic(RobotController rc) throws GameActionException {
+        System.out.println("HERE");
         Team ally = rc.getTeam();
         Team enemy = rc.getTeam().opponent();
         double empowerFactor = rc.getEmpowerFactor(rc.getTeam(), 0);
@@ -347,7 +377,7 @@ public class Politician {
                         }
                         //}
                         Direction nextDir = Pathfinding.basicBug(rc, robot.getLocation());
-                        nextDir = Pathfinding.smartNav(rc, robot.getLocation());
+                        //nextDir = Pathfinding.smartNav(rc, robot.getLocation());
                         if (rc.canMove(nextDir)) {
                             rc.move(nextDir);
                         }
@@ -399,9 +429,16 @@ public class Politician {
         //System.out.println(role);
         int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
         MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
+
+        if (rc.canSenseLocation(target)) {
+            RobotInfo robot = rc.senseRobotAtLocation(target);
+            if (robot != null && robot.getTeam().equals(rc.getTeam())) {
+                role = "";
+            }
+        }
         //System.out.println(target.toString());
         Direction nextDir = Pathfinding.basicBug(rc, target);
-        nextDir = Pathfinding.smartNav(rc, target);
+        //nextDir = Pathfinding.smartNav(rc, target);
         if (rc.canMove(nextDir)) {
             rc.move(nextDir);
         }
@@ -441,7 +478,7 @@ public class Politician {
                         && robot.getLocation().isWithinDistanceSquared(rc.getLocation(), 25)
                         && (thisConviction - 10) * currentEmpowerFactor > robot.getConviction()) {
                     Direction dir = Pathfinding.basicBug(rc, robot.getLocation());
-                    dir = Pathfinding.smartNav(rc, robot.getLocation());
+                    //dir = Pathfinding.smartNav(rc, robot.getLocation());
                     if (rc.canMove(dir)) {
                         rc.move(dir);
                     }

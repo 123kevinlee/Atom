@@ -203,7 +203,7 @@ public class Pathfinding {
                 double pass = rc.sensePassability(beginning.add(dir));
                 pass *= 100;
                 if (Math.ceil(pass) > Math.ceil(highestPass)) {
-                    System.out.println(dir);
+                    //System.out.println(dir);
                     fastestDir = dir;
                     highestPass = pass;
                 }
@@ -214,16 +214,16 @@ public class Pathfinding {
             tries++;
         }
 
-        if (tries > 2 || antiTries > 0) {
+        if (tries > 6 || antiTries > 0) {
             tries = 0;
             antiTries += 1;
-            if (antiTries > 2) {
+            if (antiTries > 4) {
                 antiTries = 0;
             }
             return basicBug(rc, target);
         }
-        //return fastestDir;
-        return basicBug(rc, target);
+        return fastestDir;
+        //return basicBug(rc, target);
     }
 
     public static Direction smartNav(RobotController rc, Direction targetDir) throws GameActionException {
@@ -261,16 +261,16 @@ public class Pathfinding {
             tries++;
         }
 
-        if (tries > 2 || antiTries > 0) {
+        if (tries > 6 || antiTries > 0) {
             tries = 0;
             antiTries += 1;
-            if (antiTries > 2) {
+            if (antiTries > 4) {
                 antiTries = 0;
             }
             return basicBug(rc, target);
         }
-        //return fastestDir;
-        return basicBug(rc, target);
+        return fastestDir;
+        //return basicBug(rc, target);
     }
 
     public static int[] getDistance(int[] ref, int[] target) {
