@@ -40,9 +40,10 @@ public class EnlightenmentCenter {
     public static Map<Direction, MapLocation> enemyCoords = new TreeMap<Direction, MapLocation>();
     public static LinkedHashSet<MapLocation> possibleEnemyBases = new LinkedHashSet<MapLocation>();
     public static LinkedHashMap<MapLocation, Integer> neutralBases = new LinkedHashMap<MapLocation, Integer>();
-    public static LinkedHashSet<MapLocation> alliedBases = new LinkedHashSet<MapLocation>();
+    //public static LinkedHashSet<MapLocation> alliedBases = new LinkedHashSet<MapLocation>();
 
     public static void run(RobotController rc) throws GameActionException {
+
         if (scoutIds.size() > 0) {
             listenForScoutMessages(rc);
         }
@@ -59,7 +60,7 @@ public class EnlightenmentCenter {
             for (RobotInfo robot : robots) {
                 if (robot.getTeam().equals(enemy) && robot.getType().equals(RobotType.ENLIGHTENMENT_CENTER)) {
                     enemyBases.add(robot.getLocation());
-                    spawnTakeoverPolitician(rc, 150, enemyBases.iterator().next(), false);
+                    spawnTakeoverPolitician(rc, 150, enemyBases.iterator().next());
                 } else if (robot.getTeam().equals(Team.NEUTRAL)) {
                     neutralBases.put(robot.getLocation(), robot.getInfluence());
                 } else if (robot.getTeam().equals(enemy) && robot.getType().equals(RobotType.MUCKRAKER)) {
@@ -104,29 +105,10 @@ public class EnlightenmentCenter {
         Object[] neutralBaseKeys = neutralBases.keySet().toArray();
         for (Object key : neutralBaseKeys) {
             if (enemyMucks == 0 && neutralBases.get(key) != 1000 && rc.getInfluence() - neutralBases.get(key) > 25) {
-                spawnTakeoverPolitician(rc, neutralBases.get(key) + 12, (MapLocation) key, true);
+                spawnTakeoverPolitician(rc, neutralBases.get(key) + 12, (MapLocation) key);
                 System.out.println("BIG BOI SPAWNED FOR" + key.toString());
             } else if (neutralBases.get(key) != 1000) {
                 save = true;
-            }
-        }
-        for (int i = 0; i < triedAttackingEnemy.size(); i++) {
-            if (triedAttackingEnemy.get(i) == false && rc.getInfluence() > 500) {
-                //Iterator<MapLocation> it = enemyBases.iterator();
-                int n = i;
-                int index = 0;
-                MapLocation target = null;
-                for (MapLocation element : enemyBases) {
-                    if (index == n) {
-                        target = element;
-                    }
-                    index++;
-                }
-                if (target != null) {
-                    spawnTakeoverPolitician(rc, 400, target, false);
-                    System.out.println("BIG BOI SPAWNED FOR" + target.toString());
-                    triedAttackingEnemy.set(i, true);
-                }
             }
         }
 
@@ -242,7 +224,7 @@ public class EnlightenmentCenter {
         }
     }
 
-    public static void spawnTakeoverPolitician(RobotController rc, int influence, MapLocation target, boolean isNeutral)
+    public static void spawnTakeoverPolitician(RobotController rc, int influence, MapLocation target)
             throws GameActionException {
         Direction spawnDir = openSpawnLocation(rc, RobotType.POLITICIAN);
         if (rc.canBuildRobot(RobotType.POLITICIAN, spawnDir, influence)) {
@@ -253,9 +235,7 @@ public class EnlightenmentCenter {
                 rc.setFlag(flag);
             }
             rc.buildRobot(RobotType.POLITICIAN, spawnDir, influence);
-            if (isNeutral) {
-                neutralBases.put(target, 1000);
-            }
+            neutralBases.put(target, 1000);
         }
     }
 
@@ -502,7 +482,7 @@ public class EnlightenmentCenter {
                         int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
                         MapLocation enemyBase = Data.originPoint.translate(distance[0], distance[1]);
                         enemyBases.add(enemyBase);
-                        triedAttackingEnemy.add(false);
+                        //triedAttackingEnemy.add(false);
                         //System.out.println("ENEMY BASES:" + enemyBases.toString());
                     }
                     //recieved neutral base coords
@@ -512,12 +492,12 @@ public class EnlightenmentCenter {
                         scoutLastMessage.put((int) key, msg);
                     }
                     //recieved ally base coords
-                    else if (msg.charAt(0) == '6') {
-                        int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
-                        MapLocation alliedBase = Data.originPoint.translate(distance[0], distance[1]);
-                        alliedBases.add(alliedBase);
-                        //System.out.println("ALLY BASES:" + alliedBases.toString());
-                    }
+                    // else if (msg.charAt(0) == '6') {
+                    //     int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
+                    //     MapLocation alliedBase = Data.originPoint.translate(distance[0], distance[1]);
+                    //     alliedBases.add(alliedBase);
+                    //     //System.out.println("ALLY BASES:" + alliedBases.toString());
+                    // }
                     //recieved warning
                     else if (msg.charAt(0) == '7') {
                         int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);

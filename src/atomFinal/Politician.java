@@ -297,9 +297,9 @@ public class Politician {
                 int[] coords = Communication.relCoordDecoder(role);
                 int[] distance = Pathfinding.getDistance(Data.relOriginPoint, coords);
                 MapLocation target = Data.originPoint.translate(distance[0], distance[1]);
-                System.out.println(target.toString());
+                //System.out.println(target.toString());
                 Direction toTarget = thisLocation.directionTo(target);
-                System.out.println(toTarget);
+                //System.out.println(toTarget);
                 Direction[] possibles = new Direction[5];
                 possibles[0] = toTarget;
                 possibles[1] = toTarget.rotateLeft();
@@ -351,7 +351,7 @@ public class Politician {
     }
 
     public static void takeoverLogic(RobotController rc) throws GameActionException {
-        System.out.println("HERE");
+        //System.out.println("HERE");
         Team ally = rc.getTeam();
         Team enemy = rc.getTeam().opponent();
         double empowerFactor = rc.getEmpowerFactor(rc.getTeam(), 0);
