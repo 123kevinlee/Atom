@@ -452,7 +452,10 @@ public class EnlightenmentCenter {
                 }
             }
         } else {
-            if (rc.canBid(1)) {
+            if (rc.canBid(lastInfluenceGain)) {
+                rc.bid(lastInfluenceGain);
+                baseVote = lastInfluenceGain;
+            } else if (rc.canBid(1)) {
                 rc.bid(1);
             }
         }
