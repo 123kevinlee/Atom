@@ -7,11 +7,11 @@ This is my submission for MIT's Battlecode 2021 competition under the team name 
 The `Compiled Robots/` folder contains every version I compiled and submitted to the scrimmage servers/tournaments.
   
 The `src/` folder contains my raw code for the different robots (including a few old robots as test bots) I made throughout the competition.
-- My final submission was `atomFinalHS`, submitted to the high school tournament
+- My final submission was `atomFinalHS`, submitted to the high school tournament and placed 9th.
 
 Other notable submissions include:
 - `atomAlphaV14`, my muckrush bot which was submitted to the first sprint tourney and peaked at 11th place on the scrimmage rankings.
-- `atomFinalQualifier`, my submission to the US Qualifiers Tournament
+- `atomFinalQualifier`, my submission to the US Qualifiers Tournament and placed 26th.
    
 The rest of the files are used to run the client and were provided by the competition developers.
 
