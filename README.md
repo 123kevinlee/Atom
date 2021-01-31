@@ -21,6 +21,6 @@ The rest of the files are used to run the client and were provided by the compet
     Runs a game with the settings in gradle.properties
 - `./gradlew update`
     Update to the newest version! Run every so often
-    - `./gradlew --stop`
+- `./gradlew --stop`
     Kills running daemons
 
