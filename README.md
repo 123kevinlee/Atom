@@ -1,30 +1,19 @@
-# Battlecode 2021 Scaffold
+# Battlecode 2021 
 
-This is the Battlecode 2021 scaffold, containing an `examplefuncsplayer`. Read https://2021.battlecode.org/getting-started!
+This is my submission for MIT's Battlecode 2021 competition under the team name of `Atom`.
 
 ### Project Structure
 
-- `README.md`
-    This file.
-- `build.gradle`
-    The Gradle build file used to build and run players.
-- `src/`
-    Player source code.
-- `test/`
-    Player test code.
-- `client/`
-    Contains the client. The proper executable can be found in this folder (don't move this!)
-- `build/`
-    Contains compiled player code and other artifacts of the build process. Can be safely ignored.
-- `matches/`
-    The output folder for match files.
-- `maps/`
-    The default folder for custom maps.
-- `gradlew`, `gradlew.bat`
-    The Unix (OS X/Linux) and Windows versions, respectively, of the Gradle wrapper. These are nifty scripts that you can execute in a terminal to run the Gradle build tasks of this project. If you aren't planning to do command line development, these can be safely ignored.
-- `gradle/`
-    Contains files used by the Gradle wrapper scripts. Can be safely ignored.
+The `Compiled Robots/` folder contains every version I compiled and submitted to the scrimmage servers/tournaments.
+  
+The `src/` folder contains my raw code for the different robots (including a few old robots as test bots) I made throughout the competition.
+- My final submission was `atomFinalHS`, submitted to the high school tournament
 
+Other notable submissions include:
+- `atomAlphaV14`, my muckrush bot which was submitted to the first sprint tourney and peaked at 11th place on the scrimmage rankings.
+- `atomFinalQualifier`, my submission to the US Qualifiers Tournament
+   
+The rest of the files are used to run the client and were provided by the competition developers.
 
 ### Useful Commands
 
