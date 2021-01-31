@@ -1,6 +1,6 @@
 # Battlecode 2021 
 
-This is my submission for MIT's Battlecode 2021 competition under the team name of `Atom`.
+This is my submission for MIT's Battlecode 2021 competition under the team `Atom`.
 
 ### Project Structure
 
